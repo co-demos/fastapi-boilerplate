@@ -1,3 +1,14 @@
+A simple boilerplate of an APi server, powered by **[Fastapi][fastapi]** framework. This work is mainly the result of following [tutorials][fastapi-tuto] from official documentation, and this [youtube playlist][MK-Fast].
+
+The current goal is to make it work with the following features : 
+- **PostgreSQL** database for storing large volumes of data and keep track of relations ;
+- **Oauth2** authentication for securiity and users management ;
+- **SocketIO** endpoints for collaborative work ;
+- Static files server
+
+
+---
+
 # INSTALLATION
 
 <!-- ## 1/ Virtual env python -->
@@ -98,3 +109,8 @@ alembic upgrade head
 ```
 
 cf : https://alexvanzyl.com/posts/2020-05-24-fastapi-simple-application-structure-from-scratch-part-2/
+
+
+[fastapi]:https://fastapi.tiangolo.com/
+[fastapi-tuto]:https://fastapi.tiangolo.com/tutorial/
+[MK-fast]:https://www.youtube.com/watch?v=HnJEiTx0feE&list=PL_9Bx_sxJkROtrlVTsGiuu-NtO_BmUfkB
