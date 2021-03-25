@@ -1,11 +1,14 @@
-A simple boilerplate of an APi server, powered by **[FastAPI][fastapi]** framework. This work is mainly the result of studying [tutorials][fastapi-tuto] from official documentation, the [amazing fullstack FastAPI-PostgreSQL boilerplate][fastapi-boilerplate], and this [youtube playlist][MK-Fast].
+A simple boilerplate of an API server, powered by **[FastAPI][fastapi]** framework with a **PostgreSQL** database. 
 
-The current goal is to make it work with the following features : 
-- **PostgreSQL** database for storing large volumes of data and keep track of relations ;
-- **Oauth2** authentication for securiity and users management ;
-- **SocketIO** endpoints for collaborative work ;
-- Static files server
+This work in progress is mainly the result of studying [tutorials][fastapi-tuto] from official documentation, the [amazing fullstack FastAPI-PostgreSQL boilerplate][fastapi-boilerplate], and this [youtube playlist][MK-Fast].
 
+The current goal is to make it work with the following generic features, so it could be adapted for later purposes :
+
+- [ ] **PostgreSQL** database for storing large volumes of data,  keep track of relations, and make queries in a simple way (easier than MongoDB at least)  ;
+- [ ] **Oauth2** authentication for securiity and users management ;
+- [ ] **SocketIO** endpoints for collaborative work ;
+- [ ] **Static files** server for avatars and so...
+- [ ] **Dockerisation**, for dev purposes...
 
 ---
 
