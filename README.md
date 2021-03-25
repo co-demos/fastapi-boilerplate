@@ -1,4 +1,4 @@
-A simple boilerplate of an APi server, powered by **[Fastapi][fastapi]** framework. This work is mainly the result of following [tutorials][fastapi-tuto] from official documentation, and this [youtube playlist][MK-Fast].
+A simple boilerplate of an APi server, powered by **[FastAPI][fastapi]** framework. This work is mainly the result of studying [tutorials][fastapi-tuto] from official documentation, the [amazing fullstack FastAPI-PostgreSQL boilerplate][fastapi-boilerplate], and this [youtube playlist][MK-Fast].
 
 The current goal is to make it work with the following features : 
 - **PostgreSQL** database for storing large volumes of data and keep track of relations ;
@@ -113,4 +113,5 @@ cf : https://alexvanzyl.com/posts/2020-05-24-fastapi-simple-application-structur
 
 [fastapi]:https://fastapi.tiangolo.com/
 [fastapi-tuto]:https://fastapi.tiangolo.com/tutorial/
+[fastapi-boilerplate]:https://github.com/tiangolo/full-stack-fastapi-postgresql
 [MK-fast]:https://www.youtube.com/watch?v=HnJEiTx0feE&list=PL_9Bx_sxJkROtrlVTsGiuu-NtO_BmUfkB
