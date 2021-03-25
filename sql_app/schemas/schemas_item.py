@@ -17,3 +17,8 @@ class Item(ItemBase):
 
   class Config:
     orm_mode = True
+
+
+class ItemList(Item):
+  owner_id: int
+  # owner: User

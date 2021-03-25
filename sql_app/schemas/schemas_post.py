@@ -21,6 +21,7 @@ class Post(PostBase):
   class Config:
     orm_mode = True
 
+
 class PostList(Post):
   owner_id: int
   # owner: User

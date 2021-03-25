@@ -14,10 +14,8 @@ def get_items(db: Session, skip: int = 0, limit: int = 100):
   return db.query(models_item.Item).offset(skip).limit(limit).all()
 
 
-def create_user_item(db: Session, item: schemas_item.ItemCreate):
-# def create_user_item(db: Session, item: schemas_item.ItemCreate, user_id: int):
-  # db_item = models_item.Item(**item.dict(), owner_id=user_id)
-  db_item = models_item.Item(**item.dict())
+def create_user_item(db: Session, item: schemas_item.ItemCreate, user_id: int):
+  db_item = models_item.Item(**item.dict(), owner_id=user_id)
   db.add(db_item)
   db.commit()
   db.refresh(db_item)
