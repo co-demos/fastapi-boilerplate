@@ -12,6 +12,13 @@ from ..models import models_user
 from ..schemas import schemas_user, schemas_token
 
 
+###  USER FIELDS ABLE TO BE UPDATED
+
+FIELDS_UPDATE = [
+  "name", "surname",
+  "description",
+  "avatar_url"
+]
 
 ###  USER FUNCTIONS
 
@@ -20,8 +27,22 @@ def get_user_by_id(db: Session, user_id: int):
 
 
 def get_user_by_email(db: Session, email: str):
-  print("get_user_by_email > email : ", email)
+  # print("get_user_by_email > email : ", email)
   return db.query(models_user.User).filter(models_user.User.email == email).first()
+
+
+def update_user_field_in_db(db: Session, user_id: int, field: str, value: any):
+  print("update_user_in_db > field : ", field)
+  print("update_user_in_db > value : ", value)
+  if field not in FIELDS_UPDATE:
+    raise HTTPException(status_code=400, detail="Field not open to update")
+  db_user = get_user_by_id(db=db, user_id=user_id)
+  print("update_user_in_db > db_user : ", db_user)
+  setattr(db_user, field, value)
+  db.add(db_user)
+  db.commit()
+  db.refresh(db_user)
+  return db_user
 
 
 ### AUTH FUNCTIONS

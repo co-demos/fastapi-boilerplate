@@ -9,3 +9,5 @@
 # dev db
 sql_app.db
 
+# media files
+media/*

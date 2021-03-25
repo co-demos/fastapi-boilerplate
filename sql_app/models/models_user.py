@@ -22,7 +22,7 @@ class User(Base):
   description = Column(String)
 
   # image avatar
-  avatar = Column(URLType)
+  avatar_url = Column(URLType)
 
   hashed_password = Column(String)
 

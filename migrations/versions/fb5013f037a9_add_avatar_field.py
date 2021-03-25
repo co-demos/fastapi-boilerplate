@@ -1,8 +1,8 @@
-"""add post table + migration
+"""add avatar field
 
-Revision ID: 472f42a14cea
+Revision ID: fb5013f037a9
 Revises: 
-Create Date: 2021-03-25 17:15:22.188444
+Create Date: 2021-03-25 21:15:23.772581
 
 """
 from alembic import op
@@ -11,7 +11,7 @@ import sqlalchemy_utils
 
 
 # revision identifiers, used by Alembic.
-revision = '472f42a14cea'
+revision = 'fb5013f037a9'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -26,6 +26,7 @@ def upgrade():
     sa.Column('surname', sa.String(), nullable=True),
     sa.Column('username', sa.String(), nullable=True),
     sa.Column('description', sa.String(), nullable=True),
+    sa.Column('avatar_url', sqlalchemy_utils.types.url.URLType(), nullable=True),
     sa.Column('hashed_password', sa.String(), nullable=True),
     sa.Column('created_date', sa.DateTime(), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=True),

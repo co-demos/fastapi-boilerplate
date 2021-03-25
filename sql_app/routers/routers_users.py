@@ -2,7 +2,7 @@ import os
 
 from . import ( List, Session, APIRouter, Depends, 
   HTTPException, status, timedelta,
-  File, UploadFile,
+  File, UploadFile, shutil,
   get_db,
   schemas_user, crud_users, models_user,
   schemas_item, crud_items,
@@ -17,7 +17,7 @@ from ..security.jwt import ( JWTError, jwt, CryptContext,
 )
 
 from ..crud.crud_users import ( authenticate_user, create_access_token,
-  create_user_in_db,
+  create_user_in_db, update_user_field_in_db,
   get_user_by_email, get_user_by_id, get_current_user, get_current_active_user,
   get_users
 )
@@ -74,6 +74,20 @@ async def read_users_me(
   return current_user
 
 
+# @router.put("/me/update_avatar", response_model=schemas_user.User)
+@router.patch("/me/update_avatar", response_model=schemas_user.User)
+async def update_user_avatar(
+  uploaded_file: UploadFile = File(...),
+  current_user: models_user.User = Depends(get_current_active_user),
+  db: Session = Depends(get_db)
+):
+  user_id = current_user.id
+  with open ("media/"+uploaded_file.filename, "wb+") as file_object:
+    shutil.copyfileobj(uploaded_file.file, file_object)
+  field = "avatar_url"
+  url = str("media/"+uploaded_file.filename)
+  return update_user_field_in_db(db=db, user_id=user_id, field=field, value=url)
+
 @router.get("/me/items/")
 async def read_own_items(
   current_user: models_user.User = Depends(get_current_active_user),
@@ -82,6 +96,7 @@ async def read_own_items(
   user_id = current_user.id
   user_items = crud_items.get_user_items(db=db, user_id=user_id)
   return [{"items": user_items, "owner": current_user.email, "owner_id": current_user.id}]
+
 
 @router.get("/me/posts/")
 async def read_own_posts(
@@ -96,7 +111,10 @@ async def read_own_posts(
 ### AUTH ROUTES
 
 @router.post("/token", response_model=schemas_token.Token)
-async def login_for_access_token(db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()):
+async def login_for_access_token(
+  db: Session = Depends(get_db),
+  form_data: OAuth2PasswordRequestForm = Depends()
+  ):
   print("login_for_access_token > form_data : ", form_data)
   user = authenticate_user(db, form_data.username, form_data.password)
   if not user:
