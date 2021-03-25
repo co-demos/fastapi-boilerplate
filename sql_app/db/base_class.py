@@ -3,7 +3,12 @@ from typing import Any
 import inflect   
 
 # from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta, declarative_base, as_declarative, declared_attr    
+from sqlalchemy.ext.declarative import ( 
+  declarative_base, 
+  DeclarativeMeta, 
+  as_declarative, 
+  declared_attr 
+)
 
 p = inflect.engine()    
 

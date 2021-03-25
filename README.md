@@ -8,6 +8,7 @@ The current goal is to make it work with the following generic features, so it c
 - [ ] **Oauth2** authentication for securiity and users management ;
 - [ ] **SocketIO** endpoints for collaborative work ;
 - [ ] **Static files** server for avatars and so...
+- [x] **CORS** implementation, to serve as SAAS API server ;
 - [ ] **Dockerisation**, for dev purposes...
 
 ---

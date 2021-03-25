@@ -1,7 +1,8 @@
-from . import Boolean, Column, ForeignKey, Integer, String, \
-  EmailType, URLType, \
-  relationship, \
+from . import ( Boolean, Column, Integer, String,
+  EmailType, URLType,
+  ForeignKey, relationship,
   DateTime, datetime
+)
 
 from ..db.base_class import Base
 
@@ -27,4 +28,5 @@ class User(Base):
   is_active = Column(Boolean, default=True)
   is_superuser = Column(Boolean, default=False)
 
-  # items = relationship("Item", back_populates="owner")
+  items = relationship("Item", back_populates="owner")
+  posts = relationship("Post", back_populates="owner")

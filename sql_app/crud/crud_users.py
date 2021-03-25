@@ -1,26 +1,16 @@
 from . import os, Session, datetime, timedelta, Optional, HTTPException, Security, status, Depends
 
 from ..db.database import get_db
-from ..security.jwt import JWTError, jwt, CryptContext, \
-  OAuth2PasswordBearer, OAuth2PasswordRequestForm, SecurityScopes, \
-  SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, \
+from ..security.jwt import ( 
+  JWTError, jwt, CryptContext,
+  OAuth2PasswordBearer, OAuth2PasswordRequestForm, SecurityScopes,
+  SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES,
   pwd_context, oauth2_scheme
+)
 
 from ..models import models_user
 from ..schemas import schemas_user, schemas_token
 
-
-
-fake_users_db = {
-  "johndoe": {
-    "username": "johndoe",
-    "name": "John",
-    "surname": "Doe",
-    "email": "johndoe@example.com",
-    "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",
-    "is_active": False,
-  }
-}
 
 
 ###  USER FUNCTIONS

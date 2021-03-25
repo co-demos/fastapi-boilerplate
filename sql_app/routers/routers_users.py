@@ -1,19 +1,24 @@
 import os
 
-from . import List, Session, APIRouter, Depends, HTTPException, status, timedelta, \
-  get_db, \
-  schemas_user, crud_users, models_user, \
-  schemas_item, crud_items, \
+from . import ( List, Session, APIRouter, Depends, 
+  HTTPException, status, timedelta,
+  get_db,
+  schemas_user, crud_users, models_user,
+  schemas_item, crud_items,
   schemas_token
+)
 
-from ..security.jwt import JWTError, jwt, CryptContext, OAuth2PasswordBearer, OAuth2PasswordRequestForm, \
-  SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, pwd_context, oauth2_scheme
+from ..security.jwt import ( JWTError, jwt, CryptContext, 
+  OAuth2PasswordBearer, OAuth2PasswordRequestForm,
+  SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, 
+  pwd_context, oauth2_scheme
+)
 
-from ..crud.crud_users import fake_users_db, \
-  authenticate_user, create_access_token, \
-  create_user_in_db, \
-  get_user_by_email, get_user_by_id, get_current_user, get_current_active_user, \
+from ..crud.crud_users import ( authenticate_user, create_access_token,
+  create_user_in_db,
+  get_user_by_email, get_user_by_id, get_current_user, get_current_active_user,
   get_users
+)
 
 router = APIRouter()
 
@@ -21,7 +26,10 @@ router = APIRouter()
 ### USER FUNCTIONS
 
 @router.post("/", response_model=schemas_user.User)
-def create_user(user: schemas_user.UserCreate, db: Session = Depends(get_db)):
+def create_user(
+  user: schemas_user.UserCreate, 
+  db: Session = Depends(get_db)
+  ):
   db_user = get_user_by_email(db, email=user.email)
   if db_user:
     raise HTTPException(status_code=400, detail="Email already registered")
@@ -29,7 +37,10 @@ def create_user(user: schemas_user.UserCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=List[schemas_user.User])
-def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def read_users(
+  skip: int = 0, limit: int = 100, 
+  db: Session = Depends(get_db)
+  ):
   users = get_users(db, skip=skip, limit=limit)
   return users
 

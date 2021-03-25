@@ -6,6 +6,10 @@ from ..schemas import schemas_item
 
 ### ITEM FUNCTIONS
 
+def get_item(db: Session, id: int):
+  return db.query(models_item.Post).filter(models_item.Item.id == id).first()
+
+
 def get_items(db: Session, skip: int = 0, limit: int = 100):
   return db.query(models_item.Item).offset(skip).limit(limit).all()
 

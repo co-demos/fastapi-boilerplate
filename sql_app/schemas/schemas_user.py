@@ -1,5 +1,11 @@
-from . import List, Optional, BaseModel, EmailStr, \
+from . import ( List, Optional, BaseModel, EmailStr,
   datetime
+)
+
+
+from .schemas_item import Item
+from .schemas_post import Post
+
 
 ### USER
 
@@ -27,7 +33,8 @@ class UserInDBBase(UserInfos):
 class User(UserInDBBase):
   is_active: Optional[bool] = None
   is_superuser: bool = False
-  # items: List[Item] = []
+  items: List[Item] = []
+  posts: List[Post] = []
 
 class UserInDB(User):
   hashed_password: str
