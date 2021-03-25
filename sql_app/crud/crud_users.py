@@ -104,6 +104,7 @@ def authenticate_user(db: Session, user_email: str, password: str):
     return False
   return user
 
+
 def create_user_in_db(db: Session, user: schemas_user.UserCreate):
   # print("create_user_in_db > user : ", user)
   db_user = models_user.User(email=user.email, username=user.username, hashed_password=get_password_hash(user.password))

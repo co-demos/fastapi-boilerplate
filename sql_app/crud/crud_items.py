@@ -20,3 +20,7 @@ def create_user_item(db: Session, item: schemas_item.ItemCreate, user_id: int):
   db.commit()
   db.refresh(db_item)
   return db_item
+
+
+def get_user_items(db: Session, user_id: int):
+  return db.query(models_item.Item).filter(models_item.Item.owner_id == user_id).all()

@@ -21,6 +21,9 @@ class User(Base):
   username = Column(String)
   description = Column(String)
 
+  # image avatar
+  avatar = Column(URLType)
+
   hashed_password = Column(String)
 
   created_date = Column(DateTime, default=datetime.datetime.utcnow)
