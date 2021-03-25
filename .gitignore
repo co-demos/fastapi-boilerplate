@@ -1,0 +1,10 @@
+# env  files
+.env
+**/*.env
+
+# cache
+**/__pycache__
+
+# dev db
+sql_app.db
+

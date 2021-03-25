@@ -1,0 +1,26 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+python-dotenv = "*"
+fastapi = "*"
+uvicorn = "*"
+psycopg2 = "*"
+python-multipart = "*"
+python-jose = {extras = ["cryptography"], version = "*"}
+passlib = {extras = ["bcrypt"], version = "*"}
+aiofiles = "*"
+fastapi-socketio = "*"
+alembic = "*"
+requests = "*"
+sqlalchemy-utils = "*"
+sqlalchemy = "<1.4.0"
+pydantic = {extras = ["email"], version = "*"}
+inflect = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"
