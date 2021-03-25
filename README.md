@@ -67,7 +67,7 @@ or
 pipenv install --three python-dotenv fastapi uvicorn sqlalchemy  sqlalchemy-utils pydantic[email] psycopg2 alembic python-multipart python-jose[cryptography] passlib[bcrypt] aiofiles fastapi-socketio requests inflect
 ```
 
-## 4/ Create secure random key
+## Create secure random key
 
 ```shell
 openssl rand -hex 32
