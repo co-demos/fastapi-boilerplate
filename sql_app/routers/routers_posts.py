@@ -1,4 +1,5 @@
-from . import ( List, Session, APIRouter, Depends,
+from . import ( List, Query,
+  Session, APIRouter, Depends,
   HTTPException, status,
   get_db,
   schemas_post, crud_posts,
@@ -54,12 +55,20 @@ def read_post(
 def create_comment_for_user_and_post(
   post_id: int,
   comment: schemas_comment.CommentCreate, 
+  comment_type: schemas_comment.CommentType = schemas_comment.CommentType.proposal,
   db: Session = Depends(get_db),
   current_user: models_user.User = Depends(get_current_user)
   ):
   user_id = current_user.id
   user_email = current_user.email
-  return crud_comments.create_user_comment_on_post(db=db, comment=comment, user_id=user_id, user_email=user_email, post_id=post_id)
+  return crud_comments.create_user_comment_on_post(
+    db=db,
+    comment=comment,
+    comment_type=comment_type,
+    user_id=user_id,
+    user_email=user_email,
+    post_id=post_id
+  )
 
 
 @router.get(

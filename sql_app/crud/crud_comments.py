@@ -20,11 +20,12 @@ def get_comments(db: Session, skip: int = 0, limit: int = 100):
 def create_user_comment_on_post(
   db: Session,
   comment: schemas_comment.CommentCreate,
+  comment_type: schemas_comment.CommentType,
   user_id: int,
   user_email: str,
   post_id: id
   ):
-  db_comment = models_comment.Comment(**comment.dict(), owner_id=user_id, email=user_email, post_id=post_id)
+  db_comment = models_comment.Comment(**comment.dict(), comment_type=comment_type, owner_id=user_id, email=user_email, post_id=post_id)
   db.add(db_comment)
   db.commit()
   db.refresh(db_comment)

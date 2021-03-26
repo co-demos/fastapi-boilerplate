@@ -13,6 +13,7 @@ class Comment(Base):
   
   email = Column(EmailType)
   body = Column(String)
+  comment_type = Column(String)
 
   created_date = Column(DateTime, default=datetime.datetime.utcnow)
   is_active = Column(Boolean, default=True)
