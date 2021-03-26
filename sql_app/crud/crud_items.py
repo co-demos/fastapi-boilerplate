@@ -1,4 +1,7 @@
-from . import os, Session, datetime, timedelta, Optional
+from . import (os, Session, datetime, timedelta,
+  Optional,
+  HTTPException, status
+)
 
 from ..models import models_item
 from ..schemas import schemas_item
@@ -7,7 +10,7 @@ from ..schemas import schemas_item
 ### ITEM FUNCTIONS
 
 def get_item(db: Session, id: int):
-  return db.query(models_item.Post).filter(models_item.Item.id == id).first()
+  return db.query(models_item.Item).filter(models_item.Item.id == id).first()
 
 
 def get_items(db: Session, skip: int = 0, limit: int = 100):

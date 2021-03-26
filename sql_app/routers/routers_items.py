@@ -1,4 +1,5 @@
 from . import ( List, Session, APIRouter, Depends,
+  HTTPException, status,
   get_db,
   schemas_item, crud_items,
   models_user
@@ -8,9 +9,11 @@ from ..crud.crud_users import (
   get_current_user,
 )
 
+
 router = APIRouter()
 
-@router.post("/", response_model=schemas_item.Item)
+
+@router.post("/", response_model=schemas_item.Item, status_code=status.HTTP_201_CREATED)
 def create_item_for_user(
   item: schemas_item.ItemCreate,
   db: Session = Depends(get_db),
@@ -23,6 +26,8 @@ def create_item_for_user(
 @router.get("/{item_id}", response_model=schemas_item.ItemList)
 def read_item(item_id: int , db: Session = Depends(get_db)):
   item = crud_items.get_item(db, id=item_id)
+  if item is None:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="item not found")
   return item
 
 

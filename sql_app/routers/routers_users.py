@@ -1,7 +1,8 @@
 import os
 
 from . import ( List, Session, APIRouter, Depends, 
-  HTTPException, status, timedelta,
+  HTTPException, status, 
+  timedelta,
   File, UploadFile, shutil,
   get_db,
   schemas_user, crud_users, models_user,
@@ -27,7 +28,7 @@ router = APIRouter()
 
 ### USER FUNCTIONS
 
-@router.post("/", response_model=schemas_user.User)
+@router.post("/", response_model=schemas_user.User, status_code=status.HTTP_201_CREATED)
 def create_user(
   user: schemas_user.UserCreate, 
   db: Session = Depends(get_db)
@@ -54,16 +55,16 @@ def read_user(
   ):
   db_user = get_user_by_id(db, user_id=user_id)
   if db_user is None:
-    raise HTTPException(status_code=404, detail="User not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
   return db_user
 
 
-@router.post("/{user_id}/items/", response_model=schemas_item.Item)
+@router.post("/{user_id}/items/", response_model=schemas_item.Item, status_code=status.HTTP_201_CREATED)
 def create_item_for_user(
   user_id: int, 
   item: schemas_item.ItemCreate,
   db: Session = Depends(get_db)
-):
+  ):
   return crud_items.create_user_item(db=db, item=item, user_id=user_id)
 
 
@@ -74,19 +75,19 @@ async def read_users_me(
   return current_user
 
 
-# @router.put("/me/update_avatar", response_model=schemas_user.User)
 @router.patch("/me/update_avatar", response_model=schemas_user.User)
 async def update_user_avatar(
   uploaded_file: UploadFile = File(...),
   current_user: models_user.User = Depends(get_current_active_user),
   db: Session = Depends(get_db)
-):
+  ):
   user_id = current_user.id
   with open ("media/"+uploaded_file.filename, "wb+") as file_object:
     shutil.copyfileobj(uploaded_file.file, file_object)
   field = "avatar_url"
   url = str("media/"+uploaded_file.filename)
   return update_user_field_in_db(db=db, user_id=user_id, field=field, value=url)
+
 
 @router.get("/me/items/")
 async def read_own_items(
@@ -110,7 +111,7 @@ async def read_own_posts(
 
 ### AUTH ROUTES
 
-@router.post("/token", response_model=schemas_token.Token)
+@router.post("/token", response_model=schemas_token.Token, status_code=status.HTTP_201_CREATED)
 async def login_for_access_token(
   db: Session = Depends(get_db),
   form_data: OAuth2PasswordRequestForm = Depends()

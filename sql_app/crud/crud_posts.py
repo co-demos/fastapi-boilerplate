@@ -1,4 +1,7 @@
-from . import os, Session, datetime, timedelta, Optional
+from . import (os, Session, datetime, timedelta,
+  Optional,
+  HTTPException, status
+)
 
 from ..models import models_post
 from ..schemas import schemas_post

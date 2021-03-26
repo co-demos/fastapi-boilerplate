@@ -1,4 +1,8 @@
-from . import os, Session, datetime, timedelta, Optional, HTTPException, Security, status, Depends
+from . import (os, Session, datetime, timedelta, 
+  Optional, 
+  HTTPException, status, Security, 
+  Depends
+)
 
 from ..db.database import get_db
 from ..security.jwt import ( 
@@ -15,7 +19,8 @@ from ..schemas import schemas_user, schemas_token
 ###  USER FIELDS ABLE TO BE UPDATED
 
 FIELDS_UPDATE = [
-  "name", "surname",
+  "name",
+  "surname",
   "description",
   "avatar_url"
 ]
@@ -105,7 +110,7 @@ async def get_current_active_user(
   ):
   print("get_current_active_user > current_user : ", current_user)
   if not current_user.is_active:
-    raise HTTPException(status_code=400, detail="Inactive user")
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user")
   return current_user
 
 

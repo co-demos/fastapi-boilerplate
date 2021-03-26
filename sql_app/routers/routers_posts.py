@@ -1,4 +1,5 @@
 from . import ( List, Session, APIRouter, Depends,
+  HTTPException, status,
   get_db,
   schemas_post, crud_posts,
   models_user
@@ -11,7 +12,8 @@ from ..crud.crud_users import (
 
 router = APIRouter()
 
-@router.post("/", response_model=schemas_post.Post)
+
+@router.post("/", response_model=schemas_post.Post, status_code=status.HTTP_201_CREATED)
 def create_post_for_user(
   post: schemas_post.PostCreate, 
   db: Session = Depends(get_db),
@@ -24,6 +26,8 @@ def create_post_for_user(
 @router.get("/{post_id}", response_model=schemas_post.PostList)
 def read_post(post_id: int , db: Session = Depends(get_db)):
   post = crud_posts.get_post(db, id=post_id)
+  if post is None:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
   return post
 
 
