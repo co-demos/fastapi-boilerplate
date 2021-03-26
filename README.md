@@ -151,6 +151,35 @@ We use [Pytest][pytest] for testing (see also [FastAPI pytest tutorial][fastapi-
 pytest
 ```
 
+---
+
+## Datamodel (goal)
+
+The current goal - better to say the endgame - is to be able to agnostically manage datasets in the same way Baserow or airtable can. Such datamodel should include the following concepts : 
+
+```
+.
+├── <user related>
+│   ├── users (usual infos as email, pwd, ... + groups + owned or shared datasets/)
+│   ├── groups (groups of users + auth levels attributions)
+│   ├── comments (similar to a notification)
+│   └── invitations
+│
+├── <data related>
+│   ├── workspaces (collection of tables/datasets)
+│   ├── tables (dataset's metadata)
+│   ├── table_data (as many sql tables there is of created datasets)
+│   ├── fields (field descriptions that could be used in several datasets)
+│   └── schemas (collections of fields)
+
+```
+
+The following illustration gives an idea of the endgame datamodel we aim for....
+
+![datamodel-v1](./docs/statics/datamodel-v1.svg)
+
+---
+
 [CRUD_def]:https://en.wikipedia.org/wiki/Create,_read,_update_and_delete
 [fastapi]:https://fastapi.tiangolo.com/
 [fastapi-tuto]:https://fastapi.tiangolo.com/tutorial/
