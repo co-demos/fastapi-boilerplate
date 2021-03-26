@@ -2,7 +2,7 @@ from . import ( List, Optional, BaseModel,
   datetime
 )
 
-# from .schemas_user import User
+from .schemas_comment import Comment
 
 class PostBase(BaseModel):
   title: str
@@ -17,6 +17,7 @@ class Post(PostBase):
   id: int
   created_date: Optional[datetime.datetime]
   owner_id: int
+  post_comments: List[Comment] = []
 
   class Config:
     orm_mode = True
