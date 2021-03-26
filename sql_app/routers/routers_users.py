@@ -5,9 +5,10 @@ from . import ( List, Session, APIRouter, Depends,
   timedelta,
   File, UploadFile, shutil,
   get_db,
-  schemas_user, crud_users, models_user,
   schemas_item, crud_items,
   schemas_post, crud_posts,
+  schemas_comment, crud_comments,
+  schemas_user, crud_users, models_user,
   schemas_token
 )
 
@@ -22,6 +23,7 @@ from ..crud.crud_users import ( authenticate_user, create_access_token,
   get_user_by_email, get_user_by_id, get_current_user, get_current_active_user,
   get_users
 )
+
 
 router = APIRouter()
 
@@ -153,6 +155,20 @@ async def read_own_posts(
   user_id = current_user.id
   user_posts = crud_posts.get_user_posts(db=db, user_id=user_id)
   return [{"posts": user_posts, "owner": current_user.email, "owner_id": current_user.id}]
+
+
+@router.get(
+  "/me/comments/",
+  summary="Get user's own comments",
+  description="Get connected/authenticated user's own comments",
+)
+async def read_own_comments(
+  current_user: models_user.User = Depends(get_current_active_user),
+  db: Session = Depends(get_db)
+  ):
+  user_id = current_user.id
+  user_comments = crud_comments.get_user_comments(db=db, user_id=user_id)
+  return [{"comments": user_comments, "owner": current_user.email, "owner_id": current_user.id}]
 
 
 ### AUTH ROUTES
