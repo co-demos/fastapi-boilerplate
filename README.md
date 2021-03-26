@@ -4,6 +4,8 @@ A simple boilerplate of an API server for [CRUD][CRUD_def] operations, powered b
 
 This work in progress is mainly the result of studying [tutorials][fastapi-tuto] from official documentation, the [amazing fullstack FastAPI-PostgreSQL boilerplate][fastapi-boilerplate], and this [tutorial playlist by MK Fast][MK-Fast] on youtube.
 
+## Features
+
 The current goal is to make it work with the following generic features, so it could be adapted for later purposes :
 
 - [ ] **PostgreSQL** database for storing large volumes of data,  keeping track of relations, and making queries in a simple way (easier than MongoDB at least)  ;
@@ -14,6 +16,10 @@ The current goal is to make it work with the following generic features, so it c
 - [ ] **Testing** wiith [Pytest][pytest], for development ;
 - [x] **CORS** implementation, to serve as SAAS API server ;
 - [ ] **Dockerisation**, for dev purposes...
+
+## Datamodel & documentation
+
+Check more about the endgame [here](docs/README.md).
 
 ---
 
