@@ -1,6 +1,8 @@
-A simple boilerplate of an API server, powered by **[FastAPI][fastapi]** framework with a **PostgreSQL** database. 
+# DMS BACKEND PROJECT
 
-This work in progress is mainly the result of studying [tutorials][fastapi-tuto] from official documentation, the [amazing fullstack FastAPI-PostgreSQL boilerplate][fastapi-boilerplate], and this [youtube playlist][MK-Fast].
+A simple boilerplate of an API server for [CRUD][CRUD_def] operations, powered by **[FastAPI][fastapi]** framework with a **PostgreSQL** database. 
+
+This work in progress is mainly the result of studying [tutorials][fastapi-tuto] from official documentation, the [amazing fullstack FastAPI-PostgreSQL boilerplate][fastapi-boilerplate], and this [tutorial playlist by MK Fast][MK-Fast] on youtube.
 
 The current goal is to make it work with the following generic features, so it could be adapted for later purposes :
 
@@ -117,7 +119,7 @@ alembic upgrade head
 
 cf : https://alexvanzyl.com/posts/2020-05-24-fastapi-simple-application-structure-from-scratch-part-2/
 
-
+[CRUD_def]:https://en.wikipedia.org/wiki/Create,_read,_update_and_delete
 [fastapi]:https://fastapi.tiangolo.com/
 [fastapi-tuto]:https://fastapi.tiangolo.com/tutorial/
 [fastapi-boilerplate]:https://github.com/tiangolo/full-stack-fastapi-postgresql
