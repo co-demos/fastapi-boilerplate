@@ -35,7 +35,10 @@ def update_user_field_in_db(db: Session, user_id: int, field: str, value: any):
   print("update_user_in_db > field : ", field)
   print("update_user_in_db > value : ", value)
   if field not in FIELDS_UPDATE:
-    raise HTTPException(status_code=400, detail="Field not open to update")
+    raise HTTPException(
+      status_code=status.HTTP_401_UNAUTHORIZED,
+      detail="Field not open to update"
+    )
   db_user = get_user_by_id(db=db, user_id=user_id)
   print("update_user_in_db > db_user : ", db_user)
   setattr(db_user, field, value)
@@ -69,8 +72,7 @@ async def get_current_user(security_scopes: SecurityScopes, db: Session = Depend
   credentials_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
     detail="Could not validate credentials",
-    # headers={"WWW-Authenticate": "Bearer"},
-    headers={"WWW-Authenticate": authenticate_value},
+    headers={"WWW-Authenticate": authenticate_value}
   )
   try:
     payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])

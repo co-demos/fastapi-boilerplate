@@ -4,9 +4,10 @@ This work in progress is mainly the result of studying [tutorials][fastapi-tuto]
 
 The current goal is to make it work with the following generic features, so it could be adapted for later purposes :
 
-- [ ] **PostgreSQL** database for storing large volumes of data,  keep track of relations, and make queries in a simple way (easier than MongoDB at least)  ;
+- [ ] **PostgreSQL** database for storing large volumes of data,  keeping track of relations, and making queries in a simple way (easier than MongoDB at least)  ;
 - [ ] **Oauth2** authentication for securiity and users management ;
 - [ ] **SocketIO** endpoints for collaborative work ;
+- [ ] **Email notifications** for password changes ;
 - [ ] **Static files** server for avatars and so...
 - [x] **CORS** implementation, to serve as SAAS API server ;
 - [ ] **Dockerisation**, for dev purposes...
@@ -23,7 +24,7 @@ virtualenv env
 source venv/bin/activate
 ``` -->
 
-## Install postgresql
+## Dependencies - PostgreSQL
 
 - ubuntu
 
@@ -47,30 +48,15 @@ brew services start postgresql
 <!-- ln -sfv /usr/local/opt/postgresql/*.plist ~/Library/LaunchAgents -->
 
 
-## Dependencies
+## Dependencies - Python
 
-<!-- ```shell
-python -m pip install --upgrade pip
-pip install python-dotenv
-pip install fastapi
-pip install uvicorn
-pip install sqlalchemy
-pip install psycopg2
-pip install python-multipart
-pip install python-jose[cryptography]
-pip install passlib[bcrypt]
-pip install aiofiles
-pip install fastapi-socketio
-```
-
-or 
-
+<!--
 ```shell
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ``` -->
 
-We use `pipenv` as package manager :
+We use [`pipenv`][pipenv] as package manager :
 
 ```shell
 pipenv install --system --dev
@@ -82,13 +68,30 @@ or
 pipenv install --three python-dotenv fastapi uvicorn sqlalchemy  sqlalchemy-utils pydantic[email] psycopg2 alembic python-multipart python-jose[cryptography] passlib[bcrypt] aiofiles fastapi-socketio requests inflect shutil
 ```
 
-## Create secure random key
+To reead more on [why pipenv](https://realpython.com/pipenv-guide/)...
+
+## Environment variables
+
+### The .env file
+
+The environment variables must be stored in the `.env` file at the root of the repo. It contains confidential values such as : postgres url with password, email smtp values, JWT secret keys... 
+
+A template - `example.env` - is present at the root. You can copy-paste it and customize it wiith your own values.
+
+```shell
+# from repo root
+cp example.env .env
+```
+
+### Create secure random keys
+
+To generatte random secret keys you  can use `openssl` command line or - if you feel lazy - [password generator website](https://passwordsgenerator.net/).
 
 ```shell
 openssl rand -hex 32
 ```
 
-and copy-paste the key as `JWT_SECRET_KEY` in `.env` file
+... and copy-paste the key as `JWT_SECRET_KEY` in `.env` file
 
 
 ---
@@ -119,3 +122,5 @@ cf : https://alexvanzyl.com/posts/2020-05-24-fastapi-simple-application-structur
 [fastapi-tuto]:https://fastapi.tiangolo.com/tutorial/
 [fastapi-boilerplate]:https://github.com/tiangolo/full-stack-fastapi-postgresql
 [MK-fast]:https://www.youtube.com/watch?v=HnJEiTx0feE&list=PL_9Bx_sxJkROtrlVTsGiuu-NtO_BmUfkB
+
+[pipenv]:https://pipenv-fork.readthedocs.io/en/latest/basics.html
