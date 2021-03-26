@@ -1,4 +1,4 @@
-# DMS BACKEND PROJECT
+# DATA PATCH - DMS BACKEND PROJECT
 
 A simple boilerplate of an API server for [CRUD][CRUD_def] operations, powered by **[FastAPI][fastapi]** framework with a **PostgreSQL** database. 
 
@@ -8,8 +8,8 @@ This work in progress is mainly the result of studying [tutorials][fastapi-tuto]
 
 The current goal is to make it work with the following generic features, so it could be adapted for later purposes :
 
-- [ ] **PostgreSQL** database for storing large volumes of data,  keeping track of relations, and making queries in a simple way (easier than MongoDB at least)  ;
-- [ ] **Oauth2** authentication for securiity and users management ;
+- [x] **PostgreSQL** database for storing large volumes of data,  keeping track of relations, and making queries in a simple way (easier than MongoDB at least)  ;
+- [x] **Oauth2** authentication for securiity and users management ;
 - [ ] **SocketIO** endpoints for collaborative work ;
 - [ ] **Email notifications** for password changes ;
 - [ ] **Static files** server for avatars and so...
@@ -69,6 +69,8 @@ pip install -r requirements.txt
 We use [`pipenv`][pipenv] as package manager :
 
 ```shell
+pipenv install --dev
+# or
 pipenv install --system --dev
 ```
 
@@ -78,7 +80,13 @@ or
 pipenv install --three python-dotenv fastapi uvicorn sqlalchemy  sqlalchemy-utils pydantic[email] psycopg2 alembic python-multipart python-jose[cryptography] passlib[bcrypt] aiofiles fastapi-socketio requests inflect shutil pytest
 ```
 
-To reead more on [why pipenv](https://realpython.com/pipenv-guide/)...
+To print requirements :
+```shell
+pipenv shelll
+pipenv run pip freeze
+```
+
+To reead more on [why pipenv](https://realpython.com/pipenv-guide/) or [here in french](https://sametmax.com/pipenv-solution-moderne-pour-remplacer-pip-et-virtualenv/)...
 
 ---
 

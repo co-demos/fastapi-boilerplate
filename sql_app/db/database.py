@@ -7,15 +7,18 @@ from sqlalchemy.orm import sessionmaker
 
 
 SQLALCHEMY_DATABASE_TYPE = os.getenv("SQL_TYPE")
+print("database.py > SQLALCHEMY_DATABASE_TYPE :", SQLALCHEMY_DATABASE_TYPE)
 
 if SQLALCHEMY_DATABASE_TYPE == "sql_lite" :
   SQLALCHEMY_DATABASE_URL = os.getenv("SQLITE_DB_URL")
+  print("database.py > sql_lite > SQLALCHEMY_DATABASE_URL :", SQLALCHEMY_DATABASE_URL)
   engine = create_engine(SQLALCHEMY_DATABASE_URL,
     connect_args={"check_same_thread": False} # only use with sqlite
   )
 
 elif SQLALCHEMY_DATABASE_TYPE == "postgre_sql" :
   SQLALCHEMY_DATABASE_URL = os.getenv("SQL_DB_URL")
+  print("database.py > postgre_sql > SQLALCHEMY_DATABASE_URL :", SQLALCHEMY_DATABASE_URL)
   engine = create_engine(SQLALCHEMY_DATABASE_URL,
     pool_size=3, max_overflow=0 # only use with postgresql
   )
