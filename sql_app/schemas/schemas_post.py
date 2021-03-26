@@ -11,7 +11,6 @@ class PostBase(BaseModel):
 
 class PostCreate(PostBase):
   pass
-  # owner_id: int
 
 
 class Post(PostBase):

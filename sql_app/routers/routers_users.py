@@ -41,7 +41,8 @@ def create_user(
   """
   Create an user with basic information:
 
-  - **email**: only the email is necessary
+  - **email**: the email is necessary and is used as primary identifier
+  - **username**: choose a pseudo
   - **password**: a password chosen by the user
   """
   db_user = get_user_by_email(db, email=user.email)

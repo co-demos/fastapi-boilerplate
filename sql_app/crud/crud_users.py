@@ -36,7 +36,12 @@ def get_user_by_email(db: Session, email: str):
   return db.query(models_user.User).filter(models_user.User.email == email).first()
 
 
-def update_user_field_in_db(db: Session, user_id: int, field: str, value: any):
+def update_user_field_in_db(
+  db: Session,
+  user_id: int,
+  field: str,
+  value: any
+  ):
   print("update_user_in_db > field : ", field)
   print("update_user_in_db > value : ", value)
   if field not in FIELDS_UPDATE:
@@ -55,7 +60,10 @@ def update_user_field_in_db(db: Session, user_id: int, field: str, value: any):
 
 ### AUTH FUNCTIONS
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+def create_access_token(
+  data: dict,
+  expires_delta: Optional[timedelta] = None
+  ):
   to_encode = data.copy()
   print("create_access_token > to_encode : ", to_encode)
   if expires_delta:
@@ -67,7 +75,11 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
   return encoded_jwt
 
 
-async def get_current_user(security_scopes: SecurityScopes, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+async def get_current_user(
+  security_scopes: SecurityScopes,
+  db: Session = Depends(get_db),
+  token: str = Depends(oauth2_scheme)
+  ):
   print("get_current_user > security_scopes.scopes : ", security_scopes.scopes)
   if security_scopes.scopes:
     authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
@@ -106,7 +118,8 @@ async def get_current_user(security_scopes: SecurityScopes, db: Session = Depend
 
 async def get_current_active_user(
   #current_user: schemas_user.User = Depends(get_current_user)
-  current_user: schemas_user.User = Security(get_current_user, scopes=["me"])
+  current_user: schemas_user.User = Security(get_current_user,
+  scopes=["me"])
   ):
   print("get_current_active_user > current_user : ", current_user)
   if not current_user.is_active:

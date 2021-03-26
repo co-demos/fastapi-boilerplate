@@ -17,8 +17,14 @@ def get_comments(db: Session, skip: int = 0, limit: int = 100):
   return db.query(models_comment.Comment).offset(skip).limit(limit).all()
 
 
-def create_user_comment_on_post(db: Session, comment: schemas_comment.CommentCreate, user_id: int, post_id: id):
-  db_comment = models_comment.Comment(**comment.dict(), owner_id=user_id, post_id=post_id)
+def create_user_comment_on_post(
+  db: Session,
+  comment: schemas_comment.CommentCreate,
+  user_id: int,
+  user_email: str,
+  post_id: id
+  ):
+  db_comment = models_comment.Comment(**comment.dict(), owner_id=user_id, email=user_email, post_id=post_id)
   db.add(db_comment)
   db.commit()
   db.refresh(db_comment)
