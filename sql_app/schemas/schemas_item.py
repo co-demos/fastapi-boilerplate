@@ -20,5 +20,5 @@ class Item(ItemBase):
 
 
 class ItemList(Item):
-  owner_id: int
   # owner: User
+  pass

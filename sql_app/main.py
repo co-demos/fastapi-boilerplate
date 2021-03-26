@@ -16,23 +16,18 @@ from fastapi_socketio import SocketManager
 from .crud import crud_items, crud_users
 
 from .models import (
-  models_user,
   models_item,
   models_post,
-  models_comment
-)
-from .schemas import (
-  schemas_user,
-  schemas_item,
-  schemas_post
+  models_comment,
+  models_user,
 )
 
 from .db.database import engine
 
-models_user.Base.metadata.create_all(bind=engine)
 models_item.Base.metadata.create_all(bind=engine)
 models_post.Base.metadata.create_all(bind=engine)
 models_comment.Base.metadata.create_all(bind=engine)
+models_user.Base.metadata.create_all(bind=engine)
 
 from .routers import (
   routers_items,
@@ -75,14 +70,14 @@ app.add_middleware(
 ### ROUTERS
 
 app.include_router(
-  routers_items.router,
-  prefix="/items",
-  tags=["items"]
-)
-app.include_router(
   routers_users.router,
   prefix="/users",
   tags=["users"]
+)
+app.include_router(
+  routers_items.router,
+  prefix="/items",
+  tags=["items"]
 )
 app.include_router(
   routers_posts.router,

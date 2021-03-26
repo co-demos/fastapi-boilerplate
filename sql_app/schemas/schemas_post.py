@@ -17,11 +17,12 @@ class PostCreate(PostBase):
 class Post(PostBase):
   id: int
   created_date: Optional[datetime.datetime]
+  owner_id: int
 
   class Config:
     orm_mode = True
 
 
 class PostList(Post):
-  owner_id: int
+  pass
   # owner: User

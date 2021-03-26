@@ -18,11 +18,12 @@ class Comment(CommentBase):
   id: int
   created_date: Optional[datetime.datetime]
   post_id: int
+  owner_id: int
 
   class Config:
     orm_mode = True
 
 
 class CommentList(Comment):
-  owner_id: int
+  pass
   # owner: User

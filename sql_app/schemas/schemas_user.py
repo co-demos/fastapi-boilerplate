@@ -6,6 +6,7 @@ from . import ( List, Optional, BaseModel,
 
 from .schemas_item import Item
 from .schemas_post import Post
+from .schemas_comment import Comment
 
 
 ### USER
@@ -41,6 +42,8 @@ class User(UserInDBBase):
   is_superuser: bool = False
   items: List[Item] = []
   posts: List[Post] = []
+  comments: List[Comment] = []
+
 
 class UserInDB(User):
   hashed_password: str
