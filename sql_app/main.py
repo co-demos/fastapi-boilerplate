@@ -18,7 +18,8 @@ from .crud import crud_items, crud_users
 from .models import (
   models_user,
   models_item,
-  models_post
+  models_post,
+  models_comment
 )
 from .schemas import (
   schemas_user,
@@ -31,11 +32,13 @@ from .db.database import engine
 models_user.Base.metadata.create_all(bind=engine)
 models_item.Base.metadata.create_all(bind=engine)
 models_post.Base.metadata.create_all(bind=engine)
+models_comment.Base.metadata.create_all(bind=engine)
 
 from .routers import (
   routers_items,
   routers_users,
-  routers_posts
+  routers_posts,
+  routers_comments
 )
 
 app = FastAPI(
@@ -85,6 +88,11 @@ app.include_router(
   routers_posts.router,
   prefix="/posts",
   tags=["posts"]
+)
+app.include_router(
+  routers_comments.router,
+  prefix="/comments",
+  tags=["comments"]
 )
 
 

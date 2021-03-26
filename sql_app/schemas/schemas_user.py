@@ -1,4 +1,5 @@
-from . import ( List, Optional, BaseModel, EmailStr,
+from . import ( List, Optional, BaseModel,
+  EmailStr,
   datetime
 )
 

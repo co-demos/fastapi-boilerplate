@@ -11,4 +11,8 @@ tags_metadata = [
     "name": "posts",
     "description": "Manage posts.",
   },
+  {
+    "name": "comments",
+    "description": "Manage comments.",
+  },
 ]

@@ -33,3 +33,4 @@ class User(Base):
 
   items = relationship("Item", back_populates="owner")
   posts = relationship("Post", back_populates="owner")
+  comments = relationship("Comments", back_populates="owner")

@@ -28,18 +28,34 @@ router = APIRouter()
 
 ### USER FUNCTIONS
 
-@router.post("/", response_model=schemas_user.User, status_code=status.HTTP_201_CREATED)
+@router.post(
+  "/",
+  summary="Create an user",
+  response_model=schemas_user.User,
+  status_code=status.HTTP_201_CREATED
+)
 def create_user(
   user: schemas_user.UserCreate, 
   db: Session = Depends(get_db)
   ):
+  """
+  Create an user with basic information:
+
+  - **email**: only the email is necessary
+  - **password**: a password chosen by the user
+  """
   db_user = get_user_by_email(db, email=user.email)
   if db_user:
     raise HTTPException(status_code=400, detail="Email already registered")
   return create_user_in_db(db=db, user=user)
 
 
-@router.get("/", response_model=List[schemas_user.User])
+@router.get(
+  "/",
+  summary="Get a list of users",
+  description="Get a list of all users given a limit",
+  response_model=List[schemas_user.User]
+)
 def read_users(
   skip: int = 0, limit: int = 100, 
   db: Session = Depends(get_db)
@@ -48,7 +64,12 @@ def read_users(
   return users
 
 
-@router.get("/{user_id}", response_model=schemas_user.User)
+@router.get(
+  "/{user_id}",
+  summary="Get an user",
+  description="Get infos of one user",
+  response_model=schemas_user.User
+)
 def read_user(
   user_id: int,
   db: Session = Depends(get_db)
@@ -59,7 +80,13 @@ def read_user(
   return db_user
 
 
-@router.post("/{user_id}/items/", response_model=schemas_item.Item, status_code=status.HTTP_201_CREATED)
+@router.post(
+  "/{user_id}/items/",
+  summary="Create an item for any user",
+  description="Create an item to another user given the user id",
+  response_model=schemas_item.Item,
+  status_code=status.HTTP_201_CREATED
+)
 def create_item_for_user(
   user_id: int, 
   item: schemas_item.ItemCreate,
@@ -68,14 +95,24 @@ def create_item_for_user(
   return crud_items.create_user_item(db=db, item=item, user_id=user_id)
 
 
-@router.get("/me/", response_model=schemas_user.User)
+@router.get(
+  "/me/",
+  summary="Get infos for connected/authenticated user",
+  description="Get infos for connected/authenticated user",
+  response_model=schemas_user.User
+)
 async def read_users_me(
   current_user: models_user.User = Depends(get_current_active_user)
   ):
   return current_user
 
 
-@router.patch("/me/update_avatar", response_model=schemas_user.User)
+@router.patch(
+  "/me/update_avatar",
+  summary="Update user avatar",
+  description="Update user avatar by uploading a file",
+  response_model=schemas_user.User
+)
 async def update_user_avatar(
   uploaded_file: UploadFile = File(...),
   current_user: models_user.User = Depends(get_current_active_user),
@@ -89,7 +126,11 @@ async def update_user_avatar(
   return update_user_field_in_db(db=db, user_id=user_id, field=field, value=url)
 
 
-@router.get("/me/items/")
+@router.get(
+  "/me/items/",
+  summary="Get user's own items",
+  description="Get connected/authenticated user's own items",
+)
 async def read_own_items(
   current_user: models_user.User = Depends(get_current_active_user),
   db: Session = Depends(get_db)
@@ -99,7 +140,11 @@ async def read_own_items(
   return [{"items": user_items, "owner": current_user.email, "owner_id": current_user.id}]
 
 
-@router.get("/me/posts/")
+@router.get(
+  "/me/posts/",
+  summary="Get user's own posts",
+  description="Get connected/authenticated user's own posts",
+)
 async def read_own_posts(
   current_user: models_user.User = Depends(get_current_active_user),
   db: Session = Depends(get_db)
@@ -111,12 +156,24 @@ async def read_own_posts(
 
 ### AUTH ROUTES
 
-@router.post("/token", response_model=schemas_token.Token, status_code=status.HTTP_201_CREATED)
+@router.post(
+  "/token",
+  summary="Create an access token for login",
+  response_model=schemas_token.Token,
+  status_code=status.HTTP_201_CREATED
+)
 async def login_for_access_token(
   db: Session = Depends(get_db),
   form_data: OAuth2PasswordRequestForm = Depends()
   ):
-  print("login_for_access_token > form_data : ", form_data)
+  """
+  Create an access token according to Oauth2 specs.
+  The request must be sent by form data. This form must have the following fields : 
+
+  - **userrname**: here enter the user's email
+  - **password**: the user's password
+  """
+  # print("login_for_access_token > form_data : ", form_data)
   user = authenticate_user(db, form_data.username, form_data.password)
   if not user:
     raise HTTPException(
@@ -125,9 +182,9 @@ async def login_for_access_token(
       headers={"WWW-Authenticate": "Bearer"},
     )
   access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-  print("login_for_access_token > user : ", user)
-  print("login_for_access_token > form_data.scopes : ", form_data.scopes)
-  print("login_for_access_token > form_data.username : ", form_data.username)
+  # print("login_for_access_token > user : ", user)
+  # print("login_for_access_token > form_data.scopes : ", form_data.scopes)
+  # print("login_for_access_token > form_data.username : ", form_data.username)
   access_token = create_access_token(
     # data={"sub": user.username},
     data={"sub": user.email, "scopes": form_data.scopes},
