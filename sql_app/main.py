@@ -4,6 +4,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(BASE_DIR, "../.env"))
 load_dotenv(verbose=True)
 
+from .config.tags_metadata import tags_metadata
+
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -36,7 +38,12 @@ from .routers import (
   routers_posts
 )
 
-app = FastAPI()
+app = FastAPI(
+  title=os.getenv("APP_TITLE"),
+  description=os.getenv("APP_DESCRIPTION"),
+  version=os.getenv("APP_VERSION"),
+  openapi_tags=tags_metadata
+)
 
 
 ### SOCKET IO

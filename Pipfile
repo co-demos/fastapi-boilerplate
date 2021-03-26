@@ -19,6 +19,7 @@ sqlalchemy-utils = "*"
 sqlalchemy = "<1.4.0"
 pydantic = {extras = ["email"], version = "*"}
 inflect = "*"
+pytest = "*"
 
 [dev-packages]
 

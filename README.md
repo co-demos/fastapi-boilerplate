@@ -11,6 +11,7 @@ The current goal is to make it work with the following generic features, so it c
 - [ ] **SocketIO** endpoints for collaborative work ;
 - [ ] **Email notifications** for password changes ;
 - [ ] **Static files** server for avatars and so...
+- [ ] **Testing** wiith [Pytest][pytest], for development ;
 - [x] **CORS** implementation, to serve as SAAS API server ;
 - [ ] **Dockerisation**, for dev purposes...
 
@@ -49,6 +50,7 @@ brew services start postgresql
 ```
 <!-- ln -sfv /usr/local/opt/postgresql/*.plist ~/Library/LaunchAgents -->
 
+---
 
 ## Dependencies - Python
 
@@ -67,10 +69,12 @@ pipenv install --system --dev
 or
 
 ```shell
-pipenv install --three python-dotenv fastapi uvicorn sqlalchemy  sqlalchemy-utils pydantic[email] psycopg2 alembic python-multipart python-jose[cryptography] passlib[bcrypt] aiofiles fastapi-socketio requests inflect shutil
+pipenv install --three python-dotenv fastapi uvicorn sqlalchemy  sqlalchemy-utils pydantic[email] psycopg2 alembic python-multipart python-jose[cryptography] passlib[bcrypt] aiofiles fastapi-socketio requests inflect shutil pytest
 ```
 
 To reead more on [why pipenv](https://realpython.com/pipenv-guide/)...
+
+---
 
 ## Environment variables
 
@@ -102,6 +106,8 @@ openssl rand -hex 32
 
 ## Run app
 
+Once you had cloned the repo and installed dependencies (postgreSQL server, and python packages with pipenv) you can run the app with thiis command line :
+
 ```shell
 alembic upgrade head && pipenv run uvicorn sql_app.main:app --reload
 ```
@@ -112,12 +118,24 @@ then open the  following url in your browser `http://localhost:8000/docs`
 
 ## Migrations 
 
+We use [Alembic][alembic] for migrations.
+
 ```shell
 alembic revision --autogenerate -m "<Migration message>"
 alembic upgrade head
 ```
 
 cf : https://alexvanzyl.com/posts/2020-05-24-fastapi-simple-application-structure-from-scratch-part-2/
+
+---
+
+## Tests
+
+We use [Pytest][pytest] for testing (see also [FastAPI pytest tutorial][fastapi-tests]).
+
+```shell
+pytest
+```
 
 [CRUD_def]:https://en.wikipedia.org/wiki/Create,_read,_update_and_delete
 [fastapi]:https://fastapi.tiangolo.com/
@@ -126,3 +144,6 @@ cf : https://alexvanzyl.com/posts/2020-05-24-fastapi-simple-application-structur
 [MK-fast]:https://www.youtube.com/watch?v=HnJEiTx0feE&list=PL_9Bx_sxJkROtrlVTsGiuu-NtO_BmUfkB
 
 [pipenv]:https://pipenv-fork.readthedocs.io/en/latest/basics.html
+[alembic]:https://alembic.sqlalchemy.org/en/latest/
+[pytest]:https://docs.pytest.org/en/stable/
+[fastapi-tests]:https://fastapi.tiangolo.com/tutorial/testing/
