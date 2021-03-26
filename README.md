@@ -128,6 +128,10 @@ alembic upgrade head && pipenv run uvicorn sql_app.main:app --reload
 
 then open the  following url in your browser `http://localhost:8000/docs`
 
+You should have somethiing like this :
+
+![screenshot-api-1](./docs/statics/screenshot-api-1.png)
+
 ---
 
 ## Migrations 
