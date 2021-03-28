@@ -105,7 +105,7 @@ cp example.env .env
 
 ### Create secure random keys
 
-To generatte random secret keys you  can use `openssl` command line or - if you feel lazy - [password generator website](https://passwordsgenerator.net/).
+To generate random secret keys you  can use `openssl` command line or - if you feel lazy - [password generator website](https://passwordsgenerator.net/).
 
 ```shell
 openssl rand -hex 32
@@ -161,11 +161,18 @@ pytest
 
 ## Roadmap
 
-To know more about this project endgame you can check the [roadmap][roadmap-beta]
+To know more about this project's endgame you can check the [roadmap][roadmap-beta].
+
+## Versions log
+
+- **current version** : v.0.1 beta
+
+- **V.0 (boilerplate)** :
+  - 2021/03/28 - v.0.1 beta : basic setups / unfinished setups
 
 ## Datamodel (goal)
 
-The current goal - better to say the endgame - is to be able to agnostically manage datasets in the same way Baserow or airtable can. Such datamodel should include the following concepts : 
+The current goal is to be able to agnostically manage datasets in the same way [Baserow][baserow] or [Airtable][airtable] can. Such datamodel should include the following concepts : 
 
 ```md
 .
@@ -202,3 +209,6 @@ The following illustration gives an idea of the endgame datamodel we aim for....
 [fastapi-tests]:https://fastapi.tiangolo.com/tutorial/testing/
 
 [roadmap-beta]:https://github.com/co-demos/fastapi-boilerplate/projects/1
+
+[baserow]:https://baserow.io/
+[airtable]:https://airtable.com/
