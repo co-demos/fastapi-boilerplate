@@ -157,11 +157,17 @@ pytest
 
 ---
 
+# Endgame
+
+## Roadmap
+
+To know more about this project endgame you can check the [roadmap][rodamap-beta]
+
 ## Datamodel (goal)
 
 The current goal - better to say the endgame - is to be able to agnostically manage datasets in the same way Baserow or airtable can. Such datamodel should include the following concepts : 
 
-```
+```md
 .
 ├── <user related>
 │   ├── users (usual infos as email, pwd, ... + groups + owned or shared datasets/)
@@ -172,7 +178,7 @@ The current goal - better to say the endgame - is to be able to agnostically man
 ├── <data related>
 │   ├── workspaces (collection of tables/datasets)
 │   ├── tables (dataset's metadata)
-│   ├── table_data (as many sql tables there is of created datasets)
+│   ├── table_data (exploded dataset data, perhaps as many sql tables there is of created datasets)
 │   ├── fields (field descriptions that could be used in several datasets)
 │   └── schemas (collections of fields)
 
@@ -194,3 +200,5 @@ The following illustration gives an idea of the endgame datamodel we aim for....
 [alembic]:https://alembic.sqlalchemy.org/en/latest/
 [pytest]:https://docs.pytest.org/en/stable/
 [fastapi-tests]:https://fastapi.tiangolo.com/tutorial/testing/
+
+[roadmap-beta]:https://github.com/co-demos/fastapi-boilerplate/projects/1
