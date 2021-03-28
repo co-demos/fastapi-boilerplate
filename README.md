@@ -161,7 +161,7 @@ pytest
 
 ## Roadmap
 
-To know more about this project endgame you can check the [roadmap][rodamap-beta]
+To know more about this project endgame you can check the [roadmap][roadmap-beta]
 
 ## Datamodel (goal)
 
