@@ -104,4 +104,4 @@ class Settings(BaseSettings):
 
 settings = Settings()
 print("config.py > settings : ...")
-pp.pprint(settings.dict())
+# pp.pprint(settings.dict())

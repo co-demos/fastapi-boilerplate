@@ -77,7 +77,10 @@ def read_user(
   ):
   db_user = get_user_by_id(db, user_id=user_id)
   if db_user is None:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    raise HTTPException(
+      status_code=status.HTTP_404_NOT_FOUND,
+      detail="User not found"
+    )
   return db_user
 
 
@@ -91,10 +94,11 @@ def delete_user(
   db: Session = Depends(get_db),
   current_user: models_user.User = Depends(get_current_active_user)
   ):
-  user_deleted_id = crud_users.delete_user_in_db(db=db, user_id=user_id, current_user=current_user)
+  user_deleted = crud_users.delete_user_in_db(db=db, user_id=user_id, current_user=current_user)
   return {
     "status" : True,
-    "user_deleted_id": user_deleted_id,
+    "user_deleted_id": user_deleted.id,
+    "user_deleted_email": user_deleted.email,
     "message": "This user has been deleted successfully." 
   }
 

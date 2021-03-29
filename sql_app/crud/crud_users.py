@@ -1,4 +1,4 @@
-from . import (settings, Session, datetime, timedelta, 
+from . import (pp, settings, Session, datetime, timedelta, 
   Optional, 
   HTTPException, status, Security, 
   Depends
@@ -28,7 +28,8 @@ FIELDS_UPDATE = [
 ###  USER FUNCTIONS
 
 def get_user_by_id(db: Session, user_id: int):
-  return db.query(models_user.User).filter(models_user.User.id == user_id).first()
+  # return db.query(models_user.User).filter(models_user.User.id == user_id).first()
+  return db.query(models_user.User).get(user_id)
 
 
 def get_user_by_email(db: Session, email: str):
@@ -68,12 +69,28 @@ def delete_user_in_db(
   # return user_id
 
   ### check if user has the right to delete another user or itself
+  print("delete_user_in_db > current_user :")
+  pp.pprint(current_user.__dict__)
 
-  ### delete
-  obj = db.query(models_user.User).get(user_id)
-  db.delete(obj)
-  db.commit()
-  return obj
+  if current_user.is_superuser or current_user.id == user_id:
+    obj = db.query(models_user.User).get(user_id)
+    print("delete_user_in_db > obj :")
+    if not obj:
+      raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="User not found"
+      )
+    pp.pprint(obj.__dict__)
+    db.delete(obj)
+    db.commit()
+    return obj
+  else:
+    raise HTTPException(
+      status_code=status.HTTP_401_UNAUTHORIZED,
+      detail="You are not authorized to  delete user other than yourself"
+    )
+
+
 
 
 ### AUTH FUNCTIONS
