@@ -58,7 +58,11 @@ def update_user_field_in_db(
   return db_user
 
 
-def delete_user_in_db(db: Session, user_id: int, ):
+def delete_user_in_db(
+  db: Session,
+  user_id: int, 
+  current_user: schemas_user.User, 
+  ):
   # query = users.delete().where(users.c.id == user.id)
   # await database.execute(query)
   # return user_id
