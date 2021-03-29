@@ -83,6 +83,23 @@ def read_user(
   return db_user
 
 
+@router.delete(
+  "/{user_id}",
+  summary="Delete an user",
+  description="Detete infos of one user",
+)
+def delete_user(
+  user_id: int, 
+  db: Session = Depends(get_db),
+  current_user: models_user.User = Depends(get_current_active_user)
+  ):
+  user_deleted_id = crud_users.delete_user_in_db(db=db, user_id=user_id, current_user=current_user)
+  return {
+    "status" : True,
+    "user_deleted_id": user_deleted_id,
+    "message": "This user has been deleted successfully." 
+  }
+
 @router.post(
   "/{user_id}/items/",
   summary="Create an item for any user",
@@ -97,6 +114,9 @@ def create_item_for_user(
   ):
   return crud_items.create_user_item(db=db, item=item, user_id=user_id)
 
+
+
+### ME ROUTES
 
 @router.get(
   "/me/",

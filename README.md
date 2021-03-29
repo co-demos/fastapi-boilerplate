@@ -47,6 +47,7 @@ sudo -u postgres psql -c "SELECT version();"
 
 cf : https://gist.github.com/ibraheem4/ce5ccd3e4d7a65589ce84f2a3b7c23a3
 cf : https://www.codementor.io/@engineerapart/getting-started-with-postgresql-on-mac-osx-are8jcopb
+cf : https://flaviocopes.com/postgres-how-to-install/
 
 ```shell
 brew doctor
@@ -193,7 +194,7 @@ The current goal is to be able to agnostically manage datasets in the same way [
 
 The following illustration gives an idea of the endgame datamodel we aim for....
 
-![datamodel-v1](./docs/statics/datamodel-v1.svg)
+![datamodel-v2](./docs/statics/datamodel-v2.svg)
 
 ---
 

@@ -1,10 +1,8 @@
-import os
-from dotenv import load_dotenv
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-load_dotenv(os.path.join(BASE_DIR, "../.env"))
-load_dotenv(verbose=True)
+from .core.config import settings
 
-from .config.tags_metadata import tags_metadata
+import databases
+
+from .core.tags_metadata import tags_metadata
 
 from pathlib import Path
 
@@ -22,7 +20,7 @@ from .models import (
   models_user,
 )
 
-from .db.database import engine
+from .db.database import engine, database
 
 models_item.Base.metadata.create_all(bind=engine)
 models_post.Base.metadata.create_all(bind=engine)
@@ -37,9 +35,9 @@ from .routers import (
 )
 
 app = FastAPI(
-  title=os.getenv("APP_TITLE"),
-  description=os.getenv("APP_DESCRIPTION"),
-  version=os.getenv("APP_VERSION"),
+  title=settings.APP_TITLE,
+  description=settings.APP_DESCRIPTION,
+  version=settings.APP_VERSION,
   openapi_tags=tags_metadata
 )
 
@@ -90,6 +88,17 @@ app.include_router(
   tags=["comments"]
 )
 
+### databases related
+
+@app.on_event("startup")
+async def startup():
+  print("startup app > ...")
+  await database.connect()
+
+@app.on_event("shutdown")
+async def shutdown():
+  print("shutdown app > ...")
+  await database.disconnect()
 
 ### STATIC FILES
 

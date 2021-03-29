@@ -1,4 +1,4 @@
-import os
+from ..core.config import settings
 
 from fastapi import Depends, HTTPException, Security, status
 from sqlalchemy.orm import Session

@@ -20,6 +20,9 @@ sqlalchemy = "<1.4.0"
 pydantic = {extras = ["email"], version = "*"}
 inflect = "*"
 pytest = "*"
+databases = "*"
+asyncpg = "*"
+asyncio = "*"
 
 [dev-packages]
 

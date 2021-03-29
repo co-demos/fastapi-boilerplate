@@ -11,6 +11,10 @@ from .schemas_comment import Comment
 
 ### USER
 
+
+class UserDelete(BaseModel):
+  id: int
+
 class UserBase(BaseModel):
   # email: str
   email: EmailStr

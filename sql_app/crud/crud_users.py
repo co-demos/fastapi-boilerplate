@@ -1,4 +1,4 @@
-from . import (os, Session, datetime, timedelta, 
+from . import (settings, Session, datetime, timedelta, 
   Optional, 
   HTTPException, status, Security, 
   Depends
@@ -56,6 +56,20 @@ def update_user_field_in_db(
   db.commit()
   db.refresh(db_user)
   return db_user
+
+
+def delete_user_in_db(db: Session, user_id: int, ):
+  # query = users.delete().where(users.c.id == user.id)
+  # await database.execute(query)
+  # return user_id
+
+  ### check if user has the right to delete another user or itself
+
+  ### delete
+  obj = db.query(models_user.User).get(user_id)
+  db.delete(obj)
+  db.commit()
+  return obj
 
 
 ### AUTH FUNCTIONS
@@ -118,8 +132,10 @@ async def get_current_user(
 
 async def get_current_active_user(
   #current_user: schemas_user.User = Depends(get_current_user)
-  current_user: schemas_user.User = Security(get_current_user,
-  scopes=["me"])
+  current_user: schemas_user.User = Security(
+    get_current_user,
+    scopes=["me"]
+    )
   ):
   print("get_current_active_user > current_user : ", current_user)
   if not current_user.is_active:

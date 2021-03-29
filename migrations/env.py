@@ -7,7 +7,6 @@ from alembic import context
 
 import os, sys
 from dotenv import load_dotenv
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 sys.path.append(BASE_DIR)
@@ -23,7 +22,6 @@ if SQLALCHEMY_DATABASE_TYPE == "sql_lite" :
   config.set_main_option("sqlalchemy.url", os.environ["SQLITE_DB_URL_ALEMBIC"])
 if SQLALCHEMY_DATABASE_TYPE == "postgre_sql" :
   config.set_main_option("sqlalchemy.url", os.environ["SQL_DB_URL"])
-
 
 
 # Interpret the config file for Python logging.

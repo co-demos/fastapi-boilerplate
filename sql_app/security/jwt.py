@@ -1,4 +1,4 @@
-import os
+from ..core.config import settings
 
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -7,9 +7,9 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, Se
 
 ### JWT CONFIG
 
-SECRET_KEY = os.getenv("JWT_SECRET_KEY")
-ALGORITHM = os.getenv("JWT_ALGORITHM")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRES"))
+SECRET_KEY = settings.JWT_SECRET_KEY
+ALGORITHM = settings.JWT_ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = int(settings.JWT_EXPIRES)
 
 pwd_context = CryptContext(
   schemes=["bcrypt"],
