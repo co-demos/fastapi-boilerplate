@@ -1,18 +1,17 @@
-from .core.config import settings
-
 import databases
-
-from .core.tags_metadata import tags_metadata
-
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi_socketio import SocketManager
 
+from .core.config import settings
+from .core.tags_metadata import tags_metadata
+
 from .crud import crud_items, crud_users
 
+from .db.database import engine, database
 from .models import (
   models_item,
   models_post,
@@ -20,19 +19,13 @@ from .models import (
   models_user,
 )
 
-from .db.database import engine, database
-
 models_item.Base.metadata.create_all(bind=engine)
 models_post.Base.metadata.create_all(bind=engine)
 models_comment.Base.metadata.create_all(bind=engine)
 models_user.Base.metadata.create_all(bind=engine)
 
-from .routers import (
-  routers_items,
-  routers_users,
-  routers_posts,
-  routers_comments
-)
+
+from .routers.routers import api_router
 
 app = FastAPI(
   title=settings.APP_TITLE,
@@ -66,27 +59,11 @@ app.add_middleware(
 
 
 ### ROUTERS
+app.include_router(
+  api_router,
+  # prefix=settings.API_V1_STR
+)
 
-app.include_router(
-  routers_users.router,
-  prefix="/users",
-  tags=["users"]
-)
-app.include_router(
-  routers_items.router,
-  prefix="/items",
-  tags=["items"]
-)
-app.include_router(
-  routers_posts.router,
-  prefix="/posts",
-  tags=["posts"]
-)
-app.include_router(
-  routers_comments.router,
-  prefix="/comments",
-  tags=["comments"]
-)
 
 ### databases related
 
@@ -99,6 +76,7 @@ async def startup():
 async def shutdown():
   print("shutdown app > ...")
   await database.disconnect()
+
 
 ### STATIC FILES
 

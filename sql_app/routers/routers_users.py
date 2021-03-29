@@ -1,5 +1,3 @@
-import os
-
 from . import ( List, Session, APIRouter, Depends, 
   HTTPException, status, 
   timedelta,
