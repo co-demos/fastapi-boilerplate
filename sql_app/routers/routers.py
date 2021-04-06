@@ -9,6 +9,7 @@ from . import (
 
 api_router = APIRouter()
 
+
 api_router.include_router(
   routers_users.router,
   prefix="/users",

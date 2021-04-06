@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 import emails
-from emails.template import JinjaTemplate
+from .emails-templates import JinjaTemplate
 from jose import jwt
 
 from .config import settings

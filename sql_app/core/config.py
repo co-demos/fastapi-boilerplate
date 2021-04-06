@@ -1,3 +1,4 @@
+from functools import lru_cache
 import secrets
 from typing import Any, Dict, List, Optional, Union
 
@@ -101,6 +102,10 @@ class Settings(BaseSettings):
     case_sensitive = True
     env_file = '../.env'
     env_file_encoding = 'utf-8'
+
+@lru_cache()
+def get_settings():
+  return Settings()
 
 settings = Settings()
 print("config.py > settings : ...")

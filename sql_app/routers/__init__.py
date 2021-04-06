@@ -4,7 +4,7 @@ from fastapi import (
   Depends,
   HTTPException, status,
   File, UploadFile, Query
-  )
+)
 
 from datetime import datetime, timedelta
 import shutil

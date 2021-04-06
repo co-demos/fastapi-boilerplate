@@ -102,6 +102,7 @@ def delete_user(
     "message": "This user has been deleted successfully." 
   }
 
+
 @router.post(
   "/{user_id}/items/",
   summary="Create an item for any user",

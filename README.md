@@ -78,7 +78,7 @@ pipenv install --system --dev
 or
 
 ```shell
-pipenv install --three python-dotenv fastapi uvicorn sqlalchemy  sqlalchemy-utils pydantic[email] psycopg2 alembic python-multipart python-jose[cryptography] passlib[bcrypt] aiofiles fastapi-socketio requests inflect shutil pytest
+pipenv install --three python-dotenv fastapi uvicorn sqlalchemy  sqlalchemy-utils pydantic[email] psycopg2 alembic python-multipart python-jose[cryptography] passlib[bcrypt] aiofiles python-socketio requests inflect shutil pytest
 ```
 
 To print requirements :
@@ -121,13 +121,15 @@ openssl rand -hex 32
 
 ## Run app
 
-Once you had cloned the repo and installed dependencies (postgreSQL server, and python packages with pipenv) you can run the app with thiis command line :
+Once you had cloned the repo and installed dependencies (postgreSQL server, and python packages with pipenv) you can run the app with this command line :
 
 ```shell
-alembic upgrade head && pipenv run uvicorn sql_app.main:app --reload
+pipenv shell
+alembic upgrade head
+pipenv run uvicorn sql_app.main:app --reload
 ```
 
-then open the  following url in your browser `http://localhost:8000/docs`
+then open the  following url in your browser `http://localhost:8000/api/docs`
 
 You should have somethiing like this :
 
@@ -194,7 +196,7 @@ The current goal is to be able to agnostically manage datasets in the same way [
 
 The following illustration gives an idea of the endgame datamodel we aim for....
 
-![datamodel-v2](./docs/statics/datamodel-v2.svg)
+![datamodel-v2](./docs/statics/datamodel-v3.svg)
 
 ---
 
