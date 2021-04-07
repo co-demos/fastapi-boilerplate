@@ -186,8 +186,9 @@ The current goal is to be able to agnostically manage datasets in the same way [
 │   └── invitations
 │
 ├── <data related>
-│   ├── workspaces (collection of tables/datasets)
-│   ├── tables (dataset's metadata)
+│   ├── workspaces (collection of datasets)
+│   ├── datasets (dataset's metadata, collection of tables)
+│   ├── tables (table's metadata)
 │   ├── table_data (exploded dataset data, perhaps as many sql tables there is of created datasets)
 │   ├── fields (field descriptions that could be used in several datasets)
 │   └── schemas (collections of fields)

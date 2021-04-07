@@ -9,7 +9,8 @@ from ..security.jwt import (
   JWTError, jwt, CryptContext,
   OAuth2PasswordBearer, OAuth2PasswordRequestForm, SecurityScopes,
   SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES,
-  pwd_context, oauth2_scheme
+  pwd_context, oauth2_scheme,
+  create_access_token
 )
 
 from ..models import models_user
@@ -95,19 +96,19 @@ def delete_user_in_db(
 
 ### AUTH FUNCTIONS
 
-def create_access_token(
-  data: dict,
-  expires_delta: Optional[timedelta] = None
-  ):
-  to_encode = data.copy()
-  print("create_access_token > to_encode : ", to_encode)
-  if expires_delta:
-    expire = datetime.utcnow() + expires_delta
-  else:
-    expire = datetime.utcnow() + timedelta(minutes=15)
-  to_encode.update({"exp": expire})
-  encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-  return encoded_jwt
+# def create_access_token(
+#   data: dict,
+#   expires_delta: Optional[timedelta] = None
+#   ):
+#   to_encode = data.copy()
+#   print("create_access_token > to_encode : ", to_encode)
+#   if expires_delta:
+#     expire = datetime.utcnow() + expires_delta
+#   else:
+#     expire = datetime.utcnow() + timedelta(minutes=15)
+#   to_encode.update({"exp": expire})
+#   encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+#   return encoded_jwt
 
 
 async def get_current_user(

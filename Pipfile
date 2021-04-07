@@ -23,6 +23,8 @@ pytest = "*"
 databases = "*"
 asyncpg = "*"
 asyncio = "*"
+emails = "*"
+jinja2 = "*"
 
 [dev-packages]
 
