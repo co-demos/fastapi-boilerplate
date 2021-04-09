@@ -80,21 +80,23 @@ def send_test_email(
 
 def send_reset_password_email(
   email_to: str,
-  email: str,
+  user: Any,
   token: str
   ):
   project_name = settings.APP_TITLE
-  subject = f"{project_name} - Password recovery for user {email}"
-  print(">>> send_reset_password_email > cwd : ", cwd )
+  subject = f"{project_name} - Password recovery for user {email_to}"
   html_template = "reset_password.html"
-  link = f"{server_host}/{api_version}/users/reset-password?token={token}"
+  # link = f"{server_host}/{api_version}/users/reset-password?token={token}"
+  link = f"{settings.SERVER_FRONT}/reset-password?token={token}&user={email_to}"
   send_email(
     email_to=email_to,
     subject_template=subject,
     html_template=html_template,
     environment={
       "project_name": project_name,
-      "username": email,
+      "username": user.username,
+      "name": user.name,
+      "surname": user.surname,
       "email": email_to,
       "valid_hours": settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS,
       "link": link,
@@ -126,6 +128,7 @@ def send_new_account_email(
       "username": username,
       "password": password,
       "email": email_to,
+      "valid_hours": settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS,
       "link": link,
     },
   )

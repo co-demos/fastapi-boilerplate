@@ -24,7 +24,7 @@ from ..security.jwt import ( JWTError, jwt, CryptContext,
 from ..crud.crud_users import ( authenticate_user,
   create_user_in_db, update_user_field_in_db,
   get_user_by_email, get_user_by_id, get_current_user, get_current_active_user,
-  get_users
+  get_users, get_password_hash
 )
 
 from ..emails.emails import (
@@ -266,7 +266,7 @@ def test_email(
 @router.post("/password-recovery/{email}",
   response_model=schemas_message.Msg
 )
-def recover_password(
+def password_recovery(
   email: str, 
   db: Session = Depends(get_db)
   ):
@@ -274,19 +274,19 @@ def recover_password(
   Password Recovery
   """
   user = get_user_by_email(db, email=email)
-
+  print("password_recovery > user : ", user)
   if not user:
     raise HTTPException(
       status_code=404,
       detail="The user with this email does not exist in the system.",
     )
-  password_reset_token = generate_password_reset_token(email=email)
+  password_reset_token = generate_password_reset_token(email=user.email)
   send_reset_password_email(
     email_to=user.email,
-    email=email,
+    user=user,
     token=password_reset_token
   )
-  return {"msg": "Password recovery email sent"}
+  return {"msg": f"Password recovery email sent to {user.email}"}
 
 
 @router.post("/reset-password/",
@@ -300,7 +300,10 @@ def reset_password(
   """
   Reset password
   """
+  print("reset_password > token : ", token)
+  print("reset_password > new_password : ", new_password)
   email = verify_password_reset_token(token)
+  print("reset_password > email : ", email)
   if not email:
     raise HTTPException(status_code=400, detail="Invalid token")
   user = get_user_by_email(db, email=email)
@@ -315,7 +318,7 @@ def reset_password(
   user.hashed_password = hashed_password
   db.add(user)
   db.commit()
-  return {"msg": "Password updated successfully"}
+  return {"msg": f"Password updated successfully for user {user.email}"}
 
 
 @router.get("/verify-email/",
