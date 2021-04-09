@@ -11,6 +11,7 @@ class Settings(BaseSettings):
   API_V1_STR: str = "/api/v1"
   SECRET_KEY: str = secrets.token_urlsafe(32)
   SERVER_HOST: AnyHttpUrl
+  SERVER_FRONT: AnyHttpUrl
 
   JWT_SECRET_KEY: str
   JWT_ALGORITHM: str

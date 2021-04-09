@@ -26,7 +26,14 @@ oauth2_scheme = OAuth2PasswordBearer(
     "me": "Read information about the current user.",
     "items": "Read items.",
     "posts": "Read posts.",
-    "comments": "Read comments."
+    "comments": "Read comments.",
+
+    "workspaces": "Read workspaces.",
+    "tables": "Read tables.",
+    "datasets": "Read datasets.",
+    "table_data": "Read table_data.",
+    "schemas": "Read schemas.",
+    "fields": "Read fields.",
   },
 )
 
@@ -57,15 +64,17 @@ def generate_password_reset_token(email: str) :
       "nbf": now,
       "sub": email
     }, 
-    settings.SECRET_KEY,
-    algorithm="HS256",
+    SECRET_KEY,
+    algorithm=ALGORITHM,
   )
   return encoded_jwt
 
 
 def verify_password_reset_token(token: str) -> Optional[str]:
+  print("verify_password_reset_token > token : ", token)
   try:
-    decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-    return decoded_token["email"]
+    decoded_token = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    print("verify_password_reset_token > decoded_token : ", decoded_token)
+    return decoded_token["sub"]
   except jwt.JWTError:
     return None

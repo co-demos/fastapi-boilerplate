@@ -116,7 +116,7 @@ async def get_current_user(
   db: Session = Depends(get_db),
   token: str = Depends(oauth2_scheme)
   ):
-  print("get_current_user > security_scopes.scopes : ", security_scopes.scopes)
+  print("\nget_current_user > security_scopes.scopes : ", security_scopes.scopes)
   if security_scopes.scopes:
     authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
   else:
@@ -191,10 +191,11 @@ def create_user_in_db(db: Session, user: schemas_user.UserCreate):
     username=user.username,
     name=user.name,
     surname=user.surname,
+    is_active=False,
     locale=user.locale,
     hashed_password=get_password_hash(user.password)
   )
-  # print("create_user_in_db > db_user : ", db_user)
+  print("create_user_in_db > db_user : ", db_user)
   db.add(db_user)
   db.commit()
   db.refresh(db_user)

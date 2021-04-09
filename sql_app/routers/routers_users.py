@@ -59,12 +59,14 @@ def create_user(
   if db_user:
     raise HTTPException(status_code=400, detail="Email already registered")
   if settings.EMAILS_ENABLED and user_in.email:
+    email_verify_token = generate_password_reset_token(email=user_in.email)
     send_new_account_email(
       email_to=user_in.email,
       username=user_in.username,
       name=user_in.name,
       surname=user_in.surname,
-      password=user_in.password
+      password=user_in.password,
+      token=email_verify_token
     )
   return create_user_in_db(db=db, user=user_in)
 
@@ -221,10 +223,10 @@ async def login_for_access_token(
   - **userrname**: here enter the user's email
   - **password**: the user's password
   """
-  print("login_for_access_token > form_data : ", form_data)
-  print("login_for_access_token > form_data.username : ", form_data.username)
-  print("login_for_access_token > form_data.password : ", form_data.password)
-  print("login_for_access_token > form_data.scopes : ", form_data.scopes)
+  # print("login_for_access_token > form_data : ", form_data)
+  # print("login_for_access_token > form_data.username : ", form_data.username)
+  # print("login_for_access_token > form_data.password : ", form_data.password)
+  # print("login_for_access_token > form_data.scopes : ", form_data.scopes)
   user = authenticate_user(db, form_data.username, form_data.password)
   if not user:
     raise HTTPException(
@@ -276,7 +278,7 @@ def recover_password(
   if not user:
     raise HTTPException(
       status_code=404,
-      detail="The user with this username does not exist in the system.",
+      detail="The user with this email does not exist in the system.",
     )
   password_reset_token = generate_password_reset_token(email=email)
   send_reset_password_email(
@@ -305,12 +307,42 @@ def reset_password(
   if not user:
     raise HTTPException(
       status_code=404,
-      detail="The user with this username does not exist in the system.",
+      detail="The user with this email does not exist in the system.",
     )
-  elif not crud.user.is_active(user):
+  elif not user.is_active:
     raise HTTPException(status_code=400, detail="Inactive user")
   hashed_password = get_password_hash(new_password)
   user.hashed_password = hashed_password
   db.add(user)
   db.commit()
   return {"msg": "Password updated successfully"}
+
+
+@router.get("/verify-email/",
+  response_model=schemas_message.Msg
+)
+def verify_email(
+  token: str,
+  db: Session = Depends(get_db),
+  ):
+  """
+  Verify email
+  """
+  print("verify_email > token : ", token)
+  email = verify_password_reset_token(token)
+  print("verify_email > email : ", email)
+  if not email:
+    raise HTTPException(status_code=400, detail="Invalid token")
+  user = get_user_by_email(db, email=email)
+  print("verify_email > user : ", user)
+  if not user:
+    raise HTTPException(
+      status_code=404,
+      detail="The user with this email does not exist in the system.",
+    )
+  elif user.is_active:
+    raise HTTPException(status_code=400, detail="User is already verified and active")
+  user.is_active = True
+  db.add(user)
+  db.commit()
+  return {"msg": f"Email {email} was verified and user is now active !"}

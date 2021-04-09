@@ -107,12 +107,14 @@ def send_new_account_email(
   name: str,
   surname: str,
   username: str,
-  password: str
+  password: str,
+  token: str
   ):
   project_name = settings.APP_TITLE
   subject = f"{project_name} - New account for user {username}"
   html_template = "new_account.html"
-  link = settings.SERVER_HOST
+  # link = f"{settings.SERVER_HOST}/verify-email?token={token}"
+  link = f"{settings.SERVER_FRONT}/verify-email?token={token}"
   send_email(
     email_to=email_to,
     subject_template=subject,
