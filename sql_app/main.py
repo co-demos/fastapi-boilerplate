@@ -36,8 +36,9 @@ app = FastAPI(
   description=settings.APP_DESCRIPTION,
   version=settings.APP_VERSION,
   openapi_tags=tags_metadata,
-  docs_url="/api/docs",
-  redoc_url="/api/redoc",
+  # openapi_prefix=settings.API_V1_STR,
+  docs_url=f"{settings.API_V1_STR}/docs",
+  redoc_url=f"{settings.API_V1_STR}/redoc",
   debug=True
 )
 

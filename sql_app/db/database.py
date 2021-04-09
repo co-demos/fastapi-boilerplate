@@ -24,11 +24,17 @@ elif SQLALCHEMY_DATABASE_TYPE == "postgre_sql" :
   DATABASE_URL = settings.SQL_DB_URL_BIS
   print("database.py > postgre_sql > SQLALCHEMY_DATABASE_URL :", SQLALCHEMY_DATABASE_URL)
   engine = create_engine(SQLALCHEMY_DATABASE_URL,
-    pool_size=3, max_overflow=0 # only use with postgresql
+    pool_size=3,
+    pool_pre_ping=True,
+    max_overflow=0 # only use with postgresql
   )
 
 database = databases.Database(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# engine = create_engine(settings.SQLALCHEMY_DATABASE_URI, pool_pre_ping=True)
+# SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 
 def get_db():
   db = SessionLocal()

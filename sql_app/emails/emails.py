@@ -104,6 +104,8 @@ def send_reset_password_email(
 
 def send_new_account_email(
   email_to: str,
+  name: str,
+  surname: str,
   username: str,
   password: str
   ):
@@ -117,6 +119,8 @@ def send_new_account_email(
     html_template=html_template,
     environment={
       "project_name": project_name,
+      "name": name,
+      "surname": surname,
       "username": username,
       "password": password,
       "email": email_to,

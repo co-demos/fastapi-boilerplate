@@ -61,7 +61,9 @@ def create_user(
   if settings.EMAILS_ENABLED and user_in.email:
     send_new_account_email(
       email_to=user_in.email,
-      username=user_in.email,
+      username=user_in.username,
+      name=user_in.name,
+      surname=user_in.surname,
       password=user_in.password
     )
   return create_user_in_db(db=db, user=user_in)
@@ -219,7 +221,10 @@ async def login_for_access_token(
   - **userrname**: here enter the user's email
   - **password**: the user's password
   """
-  # print("login_for_access_token > form_data : ", form_data)
+  print("login_for_access_token > form_data : ", form_data)
+  print("login_for_access_token > form_data.username : ", form_data.username)
+  print("login_for_access_token > form_data.password : ", form_data.password)
+  print("login_for_access_token > form_data.scopes : ", form_data.scopes)
   user = authenticate_user(db, form_data.username, form_data.password)
   if not user:
     raise HTTPException(

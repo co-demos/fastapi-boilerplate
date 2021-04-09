@@ -7,6 +7,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, SecurityScopes
 
+# print('>>> OAuth2PasswordRequestForm : ', OAuth2PasswordRequestForm.__dict__)
 
 ### JWT CONFIG
 

@@ -21,16 +21,21 @@ class UserBase(BaseModel):
   username: str
   # username: Optional[str] = None
 
-
-class UserInfos(UserBase):
+class UserBasicInfos(BaseModel):
   name: Optional[str] = None
   surname: Optional[str] = None
+  locale: Optional[str] = None
   description: Optional[str] = None
+
+class UserInfos(UserBase, UserBasicInfos):
+  # name: Optional[str] = None
+  # surname: Optional[str] = None
+  # description: Optional[str] = None
   created_date: Optional[datetime.datetime]
   avatar_url: Optional[str] = None
 
 
-class UserCreate(UserBase):
+class UserCreate(UserBase, UserBasicInfos):
   password: str
 
 
