@@ -197,7 +197,7 @@ The current goal is to be able to agnostically manage datasets in the same way [
 
 The following illustration gives an idea of the endgame datamodel we aim for....
 
-![datamodel-v2](./docs/statics/datamodel-v3.svg)
+![datamodel-v4](./docs/statics/datamodel-v4.svg)
 
 ---
 
