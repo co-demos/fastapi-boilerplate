@@ -16,7 +16,7 @@ class Settings(BaseSettings):
   JWT_SECRET_KEY: str
   JWT_ALGORITHM: str
   JWT_EXPIRES: int
-  # ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
+  JWT_REFRESH_EXPIRES_DAYS: int
   # 60 minutes * 24 hours * 8 days = 8 days
 
   # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins

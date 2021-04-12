@@ -16,14 +16,15 @@ from . import ( settings,
 
 from ..security.jwt import ( JWTError, jwt, CryptContext, 
   OAuth2PasswordBearer, OAuth2PasswordRequestForm,
-  SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, 
+  SECRET_KEY, ALGORITHM, 
+  ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_MINUTES,
   pwd_context, oauth2_scheme,
   create_access_token, verify_password_reset_token, generate_password_reset_token, 
 )
 
 from ..crud.crud_users import ( authenticate_user,
   create_user_in_db, update_user_field_in_db,
-  get_user_by_email, get_user_by_id, get_current_user, get_current_active_user,
+  get_user_by_email, get_user_by_id, get_current_user, get_current_active_user, get_current_active_user_refresh,
   get_users, get_password_hash
 )
 
@@ -209,7 +210,7 @@ async def read_own_comments(
 
 @router.post("/token",
   summary="Create an access token for login",
-  response_model=schemas_token.Token,
+  response_model=schemas_token.TokenAccessRefresh,
   status_code=status.HTTP_201_CREATED
 )
 async def login_for_access_token(
@@ -235,17 +236,66 @@ async def login_for_access_token(
       headers={"WWW-Authenticate": "Bearer"},
     )
   access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+  refresh_token_expires = timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
   # print("login_for_access_token > user : ", user)
   # print("login_for_access_token > form_data.scopes : ", form_data.scopes)
   # print("login_for_access_token > form_data.username : ", form_data.username)
   access_token = create_access_token(
-    # data={"sub": user.username},
-    data={"sub": user.email, "scopes": form_data.scopes},
+    data={
+      "sub": user.email, 
+      "scopes": form_data.scopes
+    },
     expires_delta=access_token_expires
   )
-  return {"access_token": access_token, "token_type": "bearer"}
+  refresh_token = create_access_token(
+    data={
+      "sub": user.email,
+      "scopes": ["refresh"]
+    },
+    expires_delta=refresh_token_expires
+  )
+  return {
+    "refresh_token": refresh_token, 
+    "access_token": access_token, 
+    "token_type": "bearer"
+  }
 
 
+@router.get("/verify-acces-token/",
+  summary="Verify user's access token",
+  description="Verify user's access token",
+  response_model=schemas_message.Msg
+)
+async def verify_access_token(
+  current_user: models_user.User = Depends(get_current_active_user)
+  ):
+  return { "msg": "Access token is stil valid"}
+
+
+@router.get("/new-access-token/",
+  summary="New access token from refresh token validation",
+  description="New access token from refresh token validation",
+  response_model=schemas_token.TokenAccess
+)
+async def new_access_token(
+  current_user: models_user.User = Depends(get_current_active_user_refresh)
+  ):
+  print("new_access_token > current_user : ", current_user)
+  access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+  access_token = create_access_token(
+    data={
+      "sub": current_user.email,
+      "scopes": ["me"]
+    },
+    expires_delta=access_token_expires
+  )
+  return {
+    "access_token": access_token, 
+    "token_type": "bearer"
+  }
+
+
+### PASSWORD RECOVERY
 
 @router.post("/test-email/",
   response_model=schemas_message.Msg,

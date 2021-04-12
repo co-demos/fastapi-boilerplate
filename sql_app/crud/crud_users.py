@@ -165,6 +165,22 @@ async def get_current_active_user(
   return current_user
 
 
+async def get_current_active_user_refresh(
+  current_user: schemas_user.User = Security(
+    get_current_user,
+    scopes=["refresh"]
+    )
+  ):
+  print("get_current_active_user_refresh > current_user : ", current_user)
+  if not current_user.is_active:
+    raise HTTPException(
+      status_code=status.HTTP_400_BAD_REQUEST,
+      msg="Inactive user",
+      detail="Inactive user"
+    )
+  return current_user
+
+
 def verify_password(plain_password, hashed_password):
   return pwd_context.verify(plain_password, hashed_password)
 

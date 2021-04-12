@@ -14,6 +14,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, Se
 SECRET_KEY = settings.JWT_SECRET_KEY
 ALGORITHM = settings.JWT_ALGORITHM
 ACCESS_TOKEN_EXPIRE_MINUTES = int(settings.JWT_EXPIRES)
+REFRESH_TOKEN_EXPIRE_MINUTES = int(settings.JWT_REFRESH_EXPIRES_DAYS * 24 * 60 )
 
 pwd_context = CryptContext(
   schemes=["bcrypt"],
@@ -24,6 +25,7 @@ oauth2_scheme = OAuth2PasswordBearer(
   tokenUrl="users/token",
   scopes={
     "me": "Read information about the current user.",
+
     "items": "Read items.",
     "posts": "Read posts.",
     "comments": "Read comments.",
@@ -34,6 +36,8 @@ oauth2_scheme = OAuth2PasswordBearer(
     "table_data": "Read table_data.",
     "schemas": "Read schemas.",
     "fields": "Read fields.",
+
+    "refresh": "Refresh token.",
   },
 )
 
