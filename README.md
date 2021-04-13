@@ -1,8 +1,10 @@
 # DATA PATCH - DMS BACKEND PROJECT
 
-A simple boilerplate of an API server for [CRUD][CRUD_def] operations, powered by **[FastAPI][fastapi]** framework with a **PostgreSQL** database. 
+A simple boilerplate of an API server for [CRUD][CRUD_def] operations, powered by **[FastAPI][fastapi]** framework with a **PostgreSQL** database.
 
 This work in progress is mainly the result of studying [tutorials][fastapi-tuto] from official documentation, the [amazing fullstack FastAPI-PostgreSQL boilerplate][fastapi-boilerplate], and this [tutorial playlist by MK Fast][MK-Fast] on youtube.
+
+A frontend interface is currently in development **[here][datapatch-front]**
 
 ## Features
 
@@ -131,7 +133,7 @@ pipenv run uvicorn sql_app.main:app --reload
 
 then open the  following url in your browser `http://localhost:8000/api/docs`
 
-You should have somethiing like this :
+You should have something like this :
 
 ![screenshot-api-1](./docs/statics/screenshot-api-1.png)
 
@@ -200,6 +202,8 @@ The following illustration gives an idea of the endgame datamodel we aim for....
 ![datamodel-v4](./docs/statics/datamodel-v4.svg)
 
 ---
+
+[datapatch-front]:https://github.com/co-demos/datapatch-front.git
 
 [CRUD_def]:https://en.wikipedia.org/wiki/Create,_read,_update_and_delete
 [fastapi]:https://fastapi.tiangolo.com/
