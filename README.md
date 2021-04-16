@@ -72,6 +72,12 @@ pip install -r requirements.txt
 We use [`pipenv`][pipenv] as package manager :
 
 ```shell
+pip install --user --upgrade pipenv
+```
+
+Install dependencies :
+
+```shell
 pipenv install --dev
 # or
 pipenv install --system --dev
@@ -121,14 +127,16 @@ openssl rand -hex 32
 
 # RUNNING APP
 
-## Run app
+## Run the app
 
-Once you had cloned the repo and installed dependencies (postgreSQL server, and python packages with pipenv) you can run the app with this command line :
+Once you have cloned the repo and installed dependencies (postgreSQL server, and python packages with pipenv) you can run the app with this command lines :
 
 ```shell
 pipenv shell
 alembic upgrade head
 pipenv run uvicorn sql_app.main:app --reload
+# or
+# uvicorn sql_app.main:app --reload
 ```
 
 then open the  following url in your browser `http://localhost:8000/api/docs`
@@ -136,6 +144,21 @@ then open the  following url in your browser `http://localhost:8000/api/docs`
 You should have something like this :
 
 ![screenshot-api-1](./docs/statics/screenshot-api-1.png)
+
+## Pre-run the app (optional)
+
+If you want to pre-populate your database with some default values (superuser, licences, ...) you can run the following :
+
+```shell
+pipenv shell
+
+# to run the database
+python ./sql_app/backend_pre_start.py
+
+# to init the database with values
+alembic upgrade head
+python ./sql_app/initial_data.py
+```
 
 ---
 

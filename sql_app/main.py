@@ -22,12 +22,22 @@ from .models import (
   models_item,
   models_post,
   models_comment,
+
+  models_licence,
+  models_table,
+  models_dataset,
+  models_workspace,
   models_user,
 )
 
 models_item.Base.metadata.create_all(bind=engine)
 models_post.Base.metadata.create_all(bind=engine)
 models_comment.Base.metadata.create_all(bind=engine)
+
+models_licence.Base.metadata.create_all(bind=engine)
+models_table.Base.metadata.create_all(bind=engine)
+models_dataset.Base.metadata.create_all(bind=engine)
+models_workspace.Base.metadata.create_all(bind=engine)
 models_user.Base.metadata.create_all(bind=engine)
 
 

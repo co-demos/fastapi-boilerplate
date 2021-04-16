@@ -16,6 +16,7 @@ api_router.include_router(
   prefix="/users",
   tags=["users"]
 )
+
 api_router.include_router(
   routers_items.router,
   prefix="/items",

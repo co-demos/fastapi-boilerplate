@@ -96,8 +96,16 @@ class Settings(BaseSettings):
     )
 
   EMAIL_TEST_USER: EmailStr = "test@example.com"  # type: ignore
+
   FIRST_SUPERUSER: EmailStr
+  FIRST_SUPERUSER_USERNAME: str
+  FIRST_SUPERUSER_NAME: str
+  FIRST_SUPERUSER_SURNAME: str
   FIRST_SUPERUSER_PASSWORD: str
+  FIRST_SUPERUSER_LOCALE: str
+  FIRST_SUPERUSER_DESCRIPTION: str
+  FIRST_SUPERUSER_PASSWORD: str
+
   USERS_OPEN_REGISTRATION: bool = False
 
   class Config:

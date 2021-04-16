@@ -9,12 +9,14 @@ from ..db.base_class import Base
 class User(Base):
   # __tablename__ = "users"
 
+  ### meta
   id = Column(Integer, primary_key=True, index=True)
+  created_date = Column(DateTime, default=datetime.datetime.utcnow)
 
+  ### basic infos
   # email = Column(String, unique=True, index=True)
-  email = Column(EmailType)
   # email = Column(String, unique=True, index=True, nullable=False)
-
+  email = Column(EmailType)
   username = Column(String)
   name = Column(String)
   surname = Column(String)
@@ -22,17 +24,32 @@ class User(Base):
   description = Column(String)
   locale = Column(String)
 
-  # image avatar
+  ### preferences
   avatar_url = Column(URLType)
 
+  ### security
   hashed_password = Column(String)
-
-  created_date = Column(DateTime, default=datetime.datetime.utcnow)
-
   is_active = Column(Boolean, default=True)
   is_superuser = Column(Boolean, default=False)
 
-  # relations
+  ### relationships
   items = relationship("Item", back_populates="owner")
   posts = relationship("Post", back_populates="owner")
   comments = relationship("Comment", back_populates="owner")
+
+  ### relationships / data patch items
+  # my_workpaces = relationship("Workspace", back_populates="owner")
+  # my_datasets = relationship("Dataset", back_populates="owner")
+  # my_tables = relationship("Table", back_populates="owner")
+  # my_schemas = relationship("Schema", back_populates="owner")
+  # my_schema_fields = relationship("SchemaField", back_populates="owner")
+
+  # my_groups = relationship("Group", back_populates="owner")
+  # my_invitations = relationship("Invitation", back_populates="owner")
+  # my_notifications = relationship("Invitation")
+
+  # shared_workpaces = relationship("Workspace", back_populates="sharing")
+  # shared_datasets = relationship("Dataset", back_populates="sharing")
+  # shared_tables = relationship("Table", back_populates="sharing")
+  # shared_schemas = relationship("Schema", back_populates="sharing")
+  # shared_schema_fields = relationship("SchemaField", back_populates="sharing")

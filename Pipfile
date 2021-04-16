@@ -25,6 +25,7 @@ asyncpg = "*"
 asyncio = "*"
 emails = "*"
 jinja2 = "*"
+tenacity = "*"
 
 [dev-packages]
 
