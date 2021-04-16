@@ -2,8 +2,11 @@ from fastapi import APIRouter
 # from ..core.config import settings
 
 from . import (
-  routers_items,
+  # routers_items,
+  
   routers_users,
+  routers_workspaces,
+
   routers_posts,
   routers_comments
 )
@@ -18,10 +21,16 @@ api_router.include_router(
 )
 
 api_router.include_router(
-  routers_items.router,
-  prefix="/items",
-  tags=["items"]
+  routers_workspaces.router,
+  prefix="/workspaces",
+  tags=["workspaces"]
 )
+
+# api_router.include_router(
+#   routers_items.router,
+#   prefix="/items",
+#   tags=["items"]
+# )
 api_router.include_router(
   routers_posts.router,
   prefix="/posts",

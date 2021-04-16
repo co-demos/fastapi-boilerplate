@@ -7,20 +7,24 @@ from .schemas_permissions import PermissionType
 
 class WorkspaceBase(BaseModel):
   ### basic infos
-  title: str
-  description: Optional[str] = None
+  title: str = "My workspace"
+  description: Optional[str] = "My workspace description"
 
   ### preferences
-  color: Optional[str] = None
-  icon: Optional[str] = None
+  color: Optional[str] = "black"
+  icon: Optional[str] = "icon-database"
 
   ### access auths
-  read: PermissionType = CommentType.perm_owner
-  write: PermissionType = CommentType.perm_owner
-  manage: PermissionType = CommentType.perm_owner
+  read: PermissionType = PermissionType.perm_owner
+  write: PermissionType = PermissionType.perm_owner
+  manage: PermissionType = PermissionType.perm_owner
 
 
 class WorkspaceCreate(WorkspaceBase):
+  pass
+
+
+class WorkspaceUpdate(WorkspaceBase):
   pass
 
 
@@ -33,6 +37,7 @@ class Workspace(WorkspaceBase):
   ### owner
   owner_id: int
 
+  ### linked data
   datasets: List[Dataset] = []
 
   class Config:

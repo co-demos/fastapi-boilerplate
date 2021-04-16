@@ -3,27 +3,14 @@ from . import (settings, Session, datetime, timedelta,
   HTTPException, status
 )
 
-from ..models import models_item
-from ..schemas import schemas_item
+from .base import CRUDBase
+from ..models.models_item import Item
+from ..schemas.schemas_item import ItemCreate, ItemUpdate
 
 
 ### ITEM FUNCTIONS
 
-def get_item(db: Session, id: int):
-  return db.query(models_item.Item).filter(models_item.Item.id == id).first()
+class CRUDItem(CRUDBase[Item, ItemCreate, ItemUpdate]):
+  pass
 
-
-def get_items(db: Session, skip: int = 0, limit: int = 100):
-  return db.query(models_item.Item).offset(skip).limit(limit).all()
-
-
-def create_user_item(db: Session, item: schemas_item.ItemCreate, user_id: int):
-  db_item = models_item.Item(**item.dict(), owner_id=user_id)
-  db.add(db_item)
-  db.commit()
-  db.refresh(db_item)
-  return db_item
-
-
-def get_user_items(db: Session, user_id: int):
-  return db.query(models_item.Item).filter(models_item.Item.owner_id == user_id).all()
+item = CRUDItem(Item)

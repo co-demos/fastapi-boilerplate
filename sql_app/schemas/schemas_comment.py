@@ -29,6 +29,10 @@ class CommentCreate(CommentBase):
   pass
 
 
+class CommentUpdate(CommentBase):
+  pass
+
+
 class Comment(CommentBase):
   id: int
   email: str
@@ -43,4 +47,3 @@ class Comment(CommentBase):
 
 class CommentList(Comment):
   pass
-  # owner: User

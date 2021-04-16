@@ -120,7 +120,7 @@ To generate random secret keys you  can use `openssl` command line or - if you f
 openssl rand -hex 32
 ```
 
-... and copy-paste the key as `JWT_SECRET_KEY` in `.env` file
+... and copy-paste the key as `JWT_SECRET_KEY` in your `.env` file
 
 
 ---

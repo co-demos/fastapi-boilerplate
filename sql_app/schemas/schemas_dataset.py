@@ -16,14 +16,18 @@ class DatasetBase(BaseModel):
   icon: Optional[str] = None
 
   ### access auths
-  read: PermissionType = CommentType.perm_owner
-  comment: PermissionType = CommentType.perm_owner
-  patch: PermissionType = CommentType.perm_owner
-  write: PermissionType = CommentType.perm_owner
-  manage: PermissionType = CommentType.perm_owner
+  read: PermissionType = PermissionType.perm_owner
+  comment: PermissionType = PermissionType.perm_owner
+  patch: PermissionType = PermissionType.perm_owner
+  write: PermissionType = PermissionType.perm_owner
+  manage: PermissionType = PermissionType.perm_owner
 
 
 class DatasetCreate(DatasetBase):
+  pass
+
+
+class DatasetUpdate(DatasetBase):
   pass
 
 
@@ -36,7 +40,8 @@ class Dataset(DatasetBase):
   ### owner
   owner_id: int
 
-  # datasets: List[Dataset] = []
+  ### linked data
+  # tables: List[Table] = []
 
   class Config:
     orm_mode = True

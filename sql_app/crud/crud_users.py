@@ -13,7 +13,8 @@ from ..security.jwt import (
   create_access_token
 )
 
-from ..models import models_user
+from .base import CRUDBase
+from ..models.models_user import User
 from ..schemas import schemas_user, schemas_token
 
 
@@ -29,13 +30,13 @@ FIELDS_UPDATE = [
 ###  USER FUNCTIONS
 
 def get_user_by_id(db: Session, user_id: int):
-  # return db.query(models_user.User).filter(models_user.User.id == user_id).first()
-  return db.query(models_user.User).get(user_id)
+  # return db.query(User).filter(User.id == user_id).first()
+  return db.query(User).get(user_id)
 
 
 def get_user_by_email(db: Session, email: str):
   # print("get_user_by_email > email : ", email)
-  return db.query(models_user.User).filter(models_user.User.email == email).first()
+  return db.query(User).filter(User.email == email).first()
 
 
 def update_user_field_in_db(
@@ -74,7 +75,7 @@ def delete_user_in_db(
   pp.pprint(current_user.__dict__)
 
   if current_user.is_superuser or current_user.id == user_id:
-    obj = db.query(models_user.User).get(user_id)
+    obj = db.query(User).get(user_id)
     print("delete_user_in_db > obj :")
     if not obj:
       raise HTTPException(
@@ -200,16 +201,17 @@ def authenticate_user(db: Session, user_email: str, password: str):
   return user
 
 
-def create_user_in_db(db: Session, user: schemas_user.UserCreate):
+def create_user_in_db(db: Session, user: schemas_user.UserCreate, superuser: bool = False):
   print("create_user_in_db > user : ", user)
-  db_user = models_user.User(
+  db_user = User(
     email=user.email,
     username=user.username,
     name=user.name,
     surname=user.surname,
-    is_active=False,
     locale=user.locale,
-    hashed_password=get_password_hash(user.password)
+    hashed_password=get_password_hash(user.password),
+    is_active=superuser,
+    is_superuser=superuser,
   )
   print("create_user_in_db > db_user : ", db_user)
   db.add(db_user)
@@ -222,5 +224,5 @@ def create_user_in_db(db: Session, user: schemas_user.UserCreate):
 ### USERS FUNCTIONS
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):
-  return db.query(models_user.User).offset(skip).limit(limit).all()
+  return db.query(User).offset(skip).limit(limit).all()
 

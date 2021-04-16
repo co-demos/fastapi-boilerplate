@@ -14,6 +14,10 @@ class LicenceCreate(LicenceBase):
   pass
 
 
+class LicenceUpdate(LicenceBase):
+  pass
+
+
 class Licence(LicenceBase):
   ### meta
   id: int

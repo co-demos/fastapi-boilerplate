@@ -28,7 +28,7 @@ class Workspace(Base):
 
   ### owner
   owner_id = Column(Integer, ForeignKey("users.id"))
-  # owner = relationship("User", back_populates="my_workspaces")
+  owner = relationship("User", back_populates="my_workspaces")
 
   ### relationships
   # datasets = relationship("Dataset", back_populates="workspace_related")

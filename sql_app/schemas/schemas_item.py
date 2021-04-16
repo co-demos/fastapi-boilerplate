@@ -10,6 +10,10 @@ class ItemCreate(ItemBase):
   pass
 
 
+class ItemUpdate(ItemBase):
+  pass
+
+
 class Item(ItemBase):
   id: int
   owner_id: int

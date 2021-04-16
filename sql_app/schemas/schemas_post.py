@@ -13,6 +13,10 @@ class PostCreate(PostBase):
   pass
 
 
+class PostUpdate(PostBase):
+  pass
+
+
 class Post(PostBase):
   id: int
   created_date: Optional[datetime.datetime]
