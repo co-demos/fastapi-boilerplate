@@ -1,6 +1,6 @@
 from . import (pp, settings, Session, datetime, timedelta, 
   Optional, 
-  HTTPException, status, Security, 
+  HTTPException, status, Security,
   Depends
 )
 
@@ -15,7 +15,9 @@ from ..security.jwt import (
 
 from .base import CRUDBase
 from ..models.models_user import User
-from ..schemas import schemas_user, schemas_token
+
+from ..schemas.schemas_user import UserCreate, UserUpdate
+from ..schemas.schemas_token import TokenData
 
 
 ###  USER FIELDS ABLE TO BE UPDATED
@@ -27,89 +29,18 @@ FIELDS_UPDATE = [
   "avatar_url"
 ]
 
-###  USER FUNCTIONS
-
-def get_user_by_id(db: Session, user_id: int):
-  # return db.query(User).filter(User.id == user_id).first()
-  return db.query(User).get(user_id)
-
-
-def get_user_by_email(db: Session, email: str):
-  # print("get_user_by_email > email : ", email)
-  return db.query(User).filter(User.email == email).first()
-
-
-def update_user_field_in_db(
-  db: Session,
-  user_id: int,
-  field: str,
-  value: any
-  ):
-  print("update_user_in_db > field : ", field)
-  print("update_user_in_db > value : ", value)
-  if field not in FIELDS_UPDATE:
-    raise HTTPException(
-      status_code=status.HTTP_401_UNAUTHORIZED,
-      detail="Field not open to update"
-    )
-  db_user = get_user_by_id(db=db, user_id=user_id)
-  print("update_user_in_db > db_user : ", db_user)
-  setattr(db_user, field, value)
-  db.add(db_user)
-  db.commit()
-  db.refresh(db_user)
-  return db_user
-
-
-def delete_user_in_db(
-  db: Session,
-  user_id: int, 
-  current_user: schemas_user.User, 
-  ):
-  # query = users.delete().where(users.c.id == user.id)
-  # await database.execute(query)
-  # return user_id
-
-  ### check if user has the right to delete another user or itself
-  print("delete_user_in_db > current_user :")
-  pp.pprint(current_user.__dict__)
-
-  if current_user.is_superuser or current_user.id == user_id:
-    obj = db.query(User).get(user_id)
-    print("delete_user_in_db > obj :")
-    if not obj:
-      raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail="User not found"
-      )
-    pp.pprint(obj.__dict__)
-    db.delete(obj)
-    db.commit()
-    return obj
-  else:
-    raise HTTPException(
-      status_code=status.HTTP_401_UNAUTHORIZED,
-      detail="You are not authorized to  delete user other than yourself"
-    )
-
-
-
 
 ### AUTH FUNCTIONS
 
-# def create_access_token(
-#   data: dict,
-#   expires_delta: Optional[timedelta] = None
-#   ):
-#   to_encode = data.copy()
-#   print("create_access_token > to_encode : ", to_encode)
-#   if expires_delta:
-#     expire = datetime.utcnow() + expires_delta
-#   else:
-#     expire = datetime.utcnow() + timedelta(minutes=15)
-#   to_encode.update({"exp": expire})
-#   encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-#   return encoded_jwt
+
+def verify_password(plain_password, hashed_password):
+  print("authenticate_user > plain_password : ", plain_password)
+  print("authenticate_user > hashed_password : ", hashed_password)
+  return pwd_context.verify(plain_password, hashed_password)
+
+
+def get_password_hash(password):
+  return pwd_context.hash(password)
 
 
 async def get_current_user(
@@ -137,10 +68,10 @@ async def get_current_user(
       raise credentials_exception
     token_scopes = payload.get("scopes", [])
     print("get_current_user > token_scopes : ", token_scopes)
-    token_data = schemas_token.TokenData(scopes=token_scopes, username=username)
+    token_data = TokenData(scopes=token_scopes, username=username)
   except JWTError:
     raise credentials_exception
-  user = get_user_by_email(db, email=token_data.username)
+  user_in_db = user.get_user_by_email(db, email=token_data.username)
   if user is None:
     raise credentials_exception
   for scope in security_scopes.scopes:
@@ -150,24 +81,27 @@ async def get_current_user(
         detail="Not enough permissions",
         headers={"WWW-Authenticate": authenticate_value},
       )
-  return user
+  return user_in_db
 
 
 async def get_current_active_user(
-  #current_user: schemas_user.User = Depends(get_current_user)
-  current_user: schemas_user.User = Security(
+  current_user: User = Security(
     get_current_user,
     scopes=["me"]
     )
   ):
   print("get_current_active_user > current_user : ", current_user)
   if not current_user.is_active:
-    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user")
+    raise HTTPException(
+      status_code=status.HTTP_400_BAD_REQUEST,
+      msg="Inactive user",
+      detail="Inactive user"
+    )
   return current_user
 
 
 async def get_current_active_user_refresh(
-  current_user: schemas_user.User = Security(
+  current_user: User = Security(
     get_current_user,
     scopes=["refresh"]
     )
@@ -182,47 +116,174 @@ async def get_current_active_user_refresh(
   return current_user
 
 
-def verify_password(plain_password, hashed_password):
-  return pwd_context.verify(plain_password, hashed_password)
+### USER CLASS
+
+class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
 
-def get_password_hash(password):
-  return pwd_context.hash(password)
+  def get_user_by_email(
+    self, db: Session, 
+    email: str
+    ):
+    # print("get_user_by_email > email : ", email)
+    return db.query(User).filter(User.email == email).first()
 
 
-def authenticate_user(db: Session, user_email: str, password: str):
-  print("authenticate_user > user_email : ", user_email)
-  user = get_user_by_email(db, user_email)
-  print("authenticate_user > user : ", user)
-  if not user:
-    return False
-  if not verify_password(password, user.hashed_password):
-    return False
-  return user
+  def authenticate_user(
+    self, db: Session,
+    user_email: str,
+    password: str
+    ):
+    print("authenticate_user > user_email : ", user_email)
+    user_in_db = self.get_user_by_email(db, user_email)
+    print("authenticate_user > user_in_db : ", user_in_db.__dict__)
+    if not user_in_db:
+      return False
+    if not verify_password(password, user_in_db.hashed_password):
+      return False
+    return user_in_db
 
 
-def create_user_in_db(db: Session, user: schemas_user.UserCreate, superuser: bool = False):
-  print("create_user_in_db > user : ", user)
-  db_user = User(
-    email=user.email,
-    username=user.username,
-    name=user.name,
-    surname=user.surname,
-    locale=user.locale,
-    hashed_password=get_password_hash(user.password),
-    is_active=superuser,
-    is_superuser=superuser,
-  )
-  print("create_user_in_db > db_user : ", db_user)
-  db.add(db_user)
-  db.commit()
-  db.refresh(db_user)
-  return db_user
+  def create_user_in_db(
+    self, db: Session,
+    user_in: UserCreate,
+    superuser: bool = False
+    ):
+    print("create_user_in_db > user_in : ", user_in)
+    db_user = User(
+      email=user_in.email,
+      username=user_in.username,
+      name=user_in.name,
+      surname=user_in.surname,
+      locale=user_in.locale,
+      hashed_password=get_password_hash(user_in.password),
+      is_active=superuser,
+      is_superuser=superuser,
+    )
+    print("create_user_in_db > db_user : ", db_user)
+    self.create(db=db, obj_in=db_user)
+    # db.add(db_user)
+    # db.commit()
+    # db.refresh(db_user)
+    return db_user
+
+
+  def remove_user(
+    self, db: Session,
+    user_id: int, 
+    current_user: User, 
+    ):
+    # query = users.delete().where(users.c.id == user.id)
+    # await database.execute(query)
+    # return user_id
+
+    ### check if user has the right to delete another user or itself
+    print("delete_user_in_db > current_user :")
+    pp.pprint(current_user.__dict__)
+
+    self.remove(db=db, id=user_id, current_user=current_user)
+    # if current_user.is_superuser or current_user.id == user_id:
+    #   obj = db.query(User).get(user_id)
+    #   print("delete_user_in_db > obj :")
+    #   if not obj:
+    #     raise HTTPException(
+    #       status_code=status.HTTP_404_NOT_FOUND,
+    #       detail="User not found"
+    #     )
+    #   pp.pprint(obj.__dict__)
+    #   db.delete(obj)
+    #   db.commit()
+    #   return obj
+    # else:
+    #   raise HTTPException(
+    #     status_code=status.HTTP_401_UNAUTHORIZED,
+    #     detail="You are not authorized to delete an user other than yourself"
+    #   )
+
+
+user = CRUDUser(User)
+
+
+
+###  USER FUNCTIONS
+
+
+# def update_user_field_in_db(
+#   db: Session,
+#   user_id: int,
+#   field: str,
+#   value: any
+#   ):
+#   print("update_user_in_db > field : ", field)
+#   print("update_user_in_db > value : ", value)
+#   if field not in FIELDS_UPDATE:
+#     raise HTTPException(
+#       status_code=status.HTTP_401_UNAUTHORIZED,
+#       detail="Field not open to update"
+#     )
+#   db_user = get_user_by_id(db=db, user_id=user_id)
+#   print("update_user_in_db > db_user : ", db_user)
+#   setattr(db_user, field, value)
+#   db.add(db_user)
+#   db.commit()
+#   db.refresh(db_user)
+#   return db_user
+
+
+# def delete_user_in_db(
+#   db: Session,
+#   user_id: int, 
+#   current_user: User, 
+#   ):
+#   # query = users.delete().where(users.c.id == user.id)
+#   # await database.execute(query)
+#   # return user_id
+
+#   ### check if user has the right to delete another user or itself
+#   print("delete_user_in_db > current_user :")
+#   pp.pprint(current_user.__dict__)
+
+#   if current_user.is_superuser or current_user.id == user_id:
+#     obj = db.query(User).get(user_id)
+#     print("delete_user_in_db > obj :")
+#     if not obj:
+#       raise HTTPException(
+#         status_code=status.HTTP_404_NOT_FOUND,
+#         detail="User not found"
+#       )
+#     pp.pprint(obj.__dict__)
+#     db.delete(obj)
+#     db.commit()
+#     return obj
+#   else:
+#     raise HTTPException(
+#       status_code=status.HTTP_401_UNAUTHORIZED,
+#       detail="You are not authorized to  delete user other than yourself"
+#     )
+
+
+# def create_user_in_db(db: Session, user: UserCreate, superuser: bool = False):
+#   print("create_user_in_db > user : ", user)
+#   db_user = User(
+#     email=user.email,
+#     username=user.username,
+#     name=user.name,
+#     surname=user.surname,
+#     locale=user.locale,
+#     hashed_password=get_password_hash(user.password),
+#     is_active=superuser,
+#     is_superuser=superuser,
+#   )
+#   print("create_user_in_db > db_user : ", db_user)
+#   db.add(db_user)
+#   db.commit()
+#   db.refresh(db_user)
+#   return db_user
 
 
 
 ### USERS FUNCTIONS
 
-def get_users(db: Session, skip: int = 0, limit: int = 100):
-  return db.query(User).offset(skip).limit(limit).all()
+# def get_users(db: Session, skip: int = 0, limit: int = 100):
+#   return db.query(User).offset(skip).limit(limit).all()
 

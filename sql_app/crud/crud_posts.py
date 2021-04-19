@@ -3,22 +3,22 @@ from . import (settings, Session, datetime, timedelta,
   HTTPException, status
 )
 
-from ..models import models_post
-from ..schemas import schemas_post
+from ..models.models_post import Post
+from ..schemas.schemas_post import PostCreate
 
 
 ### POSTS FUNCTIONS
 
 def get_post(db: Session, id: int):
-  return db.query(models_post.Post).filter(models_post.Post.id == id).first()
+  return db.query(Post).filter(Post.id == id).first()
 
 
 def get_posts(db: Session, skip: int = 0, limit: int = 100):
-  return db.query(models_post.Post).offset(skip).limit(limit).all()
+  return db.query(Post).offset(skip).limit(limit).all()
 
 
-def create_user_post(db: Session, post: schemas_post.PostCreate, user_id: int):
-  db_post = models_post.Post(**post.dict(), owner_id=user_id)
+def create_user_post(db: Session, post: PostCreate, user_id: int):
+  db_post = Post(**post.dict(), owner_id=user_id)
   db.add(db_post)
   db.commit()
   db.refresh(db_post)
@@ -26,4 +26,4 @@ def create_user_post(db: Session, post: schemas_post.PostCreate, user_id: int):
 
 
 def get_user_posts(db: Session, user_id: int):
-  return db.query(models_post.Post).filter(models_post.Post.owner_id == user_id).all()
+  return db.query(Post).filter(Post.owner_id == user_id).all()

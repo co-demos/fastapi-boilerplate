@@ -1,13 +1,17 @@
 from . import ( List, Session, APIRouter, Depends,
   HTTPException, status,
   get_db,
-  schemas_comment, crud_comments,
-  models_user
+  # schemas_comment,
+  crud_comments,
+  # models_user
 )
 
 from ..crud.crud_users import (
   get_current_user,
 )
+
+from ..models.models_user import User
+from ..schemas.schemas_comment import CommentList
 
 
 router = APIRouter()
@@ -17,7 +21,7 @@ router = APIRouter()
   "/{comment_id}",
   summary="Get an comment",
   description="Get an comment given its id",
-  response_model=schemas_comment.CommentList
+  response_model=CommentList
 )
 def read_comment(
   comment_id: int,
@@ -33,7 +37,7 @@ def read_comment(
   "/",
   summary="Get a list of comments",
   description="Get a list of all comments given a limit",
-  response_model=List[schemas_comment.CommentList]
+  response_model=List[CommentList]
 )
 def read_comments(
   skip: int = 0, limit: int = 100,

@@ -1,3 +1,4 @@
+print(">>>>>> import db.base_class.py ...")
 from typing import Any    
 
 import inflect   
@@ -10,7 +11,7 @@ from sqlalchemy.ext.declarative import (
   declared_attr 
 )
 
-p = inflect.engine()    
+p = inflect.engine()
 
 # Base = declarative_base()
 # Base: DeclarativeMeta = declarative_base()

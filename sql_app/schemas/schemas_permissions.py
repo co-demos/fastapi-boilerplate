@@ -1,3 +1,4 @@
+print(">>>>>> import schemas_permissions.py >  PermissionType ...")
 from enum import Enum
 
 class PermissionType(str, Enum):

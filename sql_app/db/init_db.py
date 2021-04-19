@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
-from ..crud import crud_users
+# from ..crud import crud_users
+from ..crud.crud_users import user
 from ..crud.crud_licences import licence
 
 from ..schemas import schemas_user
@@ -22,7 +23,8 @@ def init_db(db: Session) -> None:
     # Base.metadata.create_all(bind=engine)
 
     ### add superuser from .env file
-    user_in_db = crud_users.get_user_by_email(db, email=settings.FIRST_SUPERUSER)
+    # user_in_db = crud_users.get_user_by_email(db, email=settings.FIRST_SUPERUSER)
+    user_in_db = user.get_user_by_email(db=db, email=settings.FIRST_SUPERUSER)
     if not user_in_db:
       user_in = schemas_user.UserSuper(
         email=settings.FIRST_SUPERUSER,
@@ -36,7 +38,8 @@ def init_db(db: Session) -> None:
         is_superuser=True,
       )
       print (">>> init_db.py > init_db > user_in :", user_in)
-      user_in_db = crud_users.create_user_in_db(db, user=user_in, superuser=True)  # noqa: F841
+      # user_in_db = crud_users.create_user_in_db(db, user=user_in, superuser=True)  # noqa: F841
+      user_in_db = user.create_user_in_db(db=db, user_in=user_in, superuser=True)  # noqa: F841
     
     ### add licences
     # print (">>> init_db.py > init_db > main_licences :", main_licences)
@@ -52,5 +55,5 @@ def init_db(db: Session) -> None:
           url=licence_raw["url"],
         )
         # print (">>> init_db.py > init_db > licence_in :", licence_in)
-        licence_in_db = licence.create(db, obj_in=licence_in)  # noqa: F841
+        licence_in_db = licence.create(db=db, obj_in=licence_in)  # noqa: F841
 

@@ -12,6 +12,7 @@ class User(Base):
   ### meta
   id = Column(Integer, primary_key=True, index=True)
   created_date = Column(DateTime, default=datetime.datetime.utcnow)
+  modif_date = Column(DateTime, default=datetime.datetime.utcnow)
 
   ### basic infos
   # email = Column(String, unique=True, index=True)

@@ -1,3 +1,4 @@
+print(">>>>>> import schemas_licence.py >  Licence ...")
 from . import ( List, Optional, BaseModel,
   datetime
 )

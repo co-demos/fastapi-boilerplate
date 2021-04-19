@@ -1,3 +1,4 @@
+print(">>>>>> import schemas_user.py >  User ...")
 from . import ( List, Optional, BaseModel,
   EmailStr,
   datetime
@@ -28,43 +29,32 @@ class UserBase(BaseModel):
 
 class UserBasicInfos(BaseModel):
   ### basic infos
+  username: str = "Eli"
   name: Optional[str] = "Elinor"
   surname: Optional[str] = "Ostrom"
   locale: Optional[str] = "en"
   description: Optional[str] = "User description"
 
+
+class UserBasicInfosAvatar(BaseModel):
   ### preferences
   avatar_url: Optional[str] = None
 
 
-class UserInfos(UserBase, UserBasicInfos):
+class UserInfos(UserBase, UserBasicInfos, UserBasicInfosAvatar):
   ### meta
   created_date: Optional[datetime.datetime]
+  modif_date: Optional[datetime.datetime]
 
 
-class UserCreate(UserBase, UserBasicInfos):
+class UserCreate(UserBase, UserBasicInfos, UserBasicInfosAvatar):
   ### secret
   password: str
-
-
-class UserUpdate(UserBase, UserBasicInfos):
-  pass
 
 
 class UserInDBBase(UserInfos):
   ### meta
   id: Optional[int] = None
-
-  class Config:
-    orm_mode = True
-
-
-class User(UserInDBBase):
-  ### meta
-  is_active: Optional[bool] = None
-
-  ### access auths
-  is_superuser: bool = False
 
   ### linked data
   items: List[Item] = []
@@ -86,9 +76,25 @@ class User(UserInDBBase):
   # shared_schemas: List[Schema] = []
   # shared_fields: List[Field] = []
 
+  class Config:
+    orm_mode = True
+
+
+class User(UserInDBBase):
+  ### meta
+  is_active: Optional[bool] = None
+
+  ### access auths
+  is_superuser: bool = False
+
+
+class UserUpdate(UserInDBBase):
+  pass
+
 
 class UserSuper(UserInDBBase, UserCreate):
   pass
+
 
 class UserInDB(User):
   ### secret

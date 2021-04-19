@@ -10,6 +10,6 @@ from ..schemas.schemas_dataset import DatasetCreate, DatasetUpdate
 class CRUDDataset(CRUDBase[Dataset, DatasetCreate, DatasetUpdate]):
   pass
 
-workspace = CRUDDataset(Dataset)
+dataset = CRUDDataset(Dataset)
 
 

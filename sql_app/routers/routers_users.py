@@ -1,18 +1,33 @@
+print(">>>>>> import routers_user.py ...")
 from pydantic.networks import EmailStr
 
 from . import ( settings,
-  List, Session, APIRouter, Depends, Body,
+  List, Session, APIRouter, Depends, Body, 
+  BackgroundTasks, Security,
   HTTPException, status, 
   timedelta,
   File, UploadFile, shutil,
+  jsonable_encoder,
   get_db,
-  schemas_item, crud_items,
-  schemas_post, crud_posts,
-  schemas_comment, crud_comments,
-  schemas_user, crud_users, models_user,
-  schemas_token,
-  schemas_message
+
+  # crud_items,
+  crud_posts,
+
+  crud_comments,
+
 )
+
+from ..schemas.schemas_item import Item, ItemCreate
+from ..schemas.schemas_post import Post
+from ..schemas.schemas_comment import Comment
+
+
+from ..models.models_user import User as UserModel
+from ..schemas.schemas_user import User, UserCreate, UserUpdate, UserBasicInfos
+from ..schemas.schemas_token import TokenAccess, TokenAccessRefresh
+from ..schemas.schemas_message import Msg
+
+from ..crud.crud_users import user, get_current_active_user, get_current_active_user_refresh, get_password_hash
 
 from ..security.jwt import ( JWTError, jwt, CryptContext, 
   OAuth2PasswordBearer, OAuth2PasswordRequestForm,
@@ -22,11 +37,6 @@ from ..security.jwt import ( JWTError, jwt, CryptContext,
   create_access_token, verify_password_reset_token, generate_password_reset_token, 
 )
 
-from ..crud.crud_users import ( authenticate_user,
-  create_user_in_db, update_user_field_in_db,
-  get_user_by_email, get_user_by_id, get_current_user, get_current_active_user, get_current_active_user_refresh,
-  get_users, get_password_hash
-)
 
 from ..emails.emails import (
   send_test_email,
@@ -42,12 +52,13 @@ router = APIRouter()
 
 @router.post("/",
   summary="Create an user",
-  response_model=schemas_user.User,
+  response_model=User,
   status_code=status.HTTP_201_CREATED
 )
 def create_user(
-  user_in: schemas_user.UserCreate, 
-  db: Session = Depends(get_db)
+  user_in: UserCreate, 
+  background_tasks: BackgroundTasks,
+  db: Session = Depends(get_db),
   ):
   """
   Create an user with basic information:
@@ -56,12 +67,22 @@ def create_user(
   - **username**: choose a pseudo
   - **password**: a password chosen by the user
   """
-  db_user = get_user_by_email(db, email=user_in.email)
-  if db_user:
+  # user_in_db = get_user_by_email(db, email=user_in.email)
+  user_in_db = user.get_user_by_email(db, email=user_in.email)
+  if user_in_db:
     raise HTTPException(status_code=400, detail="Email already registered")
   if settings.EMAILS_ENABLED and user_in.email:
     email_verify_token = generate_password_reset_token(email=user_in.email)
-    send_new_account_email(
+    # send_new_account_email(
+    #   email_to=user_in.email,
+    #   username=user_in.username,
+    #   name=user_in.name,
+    #   surname=user_in.surname,
+    #   password=user_in.password,
+    #   token=email_verify_token
+    # )
+    background_tasks.add_task(
+      send_new_account_email,
       email_to=user_in.email,
       username=user_in.username,
       name=user_in.name,
@@ -69,38 +90,39 @@ def create_user(
       password=user_in.password,
       token=email_verify_token
     )
-  return create_user_in_db(db=db, user=user_in)
+  return user.create_user_in_db(db=db, user_in=user_in)
 
 
 @router.get("/",
   summary="Get a list of users",
   description="Get a list of all users given a limit",
-  response_model=List[schemas_user.User]
+  response_model=List[User]
 )
 def read_users(
   skip: int = 0, limit: int = 100, 
   db: Session = Depends(get_db)
   ):
-  users = get_users(db, skip=skip, limit=limit)
-  return users
+  # users_in_db = get_users(db, skip=skip, limit=limit)
+  users_in_db = user.get_multi(db, skip=skip, limit=limit)
+  return users_in_db
 
 
 @router.get("/{user_id}",
   summary="Get an user",
   description="Get infos of one user",
-  response_model=schemas_user.User
+  response_model=User
 )
 def read_user(
   user_id: int,
   db: Session = Depends(get_db)
   ):
-  db_user = get_user_by_id(db, user_id=user_id)
-  if db_user is None:
+  user_in_db = user.get_by_id(db, id=user_id)
+  if user_in_db is None:
     raise HTTPException(
       status_code=status.HTTP_404_NOT_FOUND,
       detail="User not found"
     )
-  return db_user
+  return user_in_db
 
 
 @router.delete("/{user_id}",
@@ -110,9 +132,9 @@ def read_user(
 def delete_user(
   user_id: int, 
   db: Session = Depends(get_db),
-  current_user: models_user.User = Depends(get_current_active_user)
+  current_user: UserModel = Depends(get_current_active_user)
   ):
-  user_deleted = crud_users.delete_user_in_db(db=db, user_id=user_id, current_user=current_user)
+  user_deleted = user.remove_user(db=db, id=user_id, current_user=current_user)
   return {
     "status" : True,
     "user_deleted_id": user_deleted.id,
@@ -121,18 +143,18 @@ def delete_user(
   }
 
 
-@router.post("/{user_id}/items/",
-  summary="Create an item for any user",
-  description="Create an item to another user given the user id",
-  response_model=schemas_item.Item,
-  status_code=status.HTTP_201_CREATED
-)
-def create_item_for_user(
-  user_id: int, 
-  item: schemas_item.ItemCreate,
-  db: Session = Depends(get_db)
-  ):
-  return crud_items.create_user_item(db=db, item=item, user_id=user_id)
+# @router.post("/{user_id}/items/",
+#   summary="Create an item for any user",
+#   description="Create an item to another user given the user id",
+#   response_model=Item,
+#   status_code=status.HTTP_201_CREATED
+# )
+# def create_item_for_user(
+#   user_id: int, 
+#   item: ItemCreate,
+#   db: Session = Depends(get_db)
+#   ):
+#   return crud_items.create_user_item(db=db, item=item, user_id=user_id)
 
 
 
@@ -141,22 +163,43 @@ def create_item_for_user(
 @router.get("/me/",
   summary="Get infos for connected/authenticated user",
   description="Get infos for connected/authenticated user",
-  response_model=schemas_user.User
+  response_model=User
 )
 async def read_users_me(
-  current_user: models_user.User = Depends(get_current_active_user)
+  current_user: UserModel = Depends(get_current_active_user)
   ):
+  print("\n read_users_me > current_user.__dict__ : ", current_user.__dict__)
   return current_user
+
+
+@router.put("/me/",
+  summary="Update user",
+  description="Update user",
+  response_model=User
+)
+async def update_user(
+  user_in: UserBasicInfos,
+  current_user: UserModel = Depends(get_current_active_user),
+  db: Session = Depends(get_db)
+  ):
+  print("\nupdate_user > user_in : ", user_in)
+  
+  current_user_data = jsonable_encoder(current_user)
+  print("update_user > current_user_data : ", current_user_data)
+  
+  user_in_db = user.update(db, db_obj=current_user, obj_in=user_in)
+  print("update_user > user_in_db : ", user_in_db)
+  return user_in_db
 
 
 @router.patch("/me/update_avatar",
   summary="Update user avatar",
   description="Update user avatar by uploading a file",
-  response_model=schemas_user.User
+  response_model=User
 )
 async def update_user_avatar(
   uploaded_file: UploadFile = File(...),
-  current_user: models_user.User = Depends(get_current_active_user),
+  current_user: UserModel = Depends(get_current_active_user),
   db: Session = Depends(get_db)
   ):
   user_id = current_user.id
@@ -164,20 +207,21 @@ async def update_user_avatar(
     shutil.copyfileobj(uploaded_file.file, file_object)
   field = "avatar_url"
   url = str("media/"+uploaded_file.filename)
-  return update_user_field_in_db(db=db, user_id=user_id, field=field, value=url)
+  # return update_user_field_in_db(db=db, user_id=user_id, field=field, value=url)
+  return user.update(db=db, user_id=user_id, field=field, value=url)
 
 
-@router.get("/me/items/",
-  summary="Get user's own items",
-  description="Get connected/authenticated user's own items",
-)
-async def read_own_items(
-  current_user: models_user.User = Depends(get_current_active_user),
-  db: Session = Depends(get_db)
-  ):
-  user_id = current_user.id
-  user_items = crud_items.get_user_items(db=db, user_id=user_id)
-  return [{"items": user_items, "owner": current_user.email, "owner_id": current_user.id}]
+# @router.get("/me/items/",
+#   summary="Get user's own items",
+#   description="Get connected/authenticated user's own items",
+# )
+# async def read_own_items(
+#   current_user: UserModel = Depends(get_current_active_user),
+#   db: Session = Depends(get_db)
+#   ):
+#   user_id = current_user.id
+#   user_items = crud_items.get_user_items(db=db, user_id=user_id)
+#   return [{"items": user_items, "owner": current_user.email, "owner_id": current_user.id}]
 
 
 @router.get("/me/posts/",
@@ -185,7 +229,7 @@ async def read_own_items(
   description="Get connected/authenticated user's own posts",
 )
 async def read_own_posts(
-  current_user: models_user.User = Depends(get_current_active_user),
+  current_user: UserModel = Depends(get_current_active_user),
   db: Session = Depends(get_db)
   ):
   user_id = current_user.id
@@ -198,7 +242,7 @@ async def read_own_posts(
   description="Get connected/authenticated user's own comments",
 )
 async def read_own_comments(
-  current_user: models_user.User = Depends(get_current_active_user),
+  current_user: UserModel = Depends(get_current_active_user),
   db: Session = Depends(get_db)
   ):
   user_id = current_user.id
@@ -210,7 +254,7 @@ async def read_own_comments(
 
 @router.post("/token",
   summary="Create an access token for login",
-  response_model=schemas_token.TokenAccessRefresh,
+  response_model=TokenAccessRefresh,
   status_code=status.HTTP_201_CREATED
 )
 async def login_for_access_token(
@@ -228,8 +272,8 @@ async def login_for_access_token(
   # print("login_for_access_token > form_data.username : ", form_data.username)
   # print("login_for_access_token > form_data.password : ", form_data.password)
   # print("login_for_access_token > form_data.scopes : ", form_data.scopes)
-  user = authenticate_user(db, form_data.username, form_data.password)
-  if not user:
+  user_in_db = user.authenticate_user(db, form_data.username, form_data.password)
+  if not user_in_db:
     raise HTTPException(
       status_code=status.HTTP_401_UNAUTHORIZED,
       detail="Incorrect username or password",
@@ -237,19 +281,19 @@ async def login_for_access_token(
     )
   access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
   refresh_token_expires = timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
-  # print("login_for_access_token > user : ", user)
+  # print("login_for_access_token > user_in_db : ", user_in_db)
   # print("login_for_access_token > form_data.scopes : ", form_data.scopes)
   # print("login_for_access_token > form_data.username : ", form_data.username)
   access_token = create_access_token(
     data={
-      "sub": user.email, 
+      "sub": user_in_db.email, 
       "scopes": form_data.scopes
     },
     expires_delta=access_token_expires
   )
   refresh_token = create_access_token(
     data={
-      "sub": user.email,
+      "sub": user_in_db.email,
       "scopes": ["refresh"]
     },
     expires_delta=refresh_token_expires
@@ -264,10 +308,10 @@ async def login_for_access_token(
 @router.get("/verify-acces-token/",
   summary="Verify user's access token",
   description="Verify user's access token",
-  response_model=schemas_message.Msg
+  response_model=Msg
 )
 async def verify_access_token(
-  current_user: models_user.User = Depends(get_current_active_user)
+  current_user: UserModel = Depends(get_current_active_user)
   ):
   return { "msg": "Access token is stil valid"}
 
@@ -275,10 +319,10 @@ async def verify_access_token(
 @router.get("/new-access-token/",
   summary="New access token from refresh token validation",
   description="New access token from refresh token validation",
-  response_model=schemas_token.TokenAccess
+  response_model=TokenAccess
 )
 async def new_access_token(
-  current_user: models_user.User = Depends(get_current_active_user_refresh)
+  current_user: UserModel = Depends(get_current_active_user_refresh)
   ):
   print("new_access_token > current_user : ", current_user)
   access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -297,50 +341,57 @@ async def new_access_token(
 
 ### PASSWORD RECOVERY
 
-@router.post("/test-email/",
-  response_model=schemas_message.Msg,
-  status_code=201
-)
-def test_email(
-    email_to: EmailStr,
-    # current_user: models_user.User = Depends(get_current_active_superuser),
-    current_user: models_user.User = Depends(get_current_active_user),
-  ) :
-  """
-  Test emails.
-  """
-  send_test_email(email_to=email_to)
-  return {"msg": "Test email sent"}
+# @router.post("/test-email/",
+#   response_model=Msg,
+#   status_code=201
+# )
+# def test_email(
+  #   email_to: EmailStr,
+  #   # current_user: UserModel = Depends(get_current_active_superuser),
+  #   current_user: UserModel = Depends(get_current_active_user),
+  # ) :
+  # """
+  # Test emails.
+  # """
+  # send_test_email(email_to=email_to)
+  # return {"msg": "Test email sent"}
 
 
 @router.post("/password-recovery/{email}",
-  response_model=schemas_message.Msg
+  response_model=Msg
 )
 def password_recovery(
-  email: str, 
+  email: str,
+  background_tasks: BackgroundTasks,
   db: Session = Depends(get_db)
   ):
   """
   Password Recovery
   """
-  user = get_user_by_email(db, email=email)
-  print("password_recovery > user : ", user)
-  if not user:
+  user_in_db = user.get_user_by_email(db, email=email)
+  print("password_recovery > user_in_db : ", user_in_db)
+  if not user_in_db:
     raise HTTPException(
       status_code=404,
       detail="The user with this email does not exist in the system.",
     )
-  password_reset_token = generate_password_reset_token(email=user.email)
-  send_reset_password_email(
-    email_to=user.email,
-    user=user,
+  password_reset_token = generate_password_reset_token(email=user_in_db.email)
+  # send_reset_password_email(
+  #   email_to=user_in_db.email,
+  #   user=user_in_db,
+  #   token=password_reset_token
+  # )
+  background_tasks.add_task(
+    send_reset_password_email,
+    email_to=user_in_db.email,
+    user=user_in_db,
     token=password_reset_token
   )
-  return {"msg": f"Password recovery email sent to {user.email}"}
+  return {"msg": f"Password recovery email sent to {user_in_db.email}"}
 
 
 @router.post("/reset-password/",
-  response_model=schemas_message.Msg
+  response_model=Msg
 )
 def reset_password(
   token: str = Body(...),
@@ -356,23 +407,26 @@ def reset_password(
   print("reset_password > email : ", email)
   if not email:
     raise HTTPException(status_code=400, detail="Invalid token")
-  user = get_user_by_email(db, email=email)
-  if not user:
+  user_in_db = user.get_user_by_email(db, email=email)
+  if not user_in_db:
     raise HTTPException(
       status_code=404,
       detail="The user with this email does not exist in the system.",
     )
-  elif not user.is_active:
-    raise HTTPException(status_code=400, detail="Inactive user")
+  elif not user_in_db.is_active:
+    raise HTTPException(
+      status_code=400,
+      detail="Inactive user"
+  )
   hashed_password = get_password_hash(new_password)
-  user.hashed_password = hashed_password
-  db.add(user)
+  user_in_db.hashed_password = hashed_password
+  db.add(user_in_db)
   db.commit()
-  return {"msg": f"Password updated successfully for user {user.email}"}
+  return {"msg": f"Password updated successfully for user {user_in_db.email}"}
 
 
 @router.get("/verify-email/",
-  response_model=schemas_message.Msg
+  response_model=Msg
 )
 def verify_email(
   token: str,
@@ -386,16 +440,19 @@ def verify_email(
   print("verify_email > email : ", email)
   if not email:
     raise HTTPException(status_code=400, detail="Invalid token")
-  user = get_user_by_email(db, email=email)
-  print("verify_email > user : ", user)
-  if not user:
+  user_in_db = user.get_user_by_email(db, email=email)
+  print("verify_email > user_in_db : ", user_in_db)
+  if not user_in_db:
     raise HTTPException(
       status_code=404,
       detail="The user with this email does not exist in the system.",
     )
-  elif user.is_active:
-    raise HTTPException(status_code=400, detail="User is already verified and active")
-  user.is_active = True
-  db.add(user)
+  elif user_in_db.is_active:
+    raise HTTPException(
+      status_code=400,
+      detail="User is already verified and active"
+  )
+  user_in_db.is_active = True
+  db.add(user_in_db)
   db.commit()
   return {"msg": f"Email {email} was verified and user is now active !"}

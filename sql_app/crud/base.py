@@ -1,10 +1,13 @@
+print(">>>>>> import crud.base.py ...")
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 
+from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from ..db.base_class import Base
+from ..models.models_user import User
 
 ModelType = TypeVar("ModelType", bound=Base)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -42,7 +45,9 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     return db.query(self.model).offset(skip).limit(limit).all()
 
   def get_multi_by_owner(
-    self, db: Session, *, owner_id: int, skip: int = 0, limit: int = 100
+    self, db: Session, *,
+    owner_id: int,
+    skip: int = 0, limit: int = 100
     ) -> List[ModelType]:
     return (
       db.query(self.model)
@@ -80,6 +85,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     obj_in: Union[UpdateSchemaType, Dict[str, Any]]
     ) -> ModelType:
     obj_data = jsonable_encoder(db_obj)
+    print("update > isinstance(obj_in, dict) : ", isinstance(obj_in, dict))
     if isinstance(obj_in, dict):
       update_data = obj_in
     else:
@@ -87,15 +93,26 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     for field in obj_data:
       if field in update_data:
         setattr(db_obj, field, update_data[field])
+    print("update > db_obj : ", db_obj)
     db.add(db_obj)
     db.commit()
     db.refresh(db_obj)
     return db_obj
 
   def remove(
-    self, db: Session, *, id: int
+    self, db: Session, *,
+    id: int,
+    current_user: User,
     ) -> ModelType:
+    print("remove > id : ", id)
+    print("remove > current_user.id : ", current_user.id)
     obj = db.query(self.model).get(id)
+    if not obj:
+      raise HTTPException(status_code=404, detail="object not found")
+    # print("remove > current_user.__dict__ : ", current_user.__dict__)
+    # if not current_user.is_superuser and (obj.owner_id == current_user.id):
+    #   raise HTTPException(status_code=400, detail="Not enough permissions")
+    print("remove > END > obj : ", obj)
     db.delete(obj)
     db.commit()
     return obj

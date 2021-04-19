@@ -15,8 +15,6 @@ from .core.tags_metadata import tags_metadata
 # from fastapi_socketio import SocketManager
 from .websockets import SocketManager
 
-from .crud import crud_items, crud_users
-
 from .db.database import engine, database
 from .models import (
   models_item,

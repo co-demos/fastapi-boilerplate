@@ -2,14 +2,21 @@ from . import ( List, Query,
   Session, APIRouter, Depends,
   HTTPException, status,
   get_db,
-  schemas_post, crud_posts,
-  schemas_comment, crud_comments,
-  models_user
+
+  # schemas_post, 
+  # schemas_comment,
+  crud_posts,
+  crud_comments,
+  # models_user
 )
 
 from ..crud.crud_users import (
   get_current_user,
 )
+
+from ..models.models_user import User
+from ..schemas.schemas_comment import Comment, CommentList, CommentCreate, CommentType
+from ..schemas.schemas_post import Post, PostCreate, PostList
 
 
 router = APIRouter()
@@ -19,12 +26,12 @@ router = APIRouter()
   "/",
   summary="Create an post",
   description="Create an postt, including the id of the user creating the post",
-  response_model=schemas_post.Post, status_code=status.HTTP_201_CREATED
+  response_model=Post, status_code=status.HTTP_201_CREATED
 )
 def create_post_for_user(
-  post: schemas_post.PostCreate, 
+  post: PostCreate, 
   db: Session = Depends(get_db),
-  current_user: models_user.User = Depends(get_current_user)
+  current_user: User = Depends(get_current_user)
   ):
   user_id = current_user.id
   return crud_posts.create_user_post(db=db, post=post, user_id=user_id)
@@ -34,7 +41,7 @@ def create_post_for_user(
   "/{post_id}",
   summary="Get an post",
   description="Get an post by its id",
-  response_model=schemas_post.PostList
+  response_model=PostList
 )
 def read_post(
   post_id: int ,
@@ -50,14 +57,14 @@ def read_post(
   "/{post_id}/comment",
   summary="Create an comment on a post",
   description="Create an comment associated to a post and an user",
-  response_model=schemas_comment.Comment, status_code=status.HTTP_201_CREATED
+  response_model=Comment, status_code=status.HTTP_201_CREATED
 )
 def create_comment_for_user_and_post(
   post_id: int,
-  comment: schemas_comment.CommentCreate, 
-  comment_type: schemas_comment.CommentType = schemas_comment.CommentType.proposal,
+  comment: CommentCreate, 
+  comment_type: CommentType = CommentType.proposal,
   db: Session = Depends(get_db),
-  current_user: models_user.User = Depends(get_current_user)
+  current_user: User = Depends(get_current_user)
   ):
   user_id = current_user.id
   user_email = current_user.email
@@ -75,7 +82,7 @@ def create_comment_for_user_and_post(
   "/",
   summary="Get a list of posts",
   description="Get a list of all posts given a limit",
-  response_model=List[schemas_post.PostList]
+  response_model=List[PostList]
 )
 def read_posts(
   skip: int = 0, limit: int = 100,

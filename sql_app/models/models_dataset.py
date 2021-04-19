@@ -32,8 +32,7 @@ class Dataset(Base):
   ### foreign keys
   owner_id = Column(Integer, ForeignKey("users.id"))
   owner = relationship("User", back_populates="my_datasets")
-  # workspace_id = Column(Integer, ForeignKey("workspaces.id"))
-  # workspace = relationship("Workspace", back_populates="datasets")
+  # workspace_related = relationship("Workspace", back_populates="datasets")
 
   ### relationships
   # owner = relationship("User", back_populates="my_datasets")

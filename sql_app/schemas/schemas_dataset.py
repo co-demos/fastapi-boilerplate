@@ -1,19 +1,21 @@
+print(">>>>>> import schemas_dataset.py >  Dataset ...")
 from . import ( List, Optional, BaseModel,
   datetime
 )
 
-# from .schemas_Table import Table
 from .schemas_permissions import PermissionType
+# from .schemas_workspace import Workspace
+# from .schemas_Table import Table
 
 class DatasetBase(BaseModel):
   ### basic infos
-  title: str
-  description: Optional[str] = None
+  title: str = "My dataset title"
+  description: Optional[str] = "My dataset description"
   licence: str
 
   ### preferences
-  color: Optional[str] = None
-  icon: Optional[str] = None
+  color: Optional[str] = "black"
+  icon: Optional[str] = "icon-table"
 
   ### access auths
   read: PermissionType = PermissionType.perm_owner
@@ -41,6 +43,7 @@ class Dataset(DatasetBase):
   owner_id: int
 
   ### linked data
+  # workspace_related: List[Workspace] = []
   # tables: List[Table] = []
 
   class Config:

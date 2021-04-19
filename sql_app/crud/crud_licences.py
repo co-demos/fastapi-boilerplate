@@ -11,4 +11,3 @@ class CRUDLicence(CRUDBase[Licence, LicenceCreate, LicenceUpdate]):
   pass
 
 licence = CRUDLicence(Licence)
-

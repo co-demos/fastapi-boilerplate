@@ -26,18 +26,14 @@ oauth2_scheme = OAuth2PasswordBearer(
   scopes={
     "me": "Read information about the current user.",
 
-    "items": "Read items.",
-    "posts": "Read posts.",
-    "comments": "Read comments.",
+    "shared": "Shared data.",
 
-    "workspaces": "Read workspaces.",
-    "tables": "Read tables.",
-    "datasets": "Read datasets.",
-    "table_data": "Read table_data.",
-    "schemas": "Read schemas.",
-    "fields": "Read fields.",
+    "read": "Read data.",
+    "comment": "Comment data.",
+    "patch": "patch data.",
+    "manage": "Manage data.",
 
-    "refresh": "Refresh token.",
+    "refresh": "Refresh token scope.",
   },
 )
 
