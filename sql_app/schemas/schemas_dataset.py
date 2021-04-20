@@ -1,7 +1,8 @@
 print(">>>>>> import schemas_dataset.py >  Dataset ...")
-from . import ( List, Optional, BaseModel,
-  datetime
-)
+from typing import List, Optional
+import datetime
+
+from pydantic import BaseModel
 
 from .schemas_permissions import PermissionType
 # from .schemas_workspace import Workspace
@@ -26,6 +27,7 @@ class DatasetBase(BaseModel):
 
 
 class DatasetCreate(DatasetBase):
+  # from_workspace_id: Optional[int]
   pass
 
 

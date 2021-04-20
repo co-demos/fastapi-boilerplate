@@ -1,8 +1,8 @@
-from . import ( Boolean, Column, Integer, String,
-  EmailType, URLType,
-  ForeignKey, relationship,
-  DateTime, datetime
-)
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, JSON
+from sqlalchemy_utils import EmailType, URLType
+from sqlalchemy.orm import relationship
+
+import datetime
 
 from ..db.base_class import Base
 
@@ -54,3 +54,7 @@ class User(Base):
   # shared_tables = relationship("Table", back_populates="sharing")
   # shared_schemas = relationship("Schema", back_populates="sharing")
   # shared_fields = relationship("SchemaField", back_populates="sharing")
+
+  ### UX preferences
+  ux_workspaces = Column(JSON)
+  # ux_datasets = Column(JSON)

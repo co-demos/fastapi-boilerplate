@@ -1,8 +1,11 @@
 print(">>>>>> import schemas_comment.py >  Comment ...")
-from . import ( List, Optional, BaseModel,
-  datetime,
-)
+from typing import List, Optional
+import datetime
+
+from pydantic import BaseModel
+
 from enum import Enum, IntEnum
+
 
 class CommentType(str, Enum):
   simple_comment = "simple comment"

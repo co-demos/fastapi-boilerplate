@@ -23,7 +23,7 @@ from ..schemas.schemas_comment import Comment
 
 
 from ..models.models_user import User as UserModel
-from ..schemas.schemas_user import User, UserCreate, UserUpdate, UserBasicInfos
+from ..schemas.schemas_user import User, UserCreate, UserUpdate, UserBasicInfos, UserUX
 from ..schemas.schemas_token import TokenAccess, TokenAccessRefresh
 from ..schemas.schemas_message import Msg
 
@@ -190,6 +190,40 @@ async def update_user(
   user_in_db = user.update(db, db_obj=current_user, obj_in=user_in)
   print("update_user > user_in_db : ", user_in_db)
   return user_in_db
+
+
+@router.get("/me/ux",
+  summary="Get user ux",
+  description="Get user ux preferences",
+  response_model=UserUX
+)
+async def read_user_ux(
+  current_user: UserModel = Depends(get_current_active_user),
+  db: Session = Depends(get_db)
+  ):
+  current_user_data = jsonable_encoder(current_user)
+  print("update_user_ux > current_user_data : ", current_user_data)
+  return current_user_data
+
+
+@router.put("/me/ux",
+  summary="Update user ux",
+  description="Update user ux",
+  response_model=UserUX
+)
+async def update_user_ux(
+  ux_in: UserUX,
+  current_user: UserModel = Depends(get_current_active_user),
+  db: Session = Depends(get_db)
+  ):
+  print("\nupdate_user_ux > ux_in : ", ux_in)
+  
+  current_user_data = jsonable_encoder(current_user)
+  print("update_user_ux > current_user_data : ", current_user_data)
+  
+  user_in_db = user.update(db, db_obj=current_user, obj_in=ux_in)
+  print("update_user_ux > jsonable_encoder(user_in_db) : ", jsonable_encoder(user_in_db))
+  return jsonable_encoder(user_in_db)
 
 
 @router.patch("/me/update_avatar",

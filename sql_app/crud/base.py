@@ -70,9 +70,12 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
   def create_with_owner(
     self, db: Session, *, 
-    obj_in: CreateSchemaType, owner_id: int
+    obj_in: CreateSchemaType,
+    owner_id: int
     ) -> ModelType:
+    print("\ncreate_with_owner > obj_in : ", obj_in)
     obj_in_data = jsonable_encoder(obj_in)
+    print("create_with_owner > obj_in_data : ", obj_in_data)
     db_obj = self.model(**obj_in_data, owner_id=owner_id)
     db.add(db_obj)
     db.commit()

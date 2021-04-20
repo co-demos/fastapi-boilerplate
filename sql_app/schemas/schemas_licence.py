@@ -1,7 +1,8 @@
 print(">>>>>> import schemas_licence.py >  Licence ...")
-from . import ( List, Optional, BaseModel,
-  datetime
-)
+from typing import Optional
+import datetime
+
+from pydantic import BaseModel
 
 class LicenceBase(BaseModel):
   ### basic infos

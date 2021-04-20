@@ -1,7 +1,8 @@
-from . import ( Boolean, Column, Integer, String,
-  ForeignKey, relationship,
-  DateTime, datetime
-)
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, JSON
+from sqlalchemy_utils import EmailType, URLType
+from sqlalchemy.orm import relationship
+
+import datetime
 
 from ..db.base_class import Base
 
@@ -32,9 +33,10 @@ class Dataset(Base):
   ### foreign keys
   owner_id = Column(Integer, ForeignKey("users.id"))
   owner = relationship("User", back_populates="my_datasets")
-  # workspace_related = relationship("Workspace", back_populates="datasets")
 
+  # workspace_related = relationship("Workspace", back_populates="datasets")
+  # workspace_id = Column(Integer, ForeignKey('workspace.id'))
+  
   ### relationships
-  # owner = relationship("User", back_populates="my_datasets")
   # tables = relationship("Table", back_populates="dataset_related")
   # sharing = relationship("User", back_populates="shared_workspaces")

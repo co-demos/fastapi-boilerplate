@@ -3,7 +3,9 @@ from . import ( List, Session, APIRouter, Depends,
   get_db,
 )
 
-from ..schemas.schemas_dataset import Dataset, DatasetCreate, DatasetUpdate, DatasetList
+from fastapi.encoders import jsonable_encoder
+
+from ..schemas.schemas_dataset import Dataset, DatasetBase,DatasetCreate, DatasetUpdate, DatasetList
 from ..crud.crud_datasets import dataset
 
 from ..models.models_user import User
@@ -28,9 +30,14 @@ def create_dataset_for_user(
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
   ):
-  print("create_dataset_for_user > obj_in :", obj_in)
   user_id = current_user.id
-  return dataset.create_with_owner(db=db, obj_in=obj_in, owner_id=user_id)
+
+  print("\ncreate_dataset_for_user > obj_in :", obj_in)
+  obj_filtered = jsonable_encoder(obj_in)
+  print("create_dataset_for_user > obj_filtered :", obj_filtered)
+  new_obj_in = DatasetBase(**obj_filtered)
+  print("create_dataset_for_user > new_obj_in :", new_obj_in)
+  return dataset.create_with_owner(db=db, obj_in=new_obj_in, owner_id=user_id)
 
 
 @router.get("/{obj_id}",
@@ -98,8 +105,7 @@ def delete_dataset(
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
   ):
-  dataset_in_db = dataset.get_by_id(db=db, id=id)
-  if not dataset_in_db:
-    raise HTTPException(status_code=404, detail="workspace not found")
-  dataset_in_db = dataset.remove(db=db, id=obj_id, current_user=current_user)
-  return dataset_in_db
+  print("delete_dataset > obj_id : ", obj_id)
+  dataset_deleted = dataset.remove(db=db, id=obj_id, current_user=current_user)
+  print("delete_dataset > dataset_deleted : ", dataset_deleted)
+  return dataset_deleted

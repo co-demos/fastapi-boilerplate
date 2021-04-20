@@ -1,10 +1,13 @@
 print(">>>>>> import schemas_workspace.py >  Workspace ...")
-from . import ( List, Optional, BaseModel,
-  datetime
-)
+from typing import List, Optional, Any
+import datetime
+
+from pydantic import BaseModel
+# from uuid import UUID
 
 from .schemas_dataset import Dataset
 from .schemas_permissions import PermissionType
+
 
 class WorkspaceBase(BaseModel):
   ### basic infos
@@ -19,6 +22,11 @@ class WorkspaceBase(BaseModel):
   read: PermissionType = PermissionType.perm_owner
   write: PermissionType = PermissionType.perm_owner
   manage: PermissionType = PermissionType.perm_owner
+
+  ### linked data
+  datasets: Any = {}
+  # datasets: List[Dataset] = []
+  # datasets: List[int] = []
 
 
 class WorkspaceCreate(WorkspaceBase):
@@ -37,9 +45,6 @@ class Workspace(WorkspaceBase):
 
   ### owner
   owner_id: int
-
-  ### linked data
-  datasets: List[Dataset] = []
 
   class Config:
     orm_mode = True

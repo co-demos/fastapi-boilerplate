@@ -1,8 +1,9 @@
 print(">>>>>> import schemas_user.py >  User ...")
-from . import ( List, Optional, BaseModel,
-  EmailStr,
-  datetime
-)
+from typing import List, Optional, Any
+import datetime
+
+from pydantic import BaseModel, EmailStr
+# from uuid import UUID
 
 from .schemas_workspace import Workspace
 from .schemas_dataset import Dataset
@@ -13,7 +14,6 @@ from .schemas_comment import Comment
 
 
 ### USER
-
 
 class UserDelete(BaseModel):
   id: int
@@ -52,7 +52,14 @@ class UserCreate(UserBase, UserBasicInfos, UserBasicInfosAvatar):
   password: str
 
 
-class UserInDBBase(UserInfos):
+class UserUX(BaseModel):
+  ### UX
+  ux_app: Any = {}
+  ux_workspaces: Any = {}
+  ux_datasets: Any = {}
+
+
+class UserInDBBase(UserInfos, UserUX):
   ### meta
   id: Optional[int] = None
 

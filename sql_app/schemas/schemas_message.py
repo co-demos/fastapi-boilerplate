@@ -1,5 +1,5 @@
 print(">>>>>> import schemas_message.py >  Msg ...")
-from . import (BaseModel)
+from pydantic import BaseModel
 
 class Msg(BaseModel):
   msg: str

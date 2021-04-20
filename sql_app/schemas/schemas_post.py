@@ -1,7 +1,9 @@
 print(">>>>>> import schemas_post.py >  Post ...")
-from . import ( List, Optional, BaseModel,
-  datetime
-)
+from typing import List, Optional, Any
+import datetime
+
+from pydantic import BaseModel, Field, EmailStr
+from uuid import UUID
 
 from .schemas_comment import Comment
 

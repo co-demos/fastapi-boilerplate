@@ -1,5 +1,7 @@
 print(">>>>>> import schemas_item.py >  Item ...")
-from . import List, Optional, BaseModel
+from typing import List, Optional
+
+from pydantic import BaseModel
 
 
 class ItemBase(BaseModel):
