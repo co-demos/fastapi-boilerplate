@@ -17,23 +17,28 @@ from .websockets import SocketManager
 
 from .db.database import engine, database
 from .models import (
+  
+  ### tutorial modells
   models_item,
   models_post,
   models_comment,
 
+  ### data patch models
   models_licence,
-  models_table,
+  models_tablemeta,
   models_dataset,
   models_workspace,
   models_user,
 )
 
+### tutorial modells
 models_item.Base.metadata.create_all(bind=engine)
 models_post.Base.metadata.create_all(bind=engine)
 models_comment.Base.metadata.create_all(bind=engine)
 
+### data patch models
 models_licence.Base.metadata.create_all(bind=engine)
-models_table.Base.metadata.create_all(bind=engine)
+models_tablemeta.Base.metadata.create_all(bind=engine)
 models_dataset.Base.metadata.create_all(bind=engine)
 models_workspace.Base.metadata.create_all(bind=engine)
 models_user.Base.metadata.create_all(bind=engine)

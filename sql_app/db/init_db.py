@@ -9,6 +9,21 @@ from ..schemas.schemas_licence import LicenceCreate, LicenceUpdate
 
 from ..core.config import settings
 from ..core.licences import main_licences
+
+# from .base_class import Base
+# from ..models import (
+  
+#   models_item, 
+#   models_post,
+#   models_comment,
+
+#   models_licence,
+#   models_tablemeta,
+#   models_dataset,
+#   models_workspace,
+#   models_user,
+# )
+
 from ..db import *  # noqa: F401
 
 # make sure all SQL Alchemy models are imported (..db) before initializing DB

@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from .schemas_permissions import PermissionType
 # from .schemas_workspace import Workspace
-# from .schemas_Table import Table
+from .schemas_tablemeta import Tablemeta, TablemetaCreate
 
 class DatasetBase(BaseModel):
   ### basic infos
@@ -26,16 +26,19 @@ class DatasetBase(BaseModel):
   manage: PermissionType = PermissionType.perm_owner
 
 
-class DatasetCreate(DatasetBase):
-  # from_workspace_id: Optional[int]
+class DatasetData(DatasetBase): 
+  tables: Optional[List[Tablemeta]] = []
+
+
+class DatasetCreate(DatasetData):
+  tables: Optional[List[TablemetaCreate]] = []
+
+
+class DatasetUpdate(DatasetData):
   pass
 
 
-class DatasetUpdate(DatasetBase):
-  pass
-
-
-class Dataset(DatasetBase):
+class Dataset(DatasetData):
   ### meta
   id: int
   created_date: Optional[datetime.datetime]
@@ -46,7 +49,6 @@ class Dataset(DatasetBase):
 
   ### linked data
   # workspace_related: List[Workspace] = []
-  # tables: List[Table] = []
 
   class Config:
     orm_mode = True

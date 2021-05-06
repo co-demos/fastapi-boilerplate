@@ -136,7 +136,7 @@ pipenv shell
 alembic upgrade head
 pipenv run uvicorn sql_app.main:app --reload
 # or
-# uvicorn sql_app.main:app --reload
+uvicorn sql_app.main:app --reload
 ```
 
 then open the  following url in your browser `http://localhost:8000/api/docs`

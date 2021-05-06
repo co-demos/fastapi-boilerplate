@@ -6,7 +6,7 @@ from ..models import (
   models_comment,
 
   models_licence,
-  models_table,
+  models_tablemeta,
   models_dataset,
   models_workspace,
   models_user,

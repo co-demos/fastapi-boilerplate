@@ -38,5 +38,6 @@ class Dataset(Base):
   # workspace_id = Column(Integer, ForeignKey('workspace.id'))
   
   ### relationships
-  # tables = relationship("Table", back_populates="dataset_related")
+  tables = relationship("Tablemeta", back_populates="dataset_related")
+  
   # sharing = relationship("User", back_populates="shared_workspaces")

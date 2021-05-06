@@ -7,6 +7,7 @@ from pydantic import BaseModel, EmailStr
 
 from .schemas_workspace import Workspace
 from .schemas_dataset import Dataset
+from .schemas_tablemeta import Tablemeta
 
 from .schemas_item import Item
 from .schemas_post import Post
@@ -70,7 +71,7 @@ class UserInDBBase(UserInfos, UserUX):
 
   my_workspaces: List[Workspace] = []
   my_datasets: List[Dataset] = []
-  # my_tables: List[Table] = []
+  # my_tables: List[Tablemeta] = []
   # my_schemas: List[Schema] = []
   # my_fields: List[Field] = []
   # my_groups: List[Group] = []

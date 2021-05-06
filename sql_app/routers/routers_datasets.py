@@ -5,7 +5,7 @@ from . import ( List, Session, APIRouter, Depends,
 
 from fastapi.encoders import jsonable_encoder
 
-from ..schemas.schemas_dataset import Dataset, DatasetBase,DatasetCreate, DatasetUpdate, DatasetList
+from ..schemas.schemas_dataset import Dataset, DatasetBase, DatasetCreate, DatasetUpdate, DatasetList
 from ..crud.crud_datasets import dataset
 
 from ..models.models_user import User
@@ -14,6 +14,10 @@ from ..crud.crud_users import (
   get_current_active_user,
 )
 
+from ..routers.routers_tablemetas import create_tablemeta_for_user
+
+import pprint
+pp = pprint.PrettyPrinter(indent=1)
 
 router = APIRouter()
 
@@ -32,12 +36,39 @@ def create_dataset_for_user(
   ):
   user_id = current_user.id
 
-  print("\ncreate_dataset_for_user > obj_in :", obj_in)
+  # print("\n...create_dataset_for_user > obj_in :", obj_in)
+  # print("\n...create_dataset_for_user > obj_in.dict() ... " )
+  # pp.pprint(obj_in.dict()) 
+
+  ### 1/ create dataset to get dataset id, without table data
   obj_filtered = jsonable_encoder(obj_in)
-  print("create_dataset_for_user > obj_filtered :", obj_filtered)
+  # print("\n...create_dataset_for_user > obj_filtered :", obj_filtered)
   new_obj_in = DatasetBase(**obj_filtered)
-  print("create_dataset_for_user > new_obj_in :", new_obj_in)
-  return dataset.create_with_owner(db=db, obj_in=new_obj_in, owner_id=user_id)
+  # print("\n...create_dataset_for_user > new_obj_in :", new_obj_in)
+  new_dataset = dataset.create_with_owner(db=db, obj_in=new_obj_in, owner_id=user_id)
+  # print("\n...create_dataset_for_user > new_dataset :", new_dataset)
+  new_dataset_id = new_dataset.id
+  # print("\n...create_dataset_for_user > new_dataset_id :", new_dataset_id)
+
+  ### 2/ create table_metadata
+  print("\n...create_dataset_for_user > tables ... " )
+  tables = obj_in.tables
+  tablemeta_ids = {
+    "tables": []
+  }
+  for table in tables :
+
+    ### 2a/ append dataset id to table_metadata and create table_meta
+    new_table_meta = create_tablemeta_for_user(new_dataset_id, table, db, current_user)
+    print("\n...create_dataset_for_user > new_table_meta ... ", new_table_meta )
+    # print("\n...create_dataset_for_user > new_table_meta ... " )
+    # pp.pprint( new_table_meta ) 
+
+    ### 2b/ store table_meta.id for later
+    tablemeta_ids["tables"].append(new_table_meta.id)
+
+  ### 3b/ return new_dataset
+  return new_dataset
 
 
 @router.get("/{obj_id}",

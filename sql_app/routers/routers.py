@@ -5,6 +5,7 @@ from fastapi import APIRouter, Security
 from . import (
   # routers_items,
 
+  routers_tablemetas,
   routers_datasets,
   routers_workspaces,
   routers_users,
@@ -33,6 +34,15 @@ api_router.include_router(
   prefix="/datasets",
   tags=["datasets"]
 )
+
+api_router.include_router(
+  routers_tablemetas.router,
+  prefix="/tables",
+  tags=["tables"]
+)
+
+
+### tutorial routes
 
 # api_router.include_router(
 #   routers_items.router,

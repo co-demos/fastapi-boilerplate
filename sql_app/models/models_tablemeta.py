@@ -6,8 +6,8 @@ import datetime
 
 from ..db.base_class import Base
 
-class Table(Base):
-  # __tablename__ = "Table"
+class Tablemeta(Base):
+  # __tablename__ = "Tablemeta"
 
   ### meta
   id = Column(Integer, primary_key=True, index=True)
@@ -18,12 +18,12 @@ class Table(Base):
   title = Column(String, index=True)
   description = Column(String, index=True)
 
-  # licence = Column(String, index=True)
+  licence = Column(String, index=True)
   # schema = Column(String, index=True)
 
   ### preferences
-  color = Column(String, default='black')
-  icon = Column(String, default='')
+  # color = Column(String, default='black')
+  # icon = Column(String, default='')
 
   ### access auths
   read = Column(String, default='owner-only')
@@ -34,9 +34,15 @@ class Table(Base):
 
   ### owner
   owner_id = Column(Integer, ForeignKey("users.id"))
-  dataset_id = Column(Integer, ForeignKey("datasets.id"))
   # owner = relationship("User", back_populates="my_tables")
 
   ### relationships
-  # table_data = relationship("TableData", back_populates="table_related")
+  dataset_id = Column(Integer, ForeignKey("datasets.id"))
+  dataset_related = relationship("Dataset", back_populates="tables")
+
+  ### table data
+  table_fields = Column(JSON)
+  # table_data = Column(String, index=True)
+  table_data_uuid = Column(String, index=True)
+
   # sharing = relationship("User", back_populates="shared_tables")
