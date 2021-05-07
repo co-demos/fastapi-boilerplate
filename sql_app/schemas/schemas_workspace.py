@@ -28,6 +28,8 @@ class WorkspaceBase(BaseModel):
   # datasets: List[Dataset] = []
   # datasets: List[int] = []
 
+print("=== SCH-schemas_workspace > WorkspaceBase : ", WorkspaceBase)
+
 
 class WorkspaceCreate(WorkspaceBase):
   pass

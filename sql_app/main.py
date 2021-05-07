@@ -16,33 +16,36 @@ from .core.tags_metadata import tags_metadata
 from .websockets import SocketManager
 
 from .db.database import engine, database
-from .models import (
+from .db.base_class import Base
+
+# from .models import (
   
-  ### tutorial modells
-  models_item,
-  models_post,
-  models_comment,
+#   ### tutorial modells
+#   models_item,
+#   models_post,
+#   models_comment,
 
-  ### data patch models
-  models_licence,
-  models_tablemeta,
-  models_dataset,
-  models_workspace,
-  models_user,
-)
+#   ### data patch models
+#   models_licence,
+#   models_tablemeta,
+#   models_dataset,
+#   models_workspace,
+#   models_user,
+# )
 
-### tutorial modells
-models_item.Base.metadata.create_all(bind=engine)
-models_post.Base.metadata.create_all(bind=engine)
-models_comment.Base.metadata.create_all(bind=engine)
+### tutorial models
+# models_item.Base.metadata.create_all(bind=engine)
+# models_post.Base.metadata.create_all(bind=engine)
+# models_comment.Base.metadata.create_all(bind=engine)
 
 ### data patch models
-models_licence.Base.metadata.create_all(bind=engine)
-models_tablemeta.Base.metadata.create_all(bind=engine)
-models_dataset.Base.metadata.create_all(bind=engine)
-models_workspace.Base.metadata.create_all(bind=engine)
-models_user.Base.metadata.create_all(bind=engine)
+# models_licence.Base.metadata.create_all(bind=engine)
+# models_tablemeta.Base.metadata.create_all(bind=engine)
+# models_dataset.Base.metadata.create_all(bind=engine)
+# models_workspace.Base.metadata.create_all(bind=engine)
+# models_user.Base.metadata.create_all(bind=engine)
 
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
   title=settings.APP_TITLE,

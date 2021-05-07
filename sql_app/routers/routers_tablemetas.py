@@ -15,6 +15,7 @@ from ..crud.crud_users import (
   get_current_user,
   get_current_active_user,
 )
+from ..models.models_tabledata import TableDataBuilder
 
 import pprint
 pp = pprint.PrettyPrinter(indent=1)
@@ -42,20 +43,42 @@ def create_tablemeta_for_user(
   # pp.pprint(obj_in.dict())
 
   ### === TABLE DATA ===
-  ### 1/ dynamically create table with table_fields, table_data, table_data_uuid
+
+  ### 1a/ set up main data for later
   table_fields = obj_in.table_fields
-  print("\n... === create_tablemeta_for_user > table_fields ...")
-  pp.pprint(table_fields)
+  # print("\n... === create_tablemeta_for_user > table_fields ...")
+  # pp.pprint(table_fields)
+
+  table_fields_dict = [ field.dict() for field in table_fields ]
+  # print("\n... === create_tablemeta_for_user > table_fields_dict ...")
+  # pp.pprint(table_fields_dict)
 
   table_data = obj_in.table_data
-  print("\n... === create_tablemeta_for_user > table_data ...")
-  pp.pprint(table_data)
+  # print("\n... === create_tablemeta_for_user > table_data ...")
+  # pp.pprint(table_data)
 
+  ### 1b/ create an uuid with a prefix for alembic exclusion
   table_data_uuid = uuid.uuid4().hex
-  print("\n... === create_tablemeta_for_user > table_data_uuid : ", table_data_uuid)
+  # print("\n... === create_tablemeta_for_user > table_data_uuid : ", table_data_uuid)
+
+  ### 1c/ create table class with table_fields, table_data_uuid, table_data
+  table_db_class = TableDataBuilder(
+    db,
+    table_data_uuid,
+    table_fields_dict
+  )
+  # print("\n... === create_tablemeta_for_user > table_db_class ...")
+  # pp.pprint(table_db_class)
+
+  ### 1d/ build Table object
+  table_db_class.create_table()
+
+  ### 1f/ populate table_db with data
+  table_db_class.bulk_import(table_data)
 
 
   ### === TABLE METADATA ===
+
   ### 2a/ append dataset_id to obj_in TablemetaCreate
   obj_in.dataset_id = dataset_id
   print("\n... === create_tablemeta_for_user > obj_in.dict() ... " )

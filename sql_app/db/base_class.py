@@ -13,13 +13,11 @@ from sqlalchemy.ext.declarative import (
 
 p = inflect.engine()
 
-# Base = declarative_base()
-# Base: DeclarativeMeta = declarative_base()
 @as_declarative()
 class Base:
   id: Any
   __name__: str
   # Generate __tablename__ automatically
-  @declared_attr    
-  def __tablename__(cls):    
+  @declared_attr
+  def __tablename__(cls):
     return p.plural(cls.__name__.lower())

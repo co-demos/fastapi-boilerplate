@@ -58,6 +58,9 @@ class FieldDataBase(BaseModel):
   hide: Optional[bool] = False
   fixed: Optional[bool] = False
 
+  class Config:  
+    use_enum_values = True
+
 
 class FieldDataCreate(FieldDataBase):
   # from_workspace_id: Optional[int]

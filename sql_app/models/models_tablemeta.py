@@ -6,6 +6,10 @@ import datetime
 
 from ..db.base_class import Base
 
+import pprint
+pp = pprint.PrettyPrinter(indent=1)
+
+
 class Tablemeta(Base):
   # __tablename__ = "Tablemeta"
 
@@ -46,3 +50,6 @@ class Tablemeta(Base):
   table_data_uuid = Column(String, index=True)
 
   # sharing = relationship("User", back_populates="shared_tables")
+
+# print("\n=== models_tablemeta > Tablemeta.__dict__ ...")
+# pp.pprint(Tablemeta.__dict__)
