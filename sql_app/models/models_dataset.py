@@ -4,10 +4,10 @@ from sqlalchemy.orm import relationship
 
 import datetime
 
-from ..db.base_class import Base
+from ..db.base_class import BaseCommons
 
-class Dataset(Base):
-  # __tablename__ = "Dataset"
+class Dataset(BaseCommons):
+  # __tablename__ = "datasets"
 
   ### meta
   id = Column(Integer, primary_key=True, index=True)

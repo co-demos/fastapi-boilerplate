@@ -5,7 +5,8 @@ from sqlalchemy import (
 )
 from sqlalchemy_utils import EmailType, URLType
 
-from ..db.database import engine
+from ..db.database import engine_commons, engine_data
+from ..db.base_class import BaseData
 
 from sqlalchemy.orm import mapper
 from sqlalchemy.ext.declarative import ( 
@@ -25,8 +26,7 @@ from ..crud.base import CRUDBase
 import pprint
 pp = pprint.PrettyPrinter(indent=1)
 
-BaseGeneric = declarative_base()
-metadata = MetaData(bind=engine, reflect=True)
+metadata = MetaData(bind=engine_data, reflect=True)
 
 table_model_prefix = "DP_"
 table_field_prefix = "f_"
@@ -54,26 +54,27 @@ field_types = {
   "any":     { "model": String,     "schema": Any },
 }
 
+
 ################################
 ### MODEL - sqlalchemy
 ################################
 
 class TableDataModel:
   """
-  Creates a SqlAlchemy model dynamically given a list of fields.
-    
-  Attributes:
-  ----------
-    [ <sqlalchemy type> ] : list of sqlachemy types
+    Creates a SqlAlchemy model dynamically given a list of fields.
+      
+    Attributes:
+    ----------
+      [ <sqlalchemy type> ] : list of sqlachemy types
   """
 
   def __init__(self, table_fields):
     """
-    The constructor for TableDataModel class.
+      The constructor for TableDataModel class.
 
-    Parameters
-    ----------
-      table_fields (list): ...
+      Parameters
+      ----------
+        table_fields (list of dicts): ...
     """
     # print("=== TableData > table_fields :", table_fields)
     for col in table_fields:
@@ -92,20 +93,6 @@ class TableDataModel:
     all_columns = self.__dict__.keys()
     return [ self.__dict__[item] for item in all_columns if not item.startswith("_")]
 
-def get_class_by_tablename(table_fullname):
-  """Return class reference mapped to table.
-
-  :param table_fullname: String with name of table.
-  :return: Class reference or None.
-  """
-  # print("\n--- get_class_by_tablename > BaseGeneric._decl_class_registry.values()  :", BaseGeneric._decl_class_registry.values() )
-  # print("\n--- get_class_by_tablename > BaseGeneric.__dict__ ..." )
-  # pp.pprint(BaseGeneric.__dict__)
-
-  # print("\n--- get_class_by_tablename > metadata.__dict__ ..." )
-  # pp.pprint(metadata.__dict__)
-
-  return metadata.tables[table_fullname]
 
 
 ################################
@@ -115,76 +102,45 @@ def get_class_by_tablename(table_fullname):
 # constructor
 def TableDataBaseConstructor(table_fields):
   """
-  The constructor for TableDataBase class.
+    The constructor for TableDataBase class.
+    ### cf : https://pydantic-docs.helpmanual.io/usage/models/#required-optional-fields
 
-  Parameters
-  ----------    
-  table_fields : [ dict ]
-    The fields (or headers) populating the columns.
-    List of field objects, each containing at least those keys : 'id', 'field_type', 'value'
+    Parameters
+    ----------    
+    table_fields : [ dict ]
+      The fields (or headers) populating the columns.
+      List of field objects, each containing at least those keys : 'id', 'field_type', 'value'
   """
-  ### cf : https://pydantic-docs.helpmanual.io/usage/models/#required-optional-fields
   pydantic_fields = {}
   for col in table_fields:
     # print("\n=== TableDataBaseConstructor > col :", col)
     col_id = f"{table_field_prefix}{col['id']}"
     col_type = col["field_type"]
-    # pydantic_fields[col_id] = Optional[field_types[col_type]["schema"]]
     # pydantic_fields[col_id] = (Optional[field_types[col_type]["schema"]], ... )
     pydantic_fields[col_id] = (Optional[field_types[col_type]["schema"]], None )
   return pydantic_fields
 
-# def TableDataBaseSetter(self, key, value):
-#   setattr(self, key, value)
-
-### methods
-# @property
-# def get_table_uuid(self, arg):
-#   return self.table_uuid
-
-# def displayMethod(self, arg):
-#   print(arg)
-  
-### class methods
-@classmethod
-def getClassName(cls):
-  return cls.__name__
-
 
 def CreateTableDataBase(table_uuid, table_fields):
   """
-  Creates a Pydantic schema class dynamically.
+    Creates a Pydantic schema class dynamically.
+      
+    Parameters
+    ----------
+    table_uuid : str
+      The table_uuid given to the dynamically created table
+    table_fields : [ dict ]
+      The fields (or headers) populating the columns.
+      List of field objects, each containing at least those keys : 'id', 'field_type', 'value'
     
-  Parameters
-  ----------
-  table_uuid : str
-    The table_uuid given to the dynamically created table
-  table_fields : [ dict ]
-    The fields (or headers) populating the columns.
-    List of field objects, each containing at least those keys : 'id', 'field_type', 'value'
-  
-  Return:
-  ----------
-    tableSchemaClass : Dynamically created pydantic model
+    Return:
+    ----------
+      tableSchemaClass : Dynamically created pydantic model
+
+    ### cf : https://www.geeksforgeeks.org/create-classes-dynamically-in-python/#:~:text=Python%20Code%20can%20be%20dynamically,the%20type%20of%20the%20object.&text=The%20above%20syntax%20returns%20the%20type%20of%20object.
   """
   print("\n=== CreateTableDataBase > table_uuid :", table_uuid)
   # print("=== CreateTableDataBase > table_fields :", table_fields)
-
-  ### cf : https://www.geeksforgeeks.org/create-classes-dynamically-in-python/#:~:text=Python%20Code%20can%20be%20dynamically,the%20type%20of%20the%20object.&text=The%20above%20syntax%20returns%20the%20type%20of%20object.
-  # class_attrs = {
-  #   # "__init__": TableDataBaseConstructor,
-  #   # "__setattr__": TableDataBaseSetter,
-  #   "__table_uuid__": table_uuid,
-  #   "__related_table__": f"{table_model_prefix}{table_uuid}",
-  #   # "func_arg": displayMethod,
-  #   "__class_name__": getClassName
-  # }
-
-  # tableSchemaClass = type( 
-  #   f"{table_base_prefix}{table_uuid}",
-  #   (BaseModel, ),
-  #   class_attrs
-  # )
 
   fields = TableDataBaseConstructor(table_fields)
   tableSchemaClass = create_model(
@@ -193,8 +149,6 @@ def CreateTableDataBase(table_uuid, table_fields):
   )
   
   print("\n=== CreateTableDataBase > tableSchemaClass.__name__ :", tableSchemaClass.__name__)
-  # print("\n=== CreateTableDataBase > dir(tableSchemaClass) :", dir(tableSchemaClass))
-  print("\n=== CreateTableDataBase > vars(tableSchemaClass) :", vars(tableSchemaClass))
   return tableSchemaClass
 
 
@@ -207,20 +161,20 @@ class TableDataBuilder(object):
 
   def __init__(self, db, table_uuid, table_fields):
     """
-    Build a full table object dynamically, usable as models, schema, ...
-    Methods can either create a new table in the DB given a list of columns, 
-    can operate CRUD operations on said table,
-    can populate the table with data,
-    can make CRUD operations on data,
-    ...
+      Build a full table object dynamically, usable as models, schema, ...
+      Methods can either create a new table in the DB given a list of columns, 
+      can operate CRUD operations on said table,
+      can populate the table with data,
+      can make CRUD operations on data,
+      ...
 
-    Parameters
-    ----------
-    table_uuid : str
-      The UUID for the created table or for the table to create
-    table_fields : [ dict ]
-      The fields (or headers) populating the columns.
-      List of field objects, each containing at least those keys : 'id', 'field_type', 'value'
+      Parameters
+      ----------
+      table_uuid : str
+        The UUID for the created table or for the table to create
+      table_fields : [ dict ]
+        The fields (or headers) populating the columns.
+        List of field objects, each containing at least those keys : 'id', 'field_type', 'value'
     """
     # print("\n=== TableDataBuilder > init > table_uuid :", table_uuid)
     # print("\n=== TableDataBuilder > init > table_fields :", table_fields)
@@ -229,11 +183,13 @@ class TableDataBuilder(object):
     self.table_uuid = table_uuid
     self.table_name = f"{table_model_prefix}{self.table_uuid}"
     self.table_fields = table_fields
+    # builfd
     self.table_structure = TableDataModel(table_fields)
     self.table_schema = CreateTableDataBase(table_uuid, table_fields)
+    self.build_model()
 
   ### ---------------------- ###
-  ### table creation
+  ### table objects (SQL model + Pydantic) creation
   ### ---------------------- ###
 
   @property
@@ -241,7 +197,7 @@ class TableDataBuilder(object):
     return self.table_structure.allColumns
 
   def build_model(self): 
-    Model = type(self.table_name, (BaseGeneric,), {
+    Model = type(self.table_name, (BaseData,), {
       '__tablename__': self.table_name,
      'id': Column(Integer, primary_key=True, autoincrement=True),
       **self.table_structure.__dict__
@@ -256,13 +212,12 @@ class TableDataBuilder(object):
     cf : https://stackoverflow.com/questions/973481/dynamic-table-creation-and-orm-mapping-in-sqlalchemy
     """
 
-    self.build_model()
-    BaseGeneric.metadata.create_all(bind=engine)
+    BaseData.metadata.create_all(bind=engine_data)
 
 
 
   ### ---------------------- ###
-  ### table population
+  ### table data population
   ### ---------------------- ###
 
   @property

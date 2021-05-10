@@ -4,10 +4,10 @@ from sqlalchemy.orm import relationship
 
 import datetime
 
-from ..db.base_class import Base
+from ..db.base_class import BaseCommons
 
-class Comment(Base):
-  # __tablename__ = "Comments"
+class Comment(BaseCommons):
+  # __tablename__ = "comments"
 
   id = Column(Integer, primary_key=True, index=True)
   

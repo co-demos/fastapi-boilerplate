@@ -1,4 +1,4 @@
-import databases
+# import databases
 from pathlib import Path
 
 import pprint
@@ -15,8 +15,8 @@ from .core.tags_metadata import tags_metadata
 # from fastapi_socketio import SocketManager
 from .websockets import SocketManager
 
-from .db.database import engine, database
-from .db.base_class import Base
+from .db.database import engine_commons #, database
+from .db.base_class import BaseCommons
 
 # from .models import (
   
@@ -34,18 +34,18 @@ from .db.base_class import Base
 # )
 
 ### tutorial models
-# models_item.Base.metadata.create_all(bind=engine)
-# models_post.Base.metadata.create_all(bind=engine)
-# models_comment.Base.metadata.create_all(bind=engine)
+# models_item.Base.metadata.create_all(bind=engine_commons)
+# models_post.Base.metadata.create_all(bind=engine_commons)
+# models_comment.Base.metadata.create_all(bind=engine_commons)
 
 ### data patch models
-# models_licence.Base.metadata.create_all(bind=engine)
-# models_tablemeta.Base.metadata.create_all(bind=engine)
-# models_dataset.Base.metadata.create_all(bind=engine)
-# models_workspace.Base.metadata.create_all(bind=engine)
-# models_user.Base.metadata.create_all(bind=engine)
+# models_licence.Base.metadata.create_all(bind=engine_commons)
+# models_tablemeta.Base.metadata.create_all(bind=engine_commons)
+# models_dataset.Base.metadata.create_all(bind=engine_commons)
+# models_workspace.Base.metadata.create_all(bind=engine_commons)
+# models_user.Base.metadata.create_all(bind=engine_commons)
 
-Base.metadata.create_all(bind=engine)
+BaseCommons.metadata.create_all(bind=engine_commons)
 
 app = FastAPI(
   title=settings.APP_TITLE,
@@ -133,15 +133,15 @@ app.openapi = custom_openapi
 
 ### databases related
 
-@app.on_event("startup")
-async def startup():
-  print("startup app > ...")
-  await database.connect()
+# @app.on_event("startup")
+# async def startup():
+#   print("startup app > ...")
+#   await database.connect()
 
-@app.on_event("shutdown")
-async def shutdown():
-  print("shutdown app > ...")
-  await database.disconnect()
+# @app.on_event("shutdown")
+# async def shutdown():
+#   print("shutdown app > ...")
+#   await database.disconnect()
 
 
 ### STATIC FILES

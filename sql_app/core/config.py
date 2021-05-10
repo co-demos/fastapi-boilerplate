@@ -44,16 +44,28 @@ class Settings(BaseSettings):
   #   return v
 
   SQL_TYPE: str
+  
+  ### SQL LITE
   SQLITE_DB_NAME: str
   SQLITE_DB_URL: str
   SQLITE_DB_URL_ALEMBIC: str
+  
+  SQLITE_DB_DATA_NAME: str
+  SQLITE_DB_DATA_URL: str
+  SQLITE_DB_DATA_URL_ALEMBIC: str
 
+  ### POSTGRESQL
   SQL_SERVER: str
   SQL_USER: str
   SQL_PWD: str
+
   SQL_DB: str
   SQL_DB_URL: str
   SQL_DB_URL_BIS: Optional[PostgresDsn] = None
+  
+  SQL_DB_DATA: str
+  SQL_DB_URL_DATA: str
+  SQL_DB_URL_DATA_BIS: Optional[PostgresDsn] = None
 
   @validator("SQL_DB_URL_BIS", pre=True)
   def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
@@ -65,6 +77,18 @@ class Settings(BaseSettings):
       password=values.get("SQL_PWD"),
       host=values.get("SQL_SERVER"),
       path=f"/{values.get('SQL_DB') or ''}",
+    )
+
+  @validator("SQL_DB_URL_DATA_BIS", pre=True)
+  def assemble_db_connection_data(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
+    if isinstance(v, str):
+      return v
+    return PostgresDsn.build(
+      scheme="postgresql",
+      user=values.get("SQL_USER"),
+      password=values.get("SQL_PWD"),
+      host=values.get("SQL_SERVER"),
+      path=f"/{values.get('SQL_DB_DATA') or ''}",
     )
 
   SMTP_TLS: bool = True
@@ -117,6 +141,6 @@ class Settings(BaseSettings):
 def get_settings():
   return Settings()
 
-settings = Settings()
 print("config.py > settings : ...")
+settings = Settings()
 # pp.pprint(settings.dict())

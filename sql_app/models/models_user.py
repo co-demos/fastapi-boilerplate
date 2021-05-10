@@ -4,10 +4,12 @@ from sqlalchemy.orm import relationship
 
 import datetime
 
-from ..db.base_class import Base
+from ..db.base_class import BaseCommons
 
-class User(Base):
+class User(BaseCommons):
   # __tablename__ = "users"
+
+  # __bind_key__ = 'DB_commons'
 
   ### meta
   id = Column(Integer, primary_key=True, index=True)

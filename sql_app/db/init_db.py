@@ -10,7 +10,7 @@ from ..schemas.schemas_licence import LicenceCreate, LicenceUpdate
 from ..core.config import settings
 from ..core.licences import main_licences
 
-# from .base_class import Base
+# from .base_class import BaseCommons
 # from ..models import (
   
 #   models_item, 
@@ -35,7 +35,7 @@ def init_db(db: Session) -> None:
     # Tables should be created with Alembic migrations
     # But if you don't want to use migrations, create
     # the tables un-commenting the next line
-    # Base.metadata.create_all(bind=engine)
+    # Base.metadata.create_all(bind=engine_commons)
 
     ### add superuser from .env file
     # user_in_db = crud_users.get_user_by_email(db, email=settings.FIRST_SUPERUSER)

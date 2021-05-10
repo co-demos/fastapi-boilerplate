@@ -4,9 +4,9 @@ from sqlalchemy.orm import relationship
 
 import datetime
 
-from ..db.base_class import Base
+from ..db.base_class import BaseCommons
 
-class Item(Base):
+class Item(BaseCommons):
   # __tablename__ = "items"
 
   id = Column(Integer, primary_key=True, index=True)

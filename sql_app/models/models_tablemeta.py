@@ -4,14 +4,16 @@ from sqlalchemy.orm import relationship
 
 import datetime
 
-from ..db.base_class import Base
+from ..db.base_class import BaseCommons
 
 import pprint
 pp = pprint.PrettyPrinter(indent=1)
 
 
-class Tablemeta(Base):
+class Tablemeta(BaseCommons):
   # __tablename__ = "Tablemeta"
+
+  # __bind_key__ = 'DB_commons'
 
   ### meta
   id = Column(Integer, primary_key=True, index=True)

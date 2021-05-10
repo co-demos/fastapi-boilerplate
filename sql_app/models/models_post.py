@@ -4,10 +4,12 @@ from sqlalchemy.orm import relationship
 
 import datetime
 
-from ..db.base_class import Base
+from ..db.base_class import BaseCommons
 
-class Post(Base):
+class Post(BaseCommons):
   # __tablename__ = "Posts"
+
+  # __bind_key__ = 'DB_commons'
 
   id = Column(Integer, primary_key=True, index=True)
   
