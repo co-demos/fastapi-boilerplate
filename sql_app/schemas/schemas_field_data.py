@@ -37,6 +37,7 @@ class FieldDataBase(BaseModel):
   value: str = "My field value"  # aka name
   text: str = "fieldValue" # aka name full
   field_type : FieldType = FieldType.str_
+  field_code : Optional[str]
 
   description: Optional[str] = "My field description"
   example: Optional[str] = "An example"

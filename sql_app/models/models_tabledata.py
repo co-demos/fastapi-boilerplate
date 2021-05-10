@@ -3,7 +3,7 @@ from sqlalchemy import (
   Table, MetaData, Column, ForeignKey, 
   Boolean, Integer, String, Float, DateTime, JSON
 )
-from sqlalchemy_utils import EmailType, URLType
+from sqlalchemy_utils import EmailType, URLType, get_class_by_table
 
 from ..db.database import engine_commons, engine_data
 from ..db.base_class import BaseData
@@ -67,6 +67,8 @@ class TableDataModel:
     ----------
       [ <sqlalchemy type> ] : list of sqlachemy types
   """
+  
+  # id = Column(Integer, primary_key=True, autoincrement=True),
 
   def __init__(self, table_fields):
     """
@@ -84,14 +86,14 @@ class TableDataModel:
       # print("=== TableDataModel > col_type :", col_type)
       self.__dict__[col_id] = Column(col_id, field_types[col_type]["model"])
 
-  @property
-  def allColumns(self) : 
-    """
-    Returns a list of Column objects from self.
-    """
-    # print("\n=== TableDataModel > allColumns ... ")
-    all_columns = self.__dict__.keys()
-    return [ self.__dict__[item] for item in all_columns if not item.startswith("_")]
+  # @property
+  # def allColumns(self) : 
+  #   """
+  #   Returns a list of Column objects from self.
+  #   """
+  #   # print("\n=== TableDataModel > allColumns ... ")
+  #   all_columns = self.__dict__.keys()
+  #   return [ self.__dict__[item] for item in all_columns if not item.startswith("_")]
 
 
 
@@ -151,6 +153,9 @@ def CreateTableDataBase(table_uuid, table_fields):
   print("\n=== CreateTableDataBase > tableSchemaClass.__name__ :", tableSchemaClass.__name__)
   return tableSchemaClass
 
+def CreateFieldsCodes(table_fields): 
+  fields_with_code = [ { **f, "field_code": f"{table_field_prefix}{f['id']}" } for f in table_fields ]
+  return fields_with_code
 
 
 ################################
@@ -176,34 +181,65 @@ class TableDataBuilder(object):
         The fields (or headers) populating the columns.
         List of field objects, each containing at least those keys : 'id', 'field_type', 'value'
     """
-    # print("\n=== TableDataBuilder > init > table_uuid :", table_uuid)
-    # print("\n=== TableDataBuilder > init > table_fields :", table_fields)
+    print("\n================================================================= ")
+    print("\n=== TableDataBuilder > init > table_uuid :", table_uuid)
+    # print("\n=== TableDataBuilder > init > stable_fields :", table_fields)
 
     self.db = db
     self.table_uuid = table_uuid
     self.table_name = f"{table_model_prefix}{self.table_uuid}"
+    
+    # build specific data
     self.table_fields = table_fields
-    # builfd
     self.table_structure = TableDataModel(table_fields)
     self.table_schema = CreateTableDataBase(table_uuid, table_fields)
-    self.build_model()
 
-  ### ---------------------- ###
+  ### ---------------------------------------------- ###
   ### table objects (SQL model + Pydantic) creation
-  ### ---------------------- ###
+  ### ---------------------------------------------- ###
 
-  @property
-  def table_columns(self):
-    return self.table_structure.allColumns
+  # @property
+  # def table_columns(self):
+  #   return self.table_structure.allColumns
 
   def build_model(self): 
     Model = type(self.table_name, (BaseData,), {
       '__tablename__': self.table_name,
-     'id': Column(Integer, primary_key=True, autoincrement=True),
+       'id': Column(Integer, primary_key=True, autoincrement=True),
       **self.table_structure.__dict__
       }
     )
-    self.model = Model 
+    return Model
+  
+  @property
+  def get_table_model(self):
+    print("\n=== === ==== ==== \n=== TableDataBuilder > get_table_model > self.table_name :", self.table_name)
+    # print("\n=== TableDataBuilder > get_table_model > metadata.tables ... ")
+    # pp.pprint(metadata.tables)
+    
+    model = None
+
+    # try:
+    print("\n=== TableDataBuilder > get_table_model > try > model ... ")
+    # print("=== TableDataBuilder > try > get_table_model > BaseData._decl_class_registry.values() ... ")
+    # pp.pprint(BaseData._decl_class_registry.values())
+    for c in BaseData._decl_class_registry.values():
+      print("=== TableDataBuilder > try > get_table_model > c ... ")
+      pp.pprint(dir(c))
+      if hasattr(c, '__tablename__') :
+        pp.pprint(c.__tablename__)
+        if c.__tablename__ == self.table_name:
+          # pp.pprint(dir(c))
+          model = c
+    
+    if not model : 
+      ### exception if server has reloaded
+      print("\n=== TableDataBuilder > get_table_model > except > model ... ")
+      model = self.build_model()
+      # pp.pprint(model.__dict__)
+
+    return model
+
 
   def create_table(self):
     """
@@ -211,9 +247,9 @@ class TableDataBuilder(object):
     cf : https://docs.sqlalchemy.org/en/14/core/metadata.html
     cf : https://stackoverflow.com/questions/973481/dynamic-table-creation-and-orm-mapping-in-sqlalchemy
     """
-
+    self.table_model = self.build_model()
+    print("\n=== TableDataBuilder > cols_mapper > self.table_model :", self.table_model)
     BaseData.metadata.create_all(bind=engine_data)
-
 
 
   ### ---------------------- ###
@@ -228,7 +264,9 @@ class TableDataBuilder(object):
     -------
       cols : a dictionnary as follow { <field_value> : <field_id> }
     """
-    cols = { h["value"] : f"{table_field_prefix}{h['id']}" for h in self.table_fields }
+    # print("\n=== TableDataBuilder > cols_mapper > self.table_fields :", self.table_fields)
+    # cols = { h["value"] : f"{table_field_prefix}{h['id']}" for h in self.table_fields }
+    cols = { h["value"] : f"{h['field_code']}" for h in self.table_fields }
     return cols
 
   def set_table_data(self, table_data):
@@ -239,10 +277,20 @@ class TableDataBuilder(object):
     ----------
       table_data ( [dict] ): list of dictionnaries... 
     """
-    # print("\n=== TableDataBuilder > bulk_import > table_data :", table_data)
+    print("\n=== TableDataBuilder > bulk_import > table_data :", table_data)
     cols_mapper = self.cols_mapper
-    # print("\n=== TableDataBuilder > bulk_import > cols_mapper :", cols_mapper)
-    self.table_data = [ { cols_mapper[k] : data[k] for k in data.keys() if k != "id" } for data in table_data ]
+    print("\n=== TableDataBuilder > bulk_import > cols_mapper :", cols_mapper)
+
+    table_data_ = [ { cols_mapper[k] : data.get(k) for k in cols_mapper.keys() } for data in table_data ]
+    # table_data_ = []
+    # for data in table_data :
+    #   print("\n=== TableDataBuilder > bulk_import > data :", data)
+    #   data_ = {}
+    #   for k in cols_mapper.keys() :
+    #     print("=== TableDataBuilder > bulk_import > k :", k)
+    #     data_[ cols_mapper[k] ] = data.get(k)
+    #     table_data_.append(data_)
+    self.table_data = table_data_
 
   def bulk_import(self, table_data):
     """ 
@@ -261,7 +309,7 @@ class TableDataBuilder(object):
     ### parse data with pydantic schema
     objects_in = [ self.table_schema(**data) for data in self.table_data ]
     # print("\n=== TableDataBuilder > bulk_import > objects_in ...")
-    # pp.pprint(objects_in)
+    pp.pprint(objects_in)
 
     ### convert data to sqlalchemy model
     objects_in_data = jsonable_encoder(objects_in)
@@ -269,10 +317,10 @@ class TableDataBuilder(object):
     # pp.pprint(objects_in_data)
     # print(objects_in_data)
 
-    # print("\n=== TableDataBuilder > bulk_import > self.model ...")
-    # pp.pprint(self.model)
+    # print("\n=== TableDataBuilder > bulk_import > self.table_model ...")
+    # pp.pprint(self.table_model)
 
-    db_objects = [ self.model(**obj) for obj in objects_in_data ]
+    db_objects = [ self.table_model(**obj) for obj in objects_in_data ]
 
     ### save in new table
     self.db.bulk_save_objects(db_objects)

@@ -15,7 +15,7 @@ from ..crud.crud_users import (
   get_current_user,
   get_current_active_user,
 )
-from ..models.models_tabledata import TableDataBuilder
+from ..models.models_tabledata import TableDataBuilder, CreateFieldsCodes
 
 import pprint
 pp = pprint.PrettyPrinter(indent=1)
@@ -37,19 +37,18 @@ def create_tablemeta_for_user(
   ):
   user_id = current_user.id
 
-  # print("\n... === create_tablemeta_for_user > dataset_id :", dataset_id)
+  print("\n... === create_tablemeta_for_user > dataset_id :", dataset_id)
   # print("\n... === create_tablemeta_for_user > obj_in :", obj_in)
   # print("\n... === create_tablemeta_for_user > obj_in.dict() ... " )
   # pp.pprint(obj_in.dict())
 
   ### === TABLE DATA ===
 
-  ### 1a/ set up main data for later
+  ### 1a/ set up raw data and fields for later
   table_fields = obj_in.table_fields
+  table_fields_dict = CreateFieldsCodes( [ field.dict() for field in table_fields ] )
   # print("\n... === create_tablemeta_for_user > table_fields ...")
   # pp.pprint(table_fields)
-
-  table_fields_dict = [ field.dict() for field in table_fields ]
   # print("\n... === create_tablemeta_for_user > table_fields_dict ...")
   # pp.pprint(table_fields_dict)
 
@@ -59,16 +58,16 @@ def create_tablemeta_for_user(
 
   ### 1b/ create an uuid with a prefix for alembic exclusion
   table_data_uuid = uuid.uuid4().hex
-  # print("\n... === create_tablemeta_for_user > table_data_uuid : ", table_data_uuid)
+  print("\n... === create_tablemeta_for_user > table_data_uuid : ", table_data_uuid)
 
   ### 1c/ create table class with table_fields, table_data_uuid, table_data
   table_db_class = TableDataBuilder(
     db,
     table_data_uuid,
-    table_fields_dict
+    table_fields_dict,
   )
-  # print("\n... === create_tablemeta_for_user > table_db_class ...")
-  # pp.pprint(table_db_class)
+  # print("\n... === create_tablemeta_for_user > table_db_class.table_fields ...")
+  # pp.pprint(table_db_class.table_fields)
 
   ### 1d/ build Table object
   table_db_class.create_table()
@@ -81,6 +80,7 @@ def create_tablemeta_for_user(
 
   ### 2a/ append dataset_id to obj_in TablemetaCreate
   obj_in.dataset_id = dataset_id
+  obj_in.table_fields = table_fields_dict
   print("\n... === create_tablemeta_for_user > obj_in.dict() ... " )
   pp.pprint( obj_in.dict() )
 
@@ -94,7 +94,7 @@ def create_tablemeta_for_user(
 
   ### 2e/ format obj_filtered with TablemetaBase model
   new_obj_in = TablemetaData(**obj_filtered)
-  print("... === create_tablemeta_for_user > new_obj_in :", new_obj_in)
+  # print("... === create_tablemeta_for_user > new_obj_in :", new_obj_in)
 
   ### 3/ create tablemeta in postgresql  and return result 
   return tablemeta.create_with_owner(db=db, obj_in=new_obj_in, owner_id=user_id)
@@ -117,6 +117,29 @@ def read_tablemeta(
       detail="tablemeta not found"
   )
   return tablemeta_in_db
+
+
+@router.get("/{obj_id}/data",
+  summary="Get a tablemeta's data",
+  description="Get a tablemeta's data by its id",
+  )
+  # response_model=Tablemeta
+def read_tablemeta_data(
+  obj_id: int,
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user)
+  ):
+  tablemeta_data_in_db = tablemeta.get_table_data(db=db, tablemeta_id=obj_id)
+  if tablemeta_data_in_db is None:
+    raise HTTPException(
+      status_code=status.HTTP_404_NOT_FOUND,
+      detail="tablemeta not found"
+  )
+
+  print("\n...read_tablemeta_data > tablemeta_data_in_db ... " )
+  print( tablemeta_data_in_db )
+
+  return tablemeta_data_in_db
 
 
 @router.put("/{obj_id}",

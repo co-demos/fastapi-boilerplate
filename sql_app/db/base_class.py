@@ -3,6 +3,7 @@ from typing import Any
 
 import inflect   
 
+from sqlalchemy import Table
 # from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.declarative import ( 
   declarative_base, 
@@ -29,3 +30,10 @@ class BaseCommons:
 
 
 BaseData = declarative_base()
+# class Base(object):
+#   @classmethod
+#   def __table_cls__(cls, *args, **kwargs):
+#     t = Table(*args, **kwargs)
+#     t.__decl_class__ = cls
+#     return t
+# BaseData = declarative_base(cls=Base)

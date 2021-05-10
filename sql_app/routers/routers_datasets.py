@@ -14,7 +14,10 @@ from ..crud.crud_users import (
   get_current_active_user,
 )
 
-from ..routers.routers_tablemetas import create_tablemeta_for_user
+from ..routers.routers_tablemetas import (
+  create_tablemeta_for_user,
+  read_tablemeta_data
+)
 
 import pprint
 pp = pprint.PrettyPrinter(indent=1)
@@ -58,6 +61,8 @@ def create_dataset_for_user(
   }
   for table in tables :
 
+    print("\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ ")
+
     ### 2a/ append dataset id to table_metadata and create table_meta
     new_table_meta = create_tablemeta_for_user(new_dataset_id, table, db, current_user)
     print("\n...create_dataset_for_user > new_table_meta ... ", new_table_meta )
@@ -87,6 +92,10 @@ def read_dataset(
       status_code=status.HTTP_404_NOT_FOUND,
       detail="dataset not found"
   )
+
+  print("\n...read_dataset > dataset_in_db ... " )
+  pp.pprint( dataset_in_db )
+
   return dataset_in_db
 
 
