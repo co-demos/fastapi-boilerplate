@@ -96,7 +96,6 @@ class TableDataModel:
   #   return [ self.__dict__[item] for item in all_columns if not item.startswith("_")]
 
 
-
 ################################
 ### SCHEMA 
 ################################
@@ -121,7 +120,6 @@ def TableDataBaseConstructor(table_fields):
     # pydantic_fields[col_id] = (Optional[field_types[col_type]["schema"]], ... )
     pydantic_fields[col_id] = (Optional[field_types[col_type]["schema"]], None )
   return pydantic_fields
-
 
 def CreateTableDataBase(table_uuid, table_fields):
   """
@@ -202,43 +200,90 @@ class TableDataBuilder(object):
   # def table_columns(self):
   #   return self.table_structure.allColumns
 
-  def build_model(self): 
-    Model = type(self.table_name, (BaseData,), {
-      '__tablename__': self.table_name,
-       'id': Column(Integer, primary_key=True, autoincrement=True),
+  def build_model(self, only_get=False, table=None): 
+    args_dict = {
+      "__tablename__": self.table_name,
+      # "__table_args__": {'extend_existing': True},
+      "id": Column(Integer, primary_key=True, autoincrement=True),
       **self.table_structure.__dict__
-      }
-    )
+    }
+    if only_get:
+      args_dict["__tablename__"] = table
+      args_dict["__table_args__"] = {'extend_existing': True}
+    Model = type(self.table_name, (BaseData,), args_dict)
     return Model
   
+  # def get_model(self, table): 
+  #   Model = type(self.table_name, (BaseData,), {
+  #     "__tablename__": table,
+  #     "__table_args__": {'extend_existing': True},
+  #     "id": Column(Integer, primary_key=True, autoincrement=True),
+  #     **self.table_structure.__dict__
+  #     }
+  #   )
+  #   return Model
+
   @property
   def get_table_model(self):
+
+    # model = None
+
     print("\n=== === ==== ==== \n=== TableDataBuilder > get_table_model > self.table_name :", self.table_name)
-    # print("\n=== TableDataBuilder > get_table_model > metadata.tables ... ")
-    # pp.pprint(metadata.tables)
-    
-    model = None
+    # pp.pprint(dir(metadata))
 
-    # try:
-    print("\n=== TableDataBuilder > get_table_model > try > model ... ")
-    # print("=== TableDataBuilder > try > get_table_model > BaseData._decl_class_registry.values() ... ")
-    # pp.pprint(BaseData._decl_class_registry.values())
-    for c in BaseData._decl_class_registry.values():
-      print("=== TableDataBuilder > try > get_table_model > c ... ")
-      pp.pprint(dir(c))
-      if hasattr(c, '__tablename__') :
-        pp.pprint(c.__tablename__)
-        if c.__tablename__ == self.table_name:
-          # pp.pprint(dir(c))
-          model = c
+    # print("\n=== TableDataBuilder > get_table_model > self.db ... ")
+    # pp.pprint( vars(self.db) )
+
+    try : 
+      print("\n=== TableDataBuilder > get_table_model > A1 > metadata.tables ... ")
+      meta_table = metadata.tables[self.table_name]
+      # print("\n=== TableDataBuilder > get_table_model > A2 > meta_table.__dict__ ... ")
+      # pp.pprint( meta_table.__dict__ )
+      # print("\n=== TableDataBuilder > get_table_model > A2 > meta_table ... ")
+      # pp.pprint( dir(meta_table.c) )
+
+      print("\n=== TableDataBuilder > get_table_model > A3 > get_model ... ")
+      model_ = self.build_model(only_get=True, table=meta_table)
+      # pp.pprint( model_.__dict__ )
+
+    # print("\n=== TableDataBuilder > get_table_model > A3 > meta_table.columns ... ")
+    # print( meta_table.columns )
+
+    # print("\n=== TableDataBuilder > get_table_model > D1 > self.table_schema ... ")
+    # print( self.table_schema.__dict__ )
+    # model = self.table_schema 
+
+    # print("\n=== TableDataBuilder > get_table_model > B1 > self.db ... ")
+    # print( dir(self.db) )
+    # pp.pprint( self.db.__dict__ )
+
+    # print("\n=== TableDataBuilder > get_table_model > B1 > BaseData ... ")
+    # pp.pprint( BaseData.__dict__ )
+    # print("\n=== TableDataBuilder > get_table_model > B2 > BaseData._decl_class_registry.values() ... ")
+    # pp.pprint( BaseData._decl_class_registry.values() )
+    # for c in BaseData._decl_class_registry.values():
+    #   print("=== TableDataBuilder > try > get_table_model > c ... ")
+    #   pp.pprint( c )
+    #   if hasattr(c, '__tablename__') :
+    #     pp.pprint(c.__tablename__)
+    #     if c.__tablename__ == self.table_name:
+    #       pp.pprint( c.__dict__ )
+    #       # pp.pprint( dir(c) )
+    #       model = c
     
-    if not model : 
+    except : 
       ### exception if server has reloaded
-      print("\n=== TableDataBuilder > get_table_model > except > model ... ")
-      model = self.build_model()
-      # pp.pprint(model.__dict__)
+      print("\n=== TableDataBuilder > get_table_model > self.build_model() > model ... ")
+      model_ = self.build_model(only_get=True, table=self.table_name)
 
-    return model
+    # print("\n=== TableDataBuilder > get_table_model > model ... ")
+    # pp.pprint(model.__dict__)
+    return {
+      # "model": model,
+      "model_": model_,
+      # "columns": meta_table.c,
+      # "table": meta_table,
+    }
 
 
   def create_table(self):

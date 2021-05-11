@@ -5,12 +5,12 @@ from ..core.config import settings
 from typing import Any    
 from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists, create_database
-from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta, declarative_base, as_declarative, declared_attr    
+from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta, declarative_base, as_declarative, declared_attr
 from sqlalchemy.orm import sessionmaker
 
 from .base_class import BaseCommons, BaseData
 
-### import databases
+import databases
 
 SQLALCHEMY_DATABASE_TYPE = settings.SQL_TYPE
 # print("database.py > SQLALCHEMY_DATABASE_TYPE :", SQLALCHEMY_DATABASE_TYPE)
@@ -35,7 +35,7 @@ if SQLALCHEMY_DATABASE_TYPE == "sql_lite" :
 elif SQLALCHEMY_DATABASE_TYPE == "postgre_sql" :
   ### DB - COMMON TABLES
   SQLALCHEMY_DATABASE_URL = settings.SQL_DB_URL
-  # DATABASE_URL = settings.SQL_DB_URL_BIS
+  DATABASE_URL = settings.SQL_DB_URL_BIS
   print("database.py > postgre_sql > SQLALCHEMY_DATABASE_URL :", SQLALCHEMY_DATABASE_URL)
   engine_commons = create_engine(SQLALCHEMY_DATABASE_URL,
     pool_size=3,
@@ -45,7 +45,7 @@ elif SQLALCHEMY_DATABASE_TYPE == "postgre_sql" :
 
   ### DB - DYNAMIC DATA TABLES
   SQLALCHEMY_DATABASE_URL_DATA = settings.SQL_DB_URL_DATA
-  # DATABASE_URL_DATA = settings.SQL_DB_URL_DATA_BIS
+  DATABASE_URL_DATA = settings.SQL_DB_URL_DATA_BIS
   print("database.py > postgre_sql > SQLALCHEMY_DATABASE_URL_DATA :", SQLALCHEMY_DATABASE_URL_DATA)
   engine_data = create_engine(SQLALCHEMY_DATABASE_URL_DATA,
     pool_size=3,
@@ -59,7 +59,8 @@ if not database_exists(engine_commons.url):
 if not database_exists(engine_data.url):
   create_database(engine_data.url)
 
-# database = databases.Database(DATABASE_URL)
+database_commons = databases.Database(DATABASE_URL)
+database_data = databases.Database(DATABASE_URL_DATA)
 
 # SessionLocal = sessionmaker(
 #   autocommit=False,

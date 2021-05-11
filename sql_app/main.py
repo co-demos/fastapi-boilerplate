@@ -15,7 +15,7 @@ from .core.tags_metadata import tags_metadata
 # from fastapi_socketio import SocketManager
 from .websockets import SocketManager
 
-from .db.database import engine_commons #, database
+from .db.database import engine_commons, database_commons, database_data
 from .db.base_class import BaseCommons
 
 # from .models import (
@@ -133,15 +133,15 @@ app.openapi = custom_openapi
 
 ### databases related
 
-# @app.on_event("startup")
-# async def startup():
-#   print("startup app > ...")
-#   await database.connect()
+@app.on_event("startup")
+async def startup():
+  print("....... startup > database_data.connect() > startup app ...")
+  await database_data.connect()
 
-# @app.on_event("shutdown")
-# async def shutdown():
-#   print("shutdown app > ...")
-#   await database.disconnect()
+@app.on_event("shutdown")
+async def shutdown():
+  print("....... startup > database_data.connect() > shutdown app ...")
+  await database_data.disconnect()
 
 
 ### STATIC FILES

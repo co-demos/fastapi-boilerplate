@@ -11,6 +11,7 @@ from sqlalchemy.ext.declarative import (
   as_declarative, 
   declared_attr 
 )
+from sqlalchemy.ext.automap import automap_base
 
 p = inflect.engine()
 
@@ -29,11 +30,12 @@ class BaseCommons:
     return "DB_commons"
 
 
+# BaseData = automap_base()
 BaseData = declarative_base()
-# class Base(object):
+# class BaseData(object):
 #   @classmethod
 #   def __table_cls__(cls, *args, **kwargs):
 #     t = Table(*args, **kwargs)
 #     t.__decl_class__ = cls
 #     return t
-# BaseData = declarative_base(cls=Base)
+# BaseData = declarative_base(cls=BaseData)

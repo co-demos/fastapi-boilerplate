@@ -42,23 +42,23 @@ class CRUDTablemeta(CRUDBase[Tablemeta, TablemetaCreate, TablemetaUpdate]):
     """
 
     table_meta_in_db = self.get_by_id(db, tablemeta_id)
-    print("\n...CRUDTablemeta > get_table_data > table_meta_in_db :", table_meta_in_db )
+    # print("\n...CRUDTablemeta > get_table_data > table_meta_in_db :", table_meta_in_db )
 
     table_data_uuid = table_meta_in_db.table_data_uuid
     table_data_fields = table_meta_in_db.table_fields
-    print("\n...CRUDTablemeta > get_table_data > table_data_uuid :", table_data_uuid )
-    print("\n...CRUDTablemeta > get_table_data > table_data_fields :", table_data_fields )
+    # print("\n...CRUDTablemeta > get_table_data > table_data_uuid :", table_data_uuid )
+    # print("\n...CRUDTablemeta > get_table_data > table_data_fields :", table_data_fields )
 
     ### 1/ recreate model from fields and table_data uuid
     table_data_obj = TableDataBuilder(db, table_data_uuid, table_data_fields)
-    print("\n...CRUDTablemeta > get_table_data > table_data_obj :", table_data_obj )
+    # print("\n...CRUDTablemeta > get_table_data > table_data_obj :", table_data_obj )
 
     table_data_model = table_data_obj.get_table_model
-    print("\n...CRUDTablemeta > get_table_data > table_data_model :", table_data_model )
+    # print("\n...CRUDTablemeta > get_table_data > table_data_model :", table_data_model )
 
     ### 2/ query db with model
     table_data = (
-      db.query(table_data_model)
+      db.query(table_data_model["model_"])
       .offset(skip)
       .limit(limit)
       .all()
