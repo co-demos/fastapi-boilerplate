@@ -38,6 +38,7 @@ class CommentUpdate(CommentBase):
 
 
 class Comment(CommentBase):
+  item_type: str = "comment"
   id: int
   email: str
   created_date: Optional[datetime.datetime]

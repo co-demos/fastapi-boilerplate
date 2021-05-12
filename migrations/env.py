@@ -55,6 +55,7 @@ def run_migrations_offline():
     script output.
 
     """
+    print("alembic / env.py > run_migrations_offline ...")
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
       url=url, target_metadata=target_metadata, literal_binds=True, compare_type=True
@@ -71,12 +72,16 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
+    print("alembic / env.py > run_migrations_online ...")
     configuration = config.get_section(config.config_ini_section)
+    print("alembic / env.py > run_migrations_online > configuration :", configuration)
     url = config.get_main_option("sqlalchemy.url")
+    print("alembic / env.py > run_migrations_online > url :", url)
     configuration["sqlalchemy.url"] = url
     connectable = engine_from_config(
       configuration, prefix="sqlalchemy.", poolclass=pool.NullPool,
     )
+    print("alembic / env.py > run_migrations_online > connectable :", connectable)
 
     with connectable.connect() as connection:
       context.configure(

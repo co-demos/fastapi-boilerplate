@@ -90,6 +90,7 @@ class UserInDBBase(UserInfos, UserUX):
 
 class User(UserInDBBase):
   ### meta
+  item_type: str = "user"
   is_active: Optional[bool] = None
 
   ### access auths

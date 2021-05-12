@@ -81,13 +81,13 @@ def create_tablemeta_for_user(
   ### 2a/ append dataset_id to obj_in TablemetaCreate
   obj_in.dataset_id = dataset_id
   obj_in.table_fields = table_fields_dict
-  print("\n... === create_tablemeta_for_user > obj_in.dict() ... " )
-  pp.pprint( obj_in.dict() )
+  # print("\n... === create_tablemeta_for_user > obj_in.dict() ... " )
+  # pp.pprint( obj_in.dict() )
 
   ### 2b/ convert obj_in to a dict
   obj_filtered = jsonable_encoder(obj_in)
-  print("\n... === create_tablemeta_for_user > obj_filtered ...")
-  pp.pprint(obj_filtered)
+  # print("\n... === create_tablemeta_for_user > obj_filtered ...")
+  # pp.pprint(obj_filtered)
 
   ### 2d/ replace table_data by table_data identifier
   obj_filtered["table_data_uuid"] = table_data_uuid

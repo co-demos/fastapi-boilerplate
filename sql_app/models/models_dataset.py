@@ -41,3 +41,6 @@ class Dataset(BaseCommons):
   tables = relationship("Tablemeta", back_populates="dataset_related")
   
   # sharing = relationship("User", back_populates="shared_workspaces")
+  
+  ### UX preferences
+  ux_tables = Column(JSON)

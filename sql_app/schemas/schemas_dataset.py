@@ -1,5 +1,5 @@
 print(">>>>>> import schemas_dataset.py >  Dataset ...")
-from typing import List, Optional
+from typing import List, Optional, Any
 import datetime
 
 from pydantic import BaseModel
@@ -25,6 +25,9 @@ class DatasetBase(BaseModel):
   write: PermissionType = PermissionType.perm_owner
   manage: PermissionType = PermissionType.perm_owner
 
+  ### UX
+  ux_tables: Any = {}
+
 
 class DatasetData(DatasetBase): 
   tables: Optional[List[Tablemeta]] = []
@@ -40,6 +43,7 @@ class DatasetUpdate(DatasetData):
 
 class Dataset(DatasetData):
   ### meta
+  item_type: str = "dataset"
   id: int
   created_date: Optional[datetime.datetime]
   is_active: bool = True

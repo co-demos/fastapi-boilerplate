@@ -22,6 +22,7 @@ class LicenceUpdate(LicenceBase):
 
 class Licence(LicenceBase):
   ### meta
+  item_type: str = "licence"
   id: int
   created_date: Optional[datetime.datetime]
   is_active: bool = True

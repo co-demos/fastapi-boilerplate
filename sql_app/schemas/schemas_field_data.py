@@ -74,6 +74,7 @@ class FieldDataUpdate(FieldDataBase):
 
 class FieldData(FieldDataBase):
   ### meta
+  item_type: str = "field"
   id: int
   created_date: Optional[datetime.datetime]
   is_active: bool = True

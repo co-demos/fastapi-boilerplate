@@ -21,6 +21,7 @@ class PostUpdate(PostBase):
 
 
 class Post(PostBase):
+  item_type: str = "post"
   id: int
   created_date: Optional[datetime.datetime]
   owner_id: int

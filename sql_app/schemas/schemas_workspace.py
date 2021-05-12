@@ -41,6 +41,7 @@ class WorkspaceUpdate(WorkspaceBase):
 
 class Workspace(WorkspaceBase):
   ### meta
+  item_type: str = "workspace"
   id: int
   created_date: Optional[datetime.datetime]
   is_active: bool = True

@@ -48,6 +48,7 @@ class TablemetaUpdate(TablemetaData):
 
 class Tablemeta(TablemetaData):
   ### meta
+  item_type: str = "table"
   id: int
   created_date: Optional[datetime.datetime]
   is_active: bool = True

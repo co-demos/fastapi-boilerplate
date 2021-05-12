@@ -18,6 +18,7 @@ class ItemUpdate(ItemBase):
 
 
 class Item(ItemBase):
+  item_type: str = "item"
   id: int
   owner_id: int
 

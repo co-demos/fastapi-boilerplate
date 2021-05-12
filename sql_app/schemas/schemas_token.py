@@ -8,6 +8,7 @@ from uuid import UUID
 ### TOKEN
 
 class Token(BaseModel):
+  item_type: str = "token"
   token_type: str
 
 class TokenAccess(Token):
@@ -20,5 +21,6 @@ class TokenAccessRefresh(TokenAccess, TokenRefresh):
   pass
 
 class TokenData(BaseModel):
+  item_type: str = "token_data"
   username: Optional[str] = None
   scopes: List[str] = []
