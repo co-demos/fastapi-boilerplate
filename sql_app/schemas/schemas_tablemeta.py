@@ -1,8 +1,9 @@
 print(">>>>>> import schemas_tablemeta.py >  Table ...")
-from typing import List, Optional, Any
+from typing import List, Dict, Optional, Any
 import datetime
 
 from pydantic import BaseModel
+from enum import Enum
 
 from .schemas_permissions import PermissionType
 
@@ -10,6 +11,9 @@ from .schemas_permissions import PermissionType
 # from .schemas_dataset import Dataset
 
 from .schemas_field_data import FieldData
+
+
+### SCHEMAS - TABLE META
 
 class TablemetaBase(BaseModel):
   ### basic infos
@@ -68,3 +72,37 @@ class Tablemeta(TablemetaData):
 class TablemetaList(Tablemeta):
   pass
   # owner: User
+
+
+### SCHEMAS - TABLE DATA
+
+class UpdateType(str, Enum):
+  cell = "cell"
+  row = "row"
+  rows = "rows"
+
+
+class TabledataCell(BaseModel):
+  row_id: int
+  column: str
+  value: Any
+
+
+class TabledataUpdate(BaseModel):
+  item_type: str = "table_data"
+  update_type: UpdateType = UpdateType.cell
+  tablemeta_id: int
+  table_data_uuid: str
+
+
+class TabledataUpdateCell(TabledataUpdate):
+  table_data_cell: TabledataCell
+
+
+class TabledataUpdateRow(TabledataUpdate):
+  table_data_row_id: int
+  table_data_row: Dict = {}
+
+
+class TabledataUpdateRows(TabledataUpdate):
+  table_data_rows: Any = []

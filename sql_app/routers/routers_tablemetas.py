@@ -1,3 +1,4 @@
+from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 from . import ( List, Session, APIRouter, Depends,
   HTTPException, status,
   get_db,
@@ -7,7 +8,18 @@ import uuid
 
 from fastapi.encoders import jsonable_encoder
 
-from ..schemas.schemas_tablemeta import Tablemeta, TablemetaBase, TablemetaCreate, TablemetaData, TablemetaUpdate, TablemetaList
+from ..schemas.schemas_tablemeta import (
+  Tablemeta,
+  TablemetaBase,
+  TablemetaCreate,
+  TablemetaData,
+  TablemetaUpdate,
+  TablemetaList,
+
+  TabledataUpdateCell,
+  TabledataUpdateRow,
+  TabledataUpdateRows,
+)
 from ..crud.crud_tablemetas import tablemeta
 
 from ..models.models_user import User
@@ -163,6 +175,32 @@ def update_tablemeta(
   tablemeta_in_db = tablemeta.update(db=db, db_obj=tablemeta_in_db, obj_in=obj_in)
   return tablemeta_in_db
 
+
+@router.put("/{obj_id}/data",
+  summary="Update a tablemeta's data row or rows",
+  description="Update a tablemeta's data row by its id",
+  )
+def update_tablemeta_data(
+  obj_id: int,
+  obj_in: Union[TabledataUpdateCell, TabledataUpdateRow, TabledataUpdateRows],
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user)
+  ):
+  tablemeta_in_db = tablemeta.get_by_id(db, id=obj_id)
+  if tablemeta_in_db is None:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="tablemeta not found")
+  if not current_user.is_superuser and (tablemeta_in_db.owner_id != current_user.id):
+    raise HTTPException(status_code=400, detail="Not enough permissions")
+  tablemeta_data_in_db = tablemeta.update_table_data_row(db=db, tablemeta_id=obj_id, obj_in=obj_in)
+  if tablemeta_data_in_db is None:
+    raise HTTPException(
+      status_code=status.HTTP_404_NOT_FOUND,
+      detail="tablemeta's data not found"
+  )
+  print("\n...update_tablemeta_data > tablemeta_data_in_db ... " )
+  print( tablemeta_data_in_db )
+
+  return tablemeta_data_in_db
 
 @router.get("/dataset/{dataset_id}",
   summary="Get a list of all tablemetas for a dataset",

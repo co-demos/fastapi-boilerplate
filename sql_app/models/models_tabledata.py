@@ -139,7 +139,7 @@ def CreateTableDataBase(table_uuid, table_fields):
 
     ### cf : https://www.geeksforgeeks.org/create-classes-dynamically-in-python/#:~:text=Python%20Code%20can%20be%20dynamically,the%20type%20of%20the%20object.&text=The%20above%20syntax%20returns%20the%20type%20of%20object.
   """
-  print("\n=== CreateTableDataBase > table_uuid :", table_uuid)
+  # print("\n=== CreateTableDataBase > table_uuid :", table_uuid)
   # print("=== CreateTableDataBase > table_fields :", table_fields)
 
   fields = TableDataBaseConstructor(table_fields)
@@ -148,7 +148,7 @@ def CreateTableDataBase(table_uuid, table_fields):
     **fields
   )
   
-  print("\n=== CreateTableDataBase > tableSchemaClass.__name__ :", tableSchemaClass.__name__)
+  # print("\n=== CreateTableDataBase > tableSchemaClass.__name__ :", tableSchemaClass.__name__)
   return tableSchemaClass
 
 def CreateFieldsCodes(table_fields): 
@@ -179,7 +179,7 @@ class TableDataBuilder(object):
         The fields (or headers) populating the columns.
         List of field objects, each containing at least those keys : 'id', 'field_type', 'value'
     """
-    print("\n================================================================= ")
+    # print("\n================================================================= ")
     print("\n=== TableDataBuilder > init > table_uuid :", table_uuid)
     # print("\n=== TableDataBuilder > init > stable_fields :", table_fields)
 
@@ -228,21 +228,21 @@ class TableDataBuilder(object):
 
     # model = None
 
-    print("\n=== === ==== ==== \n=== TableDataBuilder > get_table_model > self.table_name :", self.table_name)
+    # print("\n=== === ==== ==== \n=== TableDataBuilder > get_table_model > self.table_name :", self.table_name)
     # pp.pprint(dir(metadata))
 
     # print("\n=== TableDataBuilder > get_table_model > self.db ... ")
     # pp.pprint( vars(self.db) )
 
     try : 
-      print("\n=== TableDataBuilder > get_table_model > A1 > metadata.tables ... ")
+      # print("\n=== TableDataBuilder > get_table_model > A1 > metadata.tables ... ")
       meta_table = metadata.tables[self.table_name]
       # print("\n=== TableDataBuilder > get_table_model > A2 > meta_table.__dict__ ... ")
       # pp.pprint( meta_table.__dict__ )
       # print("\n=== TableDataBuilder > get_table_model > A2 > meta_table ... ")
       # pp.pprint( dir(meta_table.c) )
 
-      print("\n=== TableDataBuilder > get_table_model > A3 > get_model ... ")
+      # print("\n=== TableDataBuilder > get_table_model > A3 > get_model ... ")
       model_ = self.build_model(only_get=True, table=meta_table)
       # pp.pprint( model_.__dict__ )
 
@@ -273,17 +273,18 @@ class TableDataBuilder(object):
     
     except : 
       ### exception if server has reloaded
-      print("\n=== TableDataBuilder > get_table_model > self.build_model() > model ... ")
+      # print("\n=== TableDataBuilder > get_table_model > self.build_model() > model ... ")
       model_ = self.build_model(only_get=True, table=self.table_name)
 
     # print("\n=== TableDataBuilder > get_table_model > model ... ")
     # pp.pprint(model.__dict__)
-    return {
-      # "model": model,
-      "model_": model_,
-      # "columns": meta_table.c,
-      # "table": meta_table,
-    }
+    # return {
+    #   # "model": model,
+    #   "model_": model_,
+    #   # "columns": meta_table.c,
+    #   # "table": meta_table,
+    # }
+    return model_
 
 
   def create_table(self):

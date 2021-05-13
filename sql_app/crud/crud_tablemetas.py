@@ -1,6 +1,7 @@
 from . import (pp, Session)
 
-from typing import List
+from typing import List, Dict, Any, Union
+from fastapi.encoders import jsonable_encoder
 
 from ..db.database import get_db
 
@@ -32,6 +33,24 @@ class CRUDTablemeta(CRUDBase[Tablemeta, TablemetaCreate, TablemetaUpdate]):
       .all()
     )
   
+  def get_tabledata_model(
+    self, db,
+    tablemeta_id: int
+    ):
+    table_meta_in_db = self.get_by_id(db, tablemeta_id)
+    # print("\n...CRUDTablemeta > get_table_data > table_meta_in_db :", table_meta_in_db )
+    table_data_uuid = table_meta_in_db.table_data_uuid
+    table_data_fields = table_meta_in_db.table_fields
+    # print("\n...CRUDTablemeta > get_table_data > table_data_uuid :", table_data_uuid )
+    # print("\n...CRUDTablemeta > get_table_data > table_data_fields :", table_data_fields )
+    
+    ### 1/ recreate model from fields and table_data uuid
+    table_data_obj = TableDataBuilder(db, table_data_uuid, table_data_fields)
+    # print("\n...CRUDTablemeta > get_table_data > table_data_obj :", table_data_obj )
+    table_data_model = table_data_obj.get_table_model
+    # print("\n...CRUDTablemeta > get_table_data > table_data_model :", table_data_model )
+    return table_data_model
+
   def get_table_data(
     self, db: Session,
     tablemeta_id: int,
@@ -41,30 +60,78 @@ class CRUDTablemeta(CRUDBase[Tablemeta, TablemetaCreate, TablemetaUpdate]):
     Get table_data (in engine_data) from a table_meta object (in engin_commons)
     """
 
-    table_meta_in_db = self.get_by_id(db, tablemeta_id)
-    # print("\n...CRUDTablemeta > get_table_data > table_meta_in_db :", table_meta_in_db )
-
-    table_data_uuid = table_meta_in_db.table_data_uuid
-    table_data_fields = table_meta_in_db.table_fields
-    # print("\n...CRUDTablemeta > get_table_data > table_data_uuid :", table_data_uuid )
-    # print("\n...CRUDTablemeta > get_table_data > table_data_fields :", table_data_fields )
-
-    ### 1/ recreate model from fields and table_data uuid
-    table_data_obj = TableDataBuilder(db, table_data_uuid, table_data_fields)
-    # print("\n...CRUDTablemeta > get_table_data > table_data_obj :", table_data_obj )
-
-    table_data_model = table_data_obj.get_table_model
-    # print("\n...CRUDTablemeta > get_table_data > table_data_model :", table_data_model )
+    # table_meta_in_db = self.get_by_id(db, tablemeta_id)
+    # table_data_uuid = table_meta_in_db.table_data_uuid
+    # table_data_fields = table_meta_in_db.table_fields
+    # table_data_obj = TableDataBuilder(db, table_data_uuid, table_data_fields)
+    # table_data_model = table_data_obj.get_table_model
+    table_data_model = self.get_tabledata_model(db, tablemeta_id)
 
     ### 2/ query db with model
     table_data = (
-      db.query(table_data_model["model_"])
+      # db.query(table_data_model["model_"])
+      db.query(table_data_model)
+      .order_by(table_data_model.id)
       .offset(skip)
       .limit(limit)
       .all()
     )
-    return table_data 
+    return table_data
 
+  def update_table_data_row(
+    self, db: Session, *,
+    tablemeta_id: int,
+    obj_in: Dict[str, Any],
+    ):
+    """
+    Update table_data (in engine_data) from a table_meta object (in engin_commons)
+    """
+    print("\nupdate_table_data_row > obj_in : ", obj_in)
+    obj_data = jsonable_encoder(obj_in)
+    print("update_table_data_row > obj_data : ", obj_data)
+    
+    # table_meta_in_db = self.get_by_id(db, tablemeta_id)
+    # table_data_uuid = table_meta_in_db.table_data_uuid
+    # table_data_fields = table_meta_in_db.table_fields
+    # table_data_obj = TableDataBuilder(db, table_data_uuid, table_data_fields)
+    # table_data_model = table_data_obj.get_table_model
+    table_data_model = self.get_tabledata_model(db, tablemeta_id)
+
+    if obj_in.update_type == "cell":
+      data_in = obj_in.table_data_cell
+      row_id = data_in.row_id
+      data_in_dict = {}
+      data_in_dict[data_in.column] = data_in.value
+
+    if obj_in.update_type == "row":
+      data_in = obj_in.table_data_row
+      row_id = obj_in.table_data_row_id
+      data_in_dict = data_in
+
+    if obj_in.update_type == "rows":
+      data_in = obj_in.table_data_rows
+      data_in_dict = data_in.dict()
+
+    print("update_table_data_row > data_in : ", data_in)
+    print("update_table_data_row > data_in_dict : ", data_in_dict)
+
+    if obj_in.update_type in ["cell", "row"] :
+      db_row = db.query(table_data_model).filter(table_data_model.id == row_id).first()
+      print("update_table_data_row > db_row A : ", db_row)
+      row_data = jsonable_encoder(db_row)
+      print("update_table_data_row > row_data : ", row_data)
+      for field in row_data:
+        print("update_table_data_row > field : ", field)
+
+        if field in data_in_dict:
+          setattr(db_row, field, data_in_dict[field])
+
+      print("update_table_data_row > db_row B : ", db_row)
+
+    db.add(db_row)
+    db.commit()
+    db.refresh(db_row)
+    return db_row
 
 tablemeta = CRUDTablemeta(Tablemeta)
 

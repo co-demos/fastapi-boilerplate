@@ -11,3 +11,6 @@ sql_app.db
 
 # media files
 media/*
+
+# migrations
+migrations/versions/*
