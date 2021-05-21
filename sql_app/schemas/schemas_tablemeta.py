@@ -101,8 +101,17 @@ class TabledataUpdateCell(TabledataUpdate):
 
 class TabledataUpdateRow(TabledataUpdate):
   table_data_row_id: int
-  table_data_row: Dict = {}
+  table_data_row: Any = {}
 
+
+class TabledataAddRow(TabledataUpdate):
+  table_data_row: Any = {}
+
+
+class TabledataDeleteRow(TabledataUpdate):
+  update_type: UpdateType = UpdateType.row
+  table_data_row_id: int
+  
 
 class TabledataUpdateRows(TabledataUpdate):
   table_data_rows: Any = []

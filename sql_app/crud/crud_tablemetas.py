@@ -105,7 +105,7 @@ class CRUDTablemeta(CRUDBase[Tablemeta, TablemetaCreate, TablemetaUpdate]):
 
     if obj_in.update_type == "row":
       data_in = obj_in.table_data_row
-      row_id = obj_in.table_data_row_id
+      # row_id = obj_in.table_data_row_id
       data_in_dict = data_in
 
     if obj_in.update_type == "rows":
@@ -115,23 +115,43 @@ class CRUDTablemeta(CRUDBase[Tablemeta, TablemetaCreate, TablemetaUpdate]):
     print("update_table_data_row > data_in : ", data_in)
     print("update_table_data_row > data_in_dict : ", data_in_dict)
 
-    if obj_in.update_type in ["cell", "row"] :
+    if obj_in.update_type in ["cell"] :
       db_row = db.query(table_data_model).filter(table_data_model.id == row_id).first()
-      print("update_table_data_row > db_row A : ", db_row)
+      print("update_table_data_row > cell > db_row A : ", db_row)
       row_data = jsonable_encoder(db_row)
-      print("update_table_data_row > row_data : ", row_data)
+      print("update_table_data_row > cell > row_data : ", row_data)
       for field in row_data:
-        print("update_table_data_row > field : ", field)
-
+        print("update_table_data_row > cell > field : ", field)
         if field in data_in_dict:
           setattr(db_row, field, data_in_dict[field])
 
-      print("update_table_data_row > db_row B : ", db_row)
+    if obj_in.update_type in ["row"] :
+      row_data = jsonable_encoder(data_in)
+      print("update_table_data_row > row > row_data : ", row_data)
+      db_row = table_data_model(**row_data)
+      print("update_table_data_row > row > db_row : ", db_row)
 
     db.add(db_row)
     db.commit()
     db.refresh(db_row)
     return db_row
+
+  def remove_table_data_row(
+    self, db: Session, *,
+    tablemeta_id: int,
+    obj_in: Dict[str, Any],
+    ):
+    """
+    Remove table_data (in engine_data) from a table_meta object (in engin_commons)
+    """
+    print("\nupdate_table_data_row > obj_in : ", obj_in)
+    table_data_model = self.get_tabledata_model(db, tablemeta_id)
+    row_id = obj_in.table_data_row_id
+    db_row = db.query(table_data_model).filter(table_data_model.id == row_id).first()
+    db.delete(db_row)
+    db.commit()
+    return db_row
+
 
 tablemeta = CRUDTablemeta(Tablemeta)
 

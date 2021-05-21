@@ -18,6 +18,8 @@ from ..schemas.schemas_tablemeta import (
 
   TabledataUpdateCell,
   TabledataUpdateRow,
+  TabledataAddRow,
+  TabledataDeleteRow,
   TabledataUpdateRows,
 )
 from ..crud.crud_tablemetas import tablemeta
@@ -182,7 +184,7 @@ def update_tablemeta(
   )
 def update_tablemeta_data(
   obj_id: int,
-  obj_in: Union[TabledataUpdateCell, TabledataUpdateRow, TabledataUpdateRows],
+  obj_in: Union[TabledataUpdateCell, TabledataUpdateRow, TabledataAddRow, TabledataUpdateRows],
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
   ):
@@ -201,6 +203,31 @@ def update_tablemeta_data(
   print( tablemeta_data_in_db )
 
   return tablemeta_data_in_db
+
+
+@router.delete("/{obj_id}/data",
+  summary="Delete a tablemeta's data row or rows",
+  description="Delete a tablemeta's data row by its id",
+  )
+def delete_tablemeta_data(
+  obj_id: int,
+  obj_in: TabledataDeleteRow,
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user)
+  ):
+  print("\n...delete_tablemeta_data > obj_id : ", obj_id )
+  print("...delete_tablemeta_data > obj_in : ", obj_in )
+  tablemeta_in_db = tablemeta.get_by_id(db, id=obj_id)
+  if tablemeta_in_db is None:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="tablemeta not found")
+  if not current_user.is_superuser and (tablemeta_in_db.owner_id != current_user.id):
+    raise HTTPException(status_code=400, detail="Not enough permissions")
+  tablemeta_data_in_db = tablemeta.remove_table_data_row(db=db, tablemeta_id=obj_id, obj_in=obj_in)
+  print("\n...delete_tablemeta_data > tablemeta_data_in_db ... " )
+  print( tablemeta_data_in_db )
+
+  return tablemeta_data_in_db
+
 
 @router.get("/dataset/{dataset_id}",
   summary="Get a list of all tablemetas for a dataset",
