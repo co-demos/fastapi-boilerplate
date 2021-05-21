@@ -115,6 +115,7 @@ class CRUDTablemeta(CRUDBase[Tablemeta, TablemetaCreate, TablemetaUpdate]):
     print("update_table_data_row > data_in : ", data_in)
     print("update_table_data_row > data_in_dict : ", data_in_dict)
 
+    # update cell
     if obj_in.update_type in ["cell"] :
       db_row = db.query(table_data_model).filter(table_data_model.id == row_id).first()
       print("update_table_data_row > cell > db_row A : ", db_row)
@@ -125,6 +126,7 @@ class CRUDTablemeta(CRUDBase[Tablemeta, TablemetaCreate, TablemetaUpdate]):
         if field in data_in_dict:
           setattr(db_row, field, data_in_dict[field])
 
+    # append a row
     if obj_in.update_type in ["row"] :
       row_data = jsonable_encoder(data_in)
       print("update_table_data_row > row > row_data : ", row_data)
