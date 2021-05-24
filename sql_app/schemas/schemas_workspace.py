@@ -13,6 +13,7 @@ class WorkspaceBase(BaseModel):
   ### basic infos
   title: str = "My workspace"
   description: Optional[str] = "My workspace description"
+  tags: Optional[List[str]] = []
 
   ### preferences
   color: Optional[str] = "black"

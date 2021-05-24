@@ -1,6 +1,7 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, JSON
 from sqlalchemy_utils import EmailType, URLType
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import ARRAY
 
 import datetime
 
@@ -18,6 +19,7 @@ class Dataset(BaseCommons):
   title = Column(String, index=True)
   description = Column(String, index=True)
   licence = Column(String, index=True)
+  tags = Column(ARRAY(String), index=True, default=[])
 
   ### preferences
   color = Column(String, default='black')

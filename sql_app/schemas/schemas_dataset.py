@@ -13,6 +13,7 @@ class DatasetBase(BaseModel):
   title: str = "My dataset title"
   description: Optional[str] = "My dataset description"
   licence: str
+  tags: Optional[List[str]] = []
 
   ### preferences
   color: Optional[str] = "black"

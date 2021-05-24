@@ -20,6 +20,8 @@ class TablemetaBase(BaseModel):
   title: str = "My table title"
   description: Optional[str] = "My table description"
   licence: str
+  tags: Optional[List[str]] = []
+
   dataset_id: Optional[int] = None # parent dataset
 
   ### preferences
