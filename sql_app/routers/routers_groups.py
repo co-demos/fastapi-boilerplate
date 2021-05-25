@@ -30,10 +30,7 @@ def create_group_for_user(
   current_user: User = Depends(get_current_user)
   ):
   user_id = current_user.id
-  current_user_data = jsonable_encoder(current_user)
-  current_user_ = UserInDBBaseLight(**current_user_data)
-  obj_in.users = [ current_user_ ]
-  return group.create_with_owner(db=db, obj_in=obj_in, owner_id=user_id)
+  return group.create_with_owner_in_team(db=db, obj_in=obj_in, owner_id=user_id, user=current_user)
 
 
 @router.get("/{obj_id}",

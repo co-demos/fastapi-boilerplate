@@ -14,8 +14,8 @@ from ..db.base_class import BaseCommons
 group_user_assoc = Table(
   'group_user_assoc',
   BaseCommons.metadata,
-  Column('group_id', Integer, ForeignKey('groups.id')),
   Column('user_id', Integer, ForeignKey('users.id')),
+  Column('group_id', Integer, ForeignKey('groups.id')),
 )
 
 
