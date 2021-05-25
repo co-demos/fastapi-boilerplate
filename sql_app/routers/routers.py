@@ -9,6 +9,7 @@ from . import (
   routers_datasets,
   routers_workspaces,
   routers_users,
+  routers_groups,
 
   routers_posts,
   routers_comments
@@ -21,6 +22,12 @@ api_router.include_router(
   routers_users.router,
   prefix="/users",
   tags=["users"]
+)
+
+api_router.include_router(
+  routers_groups.router,
+  prefix="/groups",
+  tags=["groups"]
 )
 
 api_router.include_router(

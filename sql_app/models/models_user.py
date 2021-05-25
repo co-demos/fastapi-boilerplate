@@ -6,6 +6,9 @@ import datetime
 
 from ..db.base_class import BaseCommons
 
+from .models_group import group_user_assoc
+
+
 class User(BaseCommons):
   # __tablename__ = "users"
 
@@ -48,6 +51,7 @@ class User(BaseCommons):
   # my_fields = relationship("SchemaField", back_populates="owner")
 
   # my_groups = relationship("Group", back_populates="owner")
+
   # my_invitations = relationship("Invitation", back_populates="owner")
   # my_notifications = relationship("Invitation")
 
@@ -60,3 +64,7 @@ class User(BaseCommons):
   ### UX preferences
   ux_workspaces = Column(JSON)
   # ux_datasets = Column(JSON)
+
+
+  def can_manage(self, user_id: int):
+    return self.owner_id == user_id

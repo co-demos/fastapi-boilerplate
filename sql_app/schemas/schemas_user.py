@@ -5,6 +5,7 @@ import datetime
 from pydantic import BaseModel, EmailStr
 # from uuid import UUID
 
+from .schemas_group import Group
 from .schemas_workspace import Workspace
 from .schemas_dataset import Dataset
 from .schemas_tablemeta import Tablemeta
@@ -74,7 +75,11 @@ class UserInDBBase(UserInfos, UserUX):
   # my_tables: List[Tablemeta] = []
   # my_schemas: List[Schema] = []
   # my_fields: List[Field] = []
-  # my_groups: List[Group] = []
+
+  my_groups: List[Group] = []
+  # my_groups: "List[Group]" = []
+  groups: List[Group] = []
+  
   # my_invitations: List[Invitation] = []
   # my_notification: List[Notifications] = []
 
@@ -112,3 +117,4 @@ class UserInDB(User):
 
 class UserList(User):
   pass
+

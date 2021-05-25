@@ -75,9 +75,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     ) -> ModelType:
     print("\ncreate_with_owner > obj_in : ", obj_in)
     obj_in_data = jsonable_encoder(obj_in)
-    print("create_with_owner > obj_in_data : ", obj_in_data)
+    print("\ncreate_with_owner > obj_in_data : ", obj_in_data)
+    print("\ncreate_with_owner > self.model : ", self.model)
     db_obj = self.model(**obj_in_data, owner_id=owner_id)
-    print("create_with_owner > db_obj : ", db_obj)
+    print("\ncreate_with_owner > db_obj : ", db_obj)
     db.add(db_obj)
     db.commit()
     db.refresh(db_obj)

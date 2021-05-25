@@ -39,3 +39,6 @@ class Workspace(BaseCommons):
   datasets = Column(JSON)
   # datasets = relationship("Dataset", backref="parent")
   # sharing = relationship("User", back_populates="shared_workspaces")
+
+  def can_manage(self, user_id: int):
+    return self.owner_id == user_id

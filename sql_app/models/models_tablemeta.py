@@ -54,5 +54,9 @@ class Tablemeta(BaseCommons):
 
   # sharing = relationship("User", back_populates="shared_tables")
 
+  def can_manage(self, user_id: int):
+    return self.owner_id == user_id
+
+
 # print("\n=== models_tablemeta > Tablemeta.__dict__ ...")
 # pp.pprint(Tablemeta.__dict__)
