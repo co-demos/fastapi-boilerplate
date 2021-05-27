@@ -233,7 +233,7 @@ def delete_tablemeta_data(
   summary="Get a list of all tablemetas for a dataset",
   description="Get all tablemetas of a dataset given and a limit",
   response_model=List[Tablemeta]
-)
+  )
 def read_tablemetas(
   dataset_id: int,
   skip: int = 0, limit: int = 100,

@@ -10,6 +10,7 @@ from . import (
   routers_workspaces,
   routers_users,
   routers_groups,
+  routers_invitations,
 
   routers_posts,
   routers_comments
@@ -28,6 +29,12 @@ api_router.include_router(
   routers_groups.router,
   prefix="/groups",
   tags=["groups"]
+)
+
+api_router.include_router(
+  routers_invitations.router,
+  prefix="/invitations",
+  tags=["invitations"]
 )
 
 api_router.include_router(

@@ -6,7 +6,7 @@ from pydantic import BaseModel
 # from uuid import UUID
 
 from .schemas_dataset import Dataset
-from .schemas_permissions import PermissionType
+from .schemas_choices import PermissionType
 
 
 class WorkspaceBase(BaseModel):

@@ -6,7 +6,7 @@ import datetime
 
 from pydantic import BaseModel
 
-from .schemas_permissions import PermissionType
+from .schemas_choices import PermissionType
 
 # cf : https://schema.data.gouv.fr/schemas/etalab/schema-inclusion-numerique/0.1.1/schema.json
 

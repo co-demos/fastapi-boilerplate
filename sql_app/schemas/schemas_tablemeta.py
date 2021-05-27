@@ -5,7 +5,7 @@ import datetime
 from pydantic import BaseModel
 from enum import Enum
 
-from .schemas_permissions import PermissionType
+from .schemas_choices import PermissionType
 
 # from .schemas_workspace import Workspace
 # from .schemas_dataset import Dataset

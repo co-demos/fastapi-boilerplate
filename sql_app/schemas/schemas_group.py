@@ -5,7 +5,7 @@ import datetime
 from pydantic import BaseModel, EmailStr
 # from uuid import UUID
 
-from .schemas_permissions import PermissionType
+from .schemas_choices import PermissionType
 # from .schemas_user import UserInDBBaseLight
 
 

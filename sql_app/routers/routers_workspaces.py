@@ -22,7 +22,7 @@ router = APIRouter()
   description="Create an workspace, including the id of the user creating the workspace",
   response_model=Workspace,
   status_code=status.HTTP_201_CREATED
-)
+  )
 def create_workspace_for_user(
   obj_in: WorkspaceCreate,
   db: Session = Depends(get_db),
@@ -74,7 +74,7 @@ def update_workspace(
   summary="Get a list of all workspaces",
   description="Get all workspaces given a limit",
   response_model=List[Workspace]
-)
+  )
 def read_workspaces(
   skip: int = 0, limit: int = 100, 
   current_user: User = Depends(get_current_user),

@@ -9,5 +9,7 @@ from ..models import (
   models_tablemeta,
   models_dataset,
   models_workspace,
+  models_group,
+  models_invitation,
   models_user,
 )

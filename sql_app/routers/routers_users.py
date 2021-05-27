@@ -14,7 +14,6 @@ from . import ( settings,
   crud_posts,
 
   crud_comments,
-
 )
 
 from ..schemas.schemas_item import Item, ItemCreate
@@ -54,7 +53,7 @@ router = APIRouter()
   summary="Create an user",
   response_model=User,
   status_code=status.HTTP_201_CREATED
-)
+  )
 def create_user(
   user_in: UserCreate, 
   background_tasks: BackgroundTasks,
@@ -73,14 +72,7 @@ def create_user(
     raise HTTPException(status_code=400, detail="Email already registered")
   if settings.EMAILS_ENABLED and user_in.email:
     email_verify_token = generate_password_reset_token(email=user_in.email)
-    # send_new_account_email(
-    #   email_to=user_in.email,
-    #   username=user_in.username,
-    #   name=user_in.name,
-    #   surname=user_in.surname,
-    #   password=user_in.password,
-    #   token=email_verify_token
-    # )
+
     background_tasks.add_task(
       send_new_account_email,
       email_to=user_in.email,
@@ -90,6 +82,7 @@ def create_user(
       password=user_in.password,
       token=email_verify_token
     )
+
   return user.create_user_in_db(db=db, user_in=user_in)
 
 
@@ -97,7 +90,7 @@ def create_user(
   summary="Get a list of users",
   description="Get a list of all users given a limit",
   response_model=List[User]
-)
+  )
 def read_users(
   skip: int = 0, limit: int = 100, 
   db: Session = Depends(get_db)
@@ -111,7 +104,7 @@ def read_users(
   summary="Get an user",
   description="Get infos of one user",
   response_model=User
-)
+ )
 def read_user(
   user_id: int,
   db: Session = Depends(get_db)
@@ -128,7 +121,7 @@ def read_user(
 @router.delete("/{user_id}",
   summary="Delete an user",
   description="Detete infos of one user",
-)
+  )
 def delete_user(
   user_id: int, 
   db: Session = Depends(get_db),
@@ -164,7 +157,7 @@ def delete_user(
   summary="Get infos for connected/authenticated user",
   description="Get infos for connected/authenticated user",
   response_model=User
-)
+  )
 async def read_users_me(
   current_user: UserModel = Depends(get_current_active_user)
   ):
@@ -176,7 +169,7 @@ async def read_users_me(
   summary="Update user",
   description="Update user",
   response_model=User
-)
+  )
 async def update_user(
   user_in: UserBasicInfos,
   current_user: UserModel = Depends(get_current_active_user),
@@ -196,7 +189,7 @@ async def update_user(
   summary="Get user ux",
   description="Get user ux preferences",
   response_model=UserUX
-)
+  )
 async def read_user_ux(
   current_user: UserModel = Depends(get_current_active_user),
   db: Session = Depends(get_db)
@@ -210,7 +203,7 @@ async def read_user_ux(
   summary="Update user ux",
   description="Update user ux",
   response_model=UserUX
-)
+  )
 async def update_user_ux(
   ux_in: UserUX,
   current_user: UserModel = Depends(get_current_active_user),
@@ -230,7 +223,7 @@ async def update_user_ux(
   summary="Update user avatar",
   description="Update user avatar by uploading a file",
   response_model=User
-)
+  )
 async def update_user_avatar(
   uploaded_file: UploadFile = File(...),
   current_user: UserModel = Depends(get_current_active_user),
@@ -261,7 +254,7 @@ async def update_user_avatar(
 @router.get("/me/posts/",
   summary="Get user's own posts",
   description="Get connected/authenticated user's own posts",
-)
+ )
 async def read_own_posts(
   current_user: UserModel = Depends(get_current_active_user),
   db: Session = Depends(get_db)
@@ -274,7 +267,7 @@ async def read_own_posts(
 @router.get("/me/comments/",
   summary="Get user's own comments",
   description="Get connected/authenticated user's own comments",
-)
+  )
 async def read_own_comments(
   current_user: UserModel = Depends(get_current_active_user),
   db: Session = Depends(get_db)
@@ -290,7 +283,7 @@ async def read_own_comments(
   summary="Create an access token for login",
   response_model=TokenAccessRefresh,
   status_code=status.HTTP_201_CREATED
-)
+  )
 async def login_for_access_token(
   db: Session = Depends(get_db),
   form_data: OAuth2PasswordRequestForm = Depends()
@@ -343,7 +336,7 @@ async def login_for_access_token(
   summary="Verify user's access token",
   description="Verify user's access token",
   response_model=Msg
-)
+  )
 async def verify_access_token(
   current_user: UserModel = Depends(get_current_active_user)
   ):
@@ -354,7 +347,7 @@ async def verify_access_token(
   summary="New access token from refresh token validation",
   description="New access token from refresh token validation",
   response_model=TokenAccess
-)
+  )
 async def new_access_token(
   current_user: UserModel = Depends(get_current_active_user_refresh)
   ):
@@ -393,7 +386,7 @@ async def new_access_token(
 
 @router.post("/password-recovery/{email}",
   response_model=Msg
-)
+ )
 def password_recovery(
   email: str,
   background_tasks: BackgroundTasks,
@@ -426,7 +419,7 @@ def password_recovery(
 
 @router.post("/reset-password/",
   response_model=Msg
-)
+  )
 def reset_password(
   token: str = Body(...),
   new_password: str = Body(...),
@@ -461,7 +454,7 @@ def reset_password(
 
 @router.get("/verify-email/",
   response_model=Msg
-)
+  )
 def verify_email(
   token: str,
   db: Session = Depends(get_db),

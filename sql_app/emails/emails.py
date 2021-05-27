@@ -27,7 +27,6 @@ if settings.SMTP_PASSWORD:
   smtp_options["password"] = settings.SMTP_PASSWORD
 
 
-
 def send_email(
   email_to: str,
   subject_template: str = "",
@@ -115,7 +114,6 @@ def send_new_account_email(
   project_name = settings.APP_TITLE
   subject = f"{project_name} - New account for user {username}"
   html_template = "new_account.html"
-  # link = f"{settings.SERVER_HOST}/verify-email?token={token}"
   link = f"{settings.SERVER_FRONT}/verify-email?token={token}"
   send_email(
     email_to=email_to,
@@ -129,6 +127,31 @@ def send_new_account_email(
       "password": password,
       "email": email_to,
       "valid_hours": settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS,
+      "link": link,
+    },
+  )
+
+
+def send_invitation_email(
+  email_from: str,
+  name: str,
+  surname: str,
+  username: str,
+  invitation: Any,
+  ):
+  project_name = settings.APP_TITLE
+  subject = f"{project_name} - New invitation from user {username}"
+  html_template = "new_invitation.html"
+  link = f"{settings.SERVER_FRONT}/{invitation.invitation_to_item_type}/{invitation.invitation_to_item_id}"
+  send_email(
+    email_to=invitation.invitee,
+    subject_template=subject,
+    html_template=html_template,
+    environment={
+      "project_name": project_name,
+      "email_from": email_from,
+      "username": username,
+      "invitation": invitation,
       "link": link,
     },
   )

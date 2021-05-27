@@ -31,7 +31,7 @@ router = APIRouter()
   description="Create an dataset, including the id of the user creating the dataset",
   response_model=Dataset,
   status_code=status.HTTP_201_CREATED
-)
+  )
 def create_dataset_for_user(
   obj_in: DatasetCreate,
   db: Session = Depends(get_db),
@@ -125,7 +125,7 @@ def update_dataset(
   summary="Get a list of all datasets",
   description="Get all datasets given a limit",
   response_model=List[Dataset]
-)
+  )
 def read_datasets(
   skip: int = 0, limit: int = 100,
   db: Session = Depends(get_db),
