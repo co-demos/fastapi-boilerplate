@@ -56,9 +56,10 @@ class UserCreate(UserBase, UserBasicInfos, UserBasicInfosAvatar):
 
 class UserUX(BaseModel):
   ### UX
-  ux_app: Any = {}
+  # ux_app: Any = {}
+  ux_groups: Any = {}
   ux_workspaces: Any = {}
-  ux_datasets: Any = {}
+  # ux_datasets: Any = {}
 
 
 class UserInDBBase(UserInfos, UserUX):

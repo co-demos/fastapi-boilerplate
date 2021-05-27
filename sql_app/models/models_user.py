@@ -64,6 +64,7 @@ class User(BaseCommons):
 
   ### UX preferences
   ux_workspaces = Column(JSON)
+  ux_groups = Column(JSON)
   # ux_datasets = Column(JSON)
 
 

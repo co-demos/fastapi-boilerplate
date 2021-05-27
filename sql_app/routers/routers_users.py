@@ -22,7 +22,7 @@ from ..schemas.schemas_comment import Comment
 
 
 from ..models.models_user import User as UserModel
-from ..schemas.schemas_user import User, UserCreate, UserUpdate, UserBasicInfos, UserUX
+from ..schemas.schemas_user import User, UserInfos, UserCreate, UserUpdate, UserBasicInfos, UserUX
 from ..schemas.schemas_token import TokenAccess, TokenAccessRefresh
 from ..schemas.schemas_message import Msg
 
@@ -95,7 +95,6 @@ def read_users(
   skip: int = 0, limit: int = 100, 
   db: Session = Depends(get_db)
   ):
-  # users_in_db = get_users(db, skip=skip, limit=limit)
   users_in_db = user.get_multi(db, skip=skip, limit=limit)
   return users_in_db
 
@@ -117,6 +116,23 @@ def read_user(
     )
   return user_in_db
 
+
+@router.get("/search",
+  summary="Get an user by its email",
+  description="Get infos of one user",
+  response_model=UserInfos
+ )
+def read_user_by_emaiil(
+  user_email: EmailStr,
+  db: Session = Depends(get_db)
+  ):
+  user_in_db = user.get_by_email(db, email=user_email)
+  if user_in_db is None:
+    raise HTTPException(
+      status_code=status.HTTP_404_NOT_FOUND,
+      detail="User not found"
+    )
+  return user_in_db
 
 @router.delete("/{user_id}",
   summary="Delete an user",

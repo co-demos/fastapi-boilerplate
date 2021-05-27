@@ -38,22 +38,19 @@ class GroupBase(BaseModel):
   write: PermissionType = PermissionType.perm_owner
   manage: PermissionType = PermissionType.perm_owner
 
-  ### linked data
-  users: List[UserInDBBaseLight] = []
-
-
 # print("=== SCH-schemas_groups > GroupBase : ", GroupBase)
 
 
 class GroupCreate(GroupBase):
-  pass
+  users_pending: List[EmailStr] = []
 
 
 class GroupUpdate(GroupBase):
-  pass
+  users: List[UserInDBBaseLight] = []
+  users_pending: Optional[List[EmailStr]] = []
 
 
-class Group(GroupBase):
+class Group(GroupUpdate):
   ### meta
   item_type: str = "group"
   id: int

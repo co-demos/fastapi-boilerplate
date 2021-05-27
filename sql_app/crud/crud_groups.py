@@ -12,13 +12,18 @@ class CRUDGroup(CRUDBase[Group, GroupCreate, GroupUpdate]):
     self, db: Session, *, 
     obj_in: GroupCreate,
     owner_id: int,
-    user = None
+    users = [],
+    users_pending = [],
     ):
     db_obj = self.create_with_owner(db=db, obj_in=obj_in, owner_id=owner_id)
 
     obj_users = db_obj.users
-    obj_users.append(user)
+    obj_users.append(*users)
     setattr(db_obj, "users", obj_users)
+
+    obj_users_pending = db_obj.users_pending
+    obj_users_pending.append(*users_pending)
+    setattr(db_obj, "users_pending", obj_users_pending)
 
     db.add(db_obj)
     db.commit()

@@ -24,13 +24,29 @@ router = APIRouter()
   response_model=Group,
   status_code=status.HTTP_201_CREATED
   )
-def create_group_for_user(
+async def create_group_for_user(
   obj_in: GroupCreate,
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
   ):
   user_id = current_user.id
-  return group.create_with_owner_in_team(db=db, obj_in=obj_in, owner_id=user_id, user=current_user)
+  
+  members_registred = [current_user]
+  members_pending = []
+  for email in obj_in.users_pending:
+    user_in_db = user.get_user_by_email(db, email=email)
+    if user_in_db is None:
+      members_pending.append(email)
+    else: 
+      members_registred.append(user_in_db)
+
+  return group.create_with_owner_in_team(
+    db=db,
+    obj_in=obj_in,
+    owner_id=user_id,
+    users=members_registred,
+    users_pending=members_pending
+  )
 
 
 @router.get("/{obj_id}",
@@ -38,7 +54,7 @@ def create_group_for_user(
   description="Get a group by its id",
   response_model=Group,
   )
-def read_group(
+async def read_group(
   obj_id: int, 
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
@@ -54,7 +70,7 @@ def read_group(
   description="Update a group by its id",
   response_model=Group
   )
-def update_group(
+async def update_group(
   obj_id: int,
   obj_in: GroupUpdate,
   db: Session = Depends(get_db),
@@ -76,7 +92,7 @@ def update_group(
   description="Get all groups given a limit",
   response_model=List[Group]
   )
-def read_groups(
+async def read_groups(
   skip: int = 0, limit: int = 100, 
   current_user: User = Depends(get_current_user),
   db: Session = Depends(get_db),
@@ -90,7 +106,7 @@ def read_groups(
   description="Delete a group by its id",
   response_model=Group
   )
-def delete_group(
+async def delete_group(
   obj_id: int,
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
