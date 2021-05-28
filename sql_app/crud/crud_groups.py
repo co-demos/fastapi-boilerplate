@@ -22,8 +22,9 @@ class CRUDGroup(CRUDBase[Group, GroupCreate, GroupUpdate]):
     setattr(db_obj, "users", obj_users)
 
     obj_users_pending = db_obj.users_pending
-    obj_users_pending.append(*users_pending)
-    setattr(db_obj, "users_pending", obj_users_pending)
+    if obj_users_pending :
+      obj_users_pending.append(*users_pending)
+      setattr(db_obj, "users_pending", obj_users_pending)
 
     db.add(db_obj)
     db.commit()

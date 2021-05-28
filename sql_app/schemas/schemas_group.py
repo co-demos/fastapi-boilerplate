@@ -38,6 +38,9 @@ class GroupBase(BaseModel):
   write: PermissionType = PermissionType.perm_owner
   manage: PermissionType = PermissionType.perm_owner
 
+  authorized_users: Optional[List[EmailStr]] = []
+  authorized_groups: Optional[List[int]] = []
+
 # print("=== SCH-schemas_groups > GroupBase : ", GroupBase)
 
 

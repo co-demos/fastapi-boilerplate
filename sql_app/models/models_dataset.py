@@ -32,9 +32,13 @@ class Dataset(BaseCommons):
   write = Column(String, default='owner-only')
   manage = Column(String, default='owner-only')
 
+  authorized_users = Column(ARRAY(EmailType), default=[])
+  authorized_groups = Column(ARRAY(Integer), default=[])
+
   ### foreign keys
   owner_id = Column(Integer, ForeignKey("users.id"))
-  owner = relationship("User", back_populates="my_datasets")
+  # owner = relationship("User", back_populates="my_datasets")
+  owner = relationship("User", backref="my_datasets")
 
   # workspace_related = relationship("Workspace", back_populates="datasets")
   # workspace_id = Column(Integer, ForeignKey('workspace.id'))

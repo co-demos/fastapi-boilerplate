@@ -45,8 +45,8 @@ class User(BaseCommons):
   comments = relationship("Comment", back_populates="owner")
 
   ### relationships / data patch items
-  my_workspaces = relationship("Workspace", back_populates="owner")
-  my_datasets = relationship("Dataset", back_populates="owner")
+  # my_workspaces = relationship("Workspace", back_populates="owner")
+  # my_datasets = relationship("Dataset", back_populates="owner")
   # my_tables = relationship("Table", back_populates="owner")
   # my_schemas = relationship("Schema", back_populates="owner")
   # my_fields = relationship("SchemaField", back_populates="owner")

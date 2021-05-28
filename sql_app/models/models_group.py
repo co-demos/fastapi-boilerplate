@@ -44,6 +44,9 @@ class Group(BaseCommons):
   manage = Column(String, default='owner-only')
   invite = Column(String, default='owner-only')
 
+  authorized_users = Column(ARRAY(EmailType), default=[])
+  authorized_groups = Column(ARRAY(Integer), default=[])
+
   ### owner
   owner_id = Column(Integer, ForeignKey("users.id"))
   owner = relationship("User", backref="my_groups")

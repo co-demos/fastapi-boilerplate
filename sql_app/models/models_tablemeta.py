@@ -39,6 +39,9 @@ class Tablemeta(BaseCommons):
   write = Column(String, default='owner-only')
   manage = Column(String, default='owner-only')
 
+  authorized_users = Column(ARRAY(EmailType), default=[])
+  authorized_groups = Column(ARRAY(Integer), default=[])
+
   ### owner
   owner_id = Column(Integer, ForeignKey("users.id"))
   # owner = relationship("User", back_populates="my_tables")

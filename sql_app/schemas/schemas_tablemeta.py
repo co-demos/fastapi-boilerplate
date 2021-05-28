@@ -2,7 +2,7 @@ print(">>>>>> import schemas_tablemeta.py >  Table ...")
 from typing import List, Dict, Optional, Any
 import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from enum import Enum
 
 from .schemas_choices import PermissionType
@@ -34,6 +34,9 @@ class TablemetaBase(BaseModel):
   patch: PermissionType = PermissionType.perm_owner
   write: PermissionType = PermissionType.perm_owner
   manage: PermissionType = PermissionType.perm_owner
+
+  authorized_users: Optional[List[EmailStr]] = []
+  authorized_groups: Optional[List[int]] = []
 
   ### table data
   table_fields : List[FieldData] = []

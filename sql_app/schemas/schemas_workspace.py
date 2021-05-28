@@ -2,7 +2,7 @@ print(">>>>>> import schemas_workspace.py >  Workspace ...")
 from typing import List, Optional, Any
 import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 # from uuid import UUID
 
 from .schemas_dataset import Dataset
@@ -23,6 +23,9 @@ class WorkspaceBase(BaseModel):
   read: PermissionType = PermissionType.perm_owner
   write: PermissionType = PermissionType.perm_owner
   manage: PermissionType = PermissionType.perm_owner
+
+  authorized_users: Optional[List[EmailStr]] = []
+  authorized_groups: Optional[List[int]] = []
 
   ### linked data
   datasets: Any = {}
