@@ -9,13 +9,28 @@ class PermissionType(str, Enum):
 
 
 class ItemType(str, Enum):
+  user = "user"
+  group = "group"
   workspace = "workspace"
   dataset = "dataset"
   table = "table"
-  group = "group"
+
+
+class ItemTypes(str, Enum):
+  users = "users"
+  groups = "groups"
+  workspaces = "workspaces"
+  datasets = "datasets"
+  tables = "tables"
 
 
 class InvitationStatus(str, Enum):
   pending = "pending"
   accepted = "accepted"
   refused = "refused"
+
+
+class OperatorType(str, Enum):
+  or_ = "or"
+  and_ = "and"
+  not_ = "not"

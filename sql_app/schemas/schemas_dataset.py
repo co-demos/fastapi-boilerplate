@@ -65,3 +65,7 @@ class Dataset(DatasetData):
 class DatasetList(Dataset):
   pass
   # owner: User
+
+
+class DatasetsList(BaseModel):
+  __root__: List[Dataset]

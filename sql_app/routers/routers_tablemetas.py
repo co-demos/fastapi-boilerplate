@@ -1,7 +1,7 @@
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 from . import ( List, Session, APIRouter, Depends,
   HTTPException, status,
-  get_db,
+  get_db, Query
 )
 
 import uuid

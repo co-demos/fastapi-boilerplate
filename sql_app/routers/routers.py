@@ -11,6 +11,7 @@ from . import (
   routers_users,
   routers_groups,
   routers_invitations,
+  routers_searches,
 
   routers_posts,
   routers_comments
@@ -53,6 +54,12 @@ api_router.include_router(
   routers_tablemetas.router,
   prefix="/tables",
   tags=["tables"]
+)
+
+api_router.include_router(
+  routers_searches.router,
+  prefix="/searches",
+  tags=["searches"]
 )
 
 

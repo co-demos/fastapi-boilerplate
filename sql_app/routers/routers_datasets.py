@@ -1,6 +1,6 @@
 from . import ( List, Session, APIRouter, Depends,
   HTTPException, status,
-  get_db,
+  get_db, Query
 )
 
 from fastapi.encoders import jsonable_encoder

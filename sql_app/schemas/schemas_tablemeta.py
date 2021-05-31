@@ -78,6 +78,9 @@ class TablemetaList(Tablemeta):
   pass
   # owner: User
 
+class TablemetasList(BaseModel):
+  __root__: List[Tablemeta]
+
 
 ### SCHEMAS - TABLE DATA
 

@@ -71,3 +71,12 @@ class GroupList(GroupBase):
   pass
   # owner: User
 
+
+class GroupLight(GroupUpdate) :
+  item_type: str = "group"
+  id: int
+  class Config:
+    orm_mode = True
+
+class GroupsList(BaseModel):
+  __root__: List[GroupLight]

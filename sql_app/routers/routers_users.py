@@ -8,7 +8,7 @@ from . import ( settings,
   timedelta,
   File, UploadFile, shutil,
   jsonable_encoder,
-  get_db,
+  get_db, Query,
 
   # crud_items,
   crud_posts,
@@ -92,7 +92,8 @@ def create_user(
   response_model=List[User]
   )
 def read_users(
-  skip: int = 0, limit: int = 100, 
+  skip: int = 0,
+  limit: int = 100, 
   db: Session = Depends(get_db)
   ):
   users_in_db = user.get_multi(db, skip=skip, limit=limit)
@@ -116,23 +117,6 @@ def read_user(
     )
   return user_in_db
 
-
-@router.get("/search",
-  summary="Get an user by its email",
-  description="Get infos of one user",
-  response_model=UserInfos
- )
-def read_user_by_emaiil(
-  user_email: EmailStr,
-  db: Session = Depends(get_db)
-  ):
-  user_in_db = user.get_by_email(db, email=user_email)
-  if user_in_db is None:
-    raise HTTPException(
-      status_code=status.HTTP_404_NOT_FOUND,
-      detail="User not found"
-    )
-  return user_in_db
 
 @router.delete("/{user_id}",
   summary="Delete an user",

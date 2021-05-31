@@ -60,3 +60,20 @@ class Workspace(WorkspaceBase):
 class WorkspaceList(Workspace):
   pass
   # owner: User
+
+
+# class WorkspaceLight(Workspace):
+#   ### meta
+#   item_type: str = "workspace"
+#   id: int
+#   created_date: Optional[datetime.datetime]
+#   is_active: bool = True
+
+#   ### owner
+#   owner_id: int
+
+#   class Config:
+#     orm_mode = True
+
+class WorkspacesList(BaseModel):
+  __root__: List[Workspace]

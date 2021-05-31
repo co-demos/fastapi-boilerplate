@@ -1,6 +1,6 @@
 from . import ( List, Session, APIRouter, Depends,
   HTTPException, status,
-  get_db,
+  get_db, Query
 )
 
 from ..schemas.schemas_workspace import Workspace, WorkspaceCreate, WorkspaceUpdate, WorkspaceList

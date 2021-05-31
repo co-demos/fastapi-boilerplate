@@ -1,6 +1,6 @@
 from . import ( List, Session, APIRouter, Depends,
   HTTPException, status,
-  get_db,
+  get_db, Query
 )
 
 from fastapi.encoders import jsonable_encoder
@@ -99,6 +99,25 @@ async def read_groups(
   ):
   groups = group.get_multi(db=db, skip=skip, limit=limit)
   return groups
+
+
+# @router.get("/search/",
+#   summary="Search for a list of groups",
+#   description="Get groups given a string query",
+#   response_model=List[Group]
+#   )
+# async def search_groups(
+#   q: str = Query("fixedquery", min_length=3),
+#   skip: int = 0, limit: int = 100, 
+#   current_user: User = Depends(get_current_user),
+#   db: Session = Depends(get_db),
+#   ):
+#   groups_in_db = group.search_multi_by_fields(
+#     db=db,
+#     q=q,
+#     fields=["title", "description"],
+#   )
+#   return groups_in_db
 
 
 @router.delete("/{obj_id}",

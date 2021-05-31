@@ -4,10 +4,13 @@ from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
+
+from sqlalchemy import and_, or_, not_
 from sqlalchemy.orm import Session
 
 from ..db.base_class import BaseCommons
 from ..models.models_user import User
+from ..schemas.schemas_choices import OperatorType
 
 ModelType = TypeVar("ModelType", bound=BaseCommons)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -40,14 +43,21 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
   def get_multi(
     self, db: Session, *, 
-    skip: int = 0, limit: int = 100
+    skip: int = 0,
+    limit: int = 100,
     ) -> List[ModelType]:
-    return db.query(self.model).offset(skip).limit(limit).all()
+    return (
+      db.query(self.model)
+      .offset(skip)
+      .limit(limit)
+      .all()
+    )
 
   def get_multi_by_owner(
     self, db: Session, *,
     owner_id: int,
-    skip: int = 0, limit: int = 100
+    skip: int = 0,
+    limit: int = 100,
     ) -> List[ModelType]:
     return (
       db.query(self.model)
@@ -56,6 +66,59 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
       .limit(limit)
       .all()
     )
+
+  def search_multi_by_fields(
+    self, db: Session, *, 
+    q: str,
+    fields: List[str],
+    skip: int = 0,
+    limit: int = 100,
+    operator: OperatorType = OperatorType.or_,
+    ) -> List[ModelType]:
+    
+
+    print("\nsearch_multi_by_fields > q : ", q)
+    print("search_multi_by_fields > fields : ", fields)
+    print("search_multi_by_fields > self.model : ", self.model)
+    # print("search_multi_by_fields > self.model.__dict__ : ", self.model.__dict__)
+
+    db_query = db.query(self.model)
+    results = db_query
+    # print("search_mu/lti_by_fields > results - 1 : ", results)
+
+    search_args = []
+    for field in fields : 
+      column = getattr(self.model, field, None)
+      filter_col = column.ilike(f"%{q}%") ### substring match
+      # filter_col = column.contains(q) ### exact match
+      search_args.append(filter_col)
+    print("search_multi_by_fields > search_args : ", search_args)
+    
+    if operator == "or" :
+      filter_arg = or_(*search_args)
+    if operator == "not" :
+      filter_arg = not_(*search_args)
+    if operator == "and" :
+      filter_arg = and_(*search_args)
+
+    results_all = (
+      db_query
+      .filter(
+        filter_arg
+      )
+    )
+    results_count = results_all.count()
+    print("search_multi_by_fields > results_count : ", results_count)
+
+    results = (
+      results_all
+      .offset(skip)
+      .limit(limit)
+      .all()
+    )
+
+    print("search_multi_by_fields > results - end : ", results)
+    return results, results_count
 
   def create(
     self, db: Session, *, 
