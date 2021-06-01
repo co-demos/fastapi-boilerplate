@@ -7,7 +7,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import parse_obj_as
 
-from ..schemas.schemas_choices import ItemTypes, OperatorType
+from ..schemas.schemas_choices import PermissionType, ItemTypes, OperatorType
 
 from ..schemas.schemas_user import UsersList
 from ..schemas.schemas_group import GroupsList
@@ -64,8 +64,9 @@ ITEM_TYPES = {
   # response_model=List[ITEM_TYPES[item_type]["model"]]
   )
 async def search_by_type(
-  item_type: ItemTypes = ItemTypes.groups,
   q: str = Query("", min_length=3),
+  item_type: ItemTypes = ItemTypes.groups,
+  auth_type: PermissionType = Query([PermissionType.perm_public]),
   operator: OperatorType = OperatorType.or_,
   skip: int = 0, limit: int = 100, 
   current_user: User = Depends(get_current_user),
@@ -79,6 +80,7 @@ async def search_by_type(
     db=db,
     q=q,
     fields=ITEM_TYPES[item_type]["fields"],
+    auth_level=auth_type,
     operator=operator, 
   )
   print("search_by_type > items_in_db : ", items_in_db)
@@ -92,6 +94,7 @@ async def search_by_type(
 async def search_any(
   q: str = Query("", min_length=3),
   item_types: List[ItemTypes] = Query([ItemTypes.groups]),
+  auth_type: PermissionType = Query([PermissionType.perm_public]),
   operator: OperatorType = OperatorType.or_,
   skip: int = 0, limit: int = 100, 
   current_user: User = Depends(get_current_user),
@@ -107,11 +110,12 @@ async def search_any(
       db=db,
       q=q,
       fields=ITEM_TYPES[item_type]["fields"],
+      auth_level=auth_type,
       operator=operator, 
     )
     # print("search_any > items_in_db : ", items_in_db)
     items_results = {}
-    print("search_any > jsonable_encoder(items_in_db) : ", jsonable_encoder(items_in_db))
+    # print("search_any > jsonable_encoder(items_in_db) : ", jsonable_encoder(items_in_db))
     model = ITEM_TYPES[item_type]["model"]
     print("search_any > model : ", model)
     
@@ -120,6 +124,6 @@ async def search_any(
     
     results[item_type] = items_results
 
-  print("search_any > results : ", results)
+  # print("search_any > results : ", results)
   # return JSONResponse(content=results)
   return results

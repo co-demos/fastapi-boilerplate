@@ -71,13 +71,14 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     self, db: Session, *, 
     q: str,
     fields: List[str],
+    auth_level: str,
     skip: int = 0,
     limit: int = 100,
     operator: OperatorType = OperatorType.or_,
     ) -> List[ModelType]:
     
-
     print("\nsearch_multi_by_fields > q : ", q)
+    print("search_multi_by_fields > auth_level : ", auth_level)
     print("search_multi_by_fields > fields : ", fields)
     print("search_multi_by_fields > self.model : ", self.model)
     # print("search_multi_by_fields > self.model.__dict__ : ", self.model.__dict__)
