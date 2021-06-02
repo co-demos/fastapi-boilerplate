@@ -5,6 +5,8 @@ import datetime
 from pydantic import BaseModel, EmailStr
 # from uuid import UUID
 
+from .schemas_choices import PermissionType
+
 from .schemas_group import Group
 from .schemas_workspace import Workspace
 from .schemas_dataset import Dataset
@@ -47,6 +49,8 @@ class UserInfos(UserBase, UserBasicInfos, UserBasicInfosAvatar):
   ### meta
   created_date: Optional[datetime.datetime]
   modif_date: Optional[datetime.datetime]
+  ### access auths
+  read: PermissionType = PermissionType.perm_public
 
 
 class UserCreate(UserBase, UserBasicInfos, UserBasicInfosAvatar):

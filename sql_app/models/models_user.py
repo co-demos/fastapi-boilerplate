@@ -39,6 +39,9 @@ class User(BaseCommons):
   is_active = Column(Boolean, default=True)
   is_superuser = Column(Boolean, default=False)
 
+  ### access auths
+  read = Column(String, default='public')
+
   ### relationships
   items = relationship("Item", back_populates="owner")
   posts = relationship("Post", back_populates="owner")
