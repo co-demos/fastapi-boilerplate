@@ -8,6 +8,11 @@ class PermissionType(str, Enum):
   perm_public = "public"
 
 
+class InviteeType(str, Enum):
+  user = "user"
+  group = "group"
+
+
 class ItemType(str, Enum):
   user = "user"
   group = "group"

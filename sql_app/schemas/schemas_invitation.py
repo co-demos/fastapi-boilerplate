@@ -5,7 +5,37 @@ import datetime
 from pydantic import BaseModel, EmailStr
 # from uuid import UUID
 
-from .schemas_choices import ItemType, InvitationStatus
+from .schemas_choices import ItemType, InvitationStatus, InviteeType
+
+
+class Invitee(BaseModel):
+  invitee_type: InviteeType = InviteeType.user
+  invitee_email: Optional[EmailStr]
+  invitee_id: Optional[int]
+
+
+class InvitationBasics(BaseModel):
+  ### basic infos
+  # title: str = "My invitation"
+  message: Optional[str] = "My invitation message"
+
+  ### linked data
+  # invitation_to_item_type: ItemType = ItemType.workspace
+  invitor_id: int
+  invitation_to_item_id: int
+  invitees: Optional[List[Invitee]] = []
+
+class InvitationToGroup(InvitationBasics):
+  invitation_to_item_type: ItemType = ItemType.group
+
+class InvitationToWorkspace(InvitationBasics):
+  invitation_to_item_type: ItemType = ItemType.workspace
+
+class InvitationToDataset(InvitationBasics):
+  invitation_to_item_type: ItemType = ItemType.dataset
+
+class InvitationToTablemeta(InvitationBasics):
+  invitation_to_item_type: ItemType = ItemType.table
 
 
 class InvitationBase(BaseModel):

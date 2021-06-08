@@ -6,6 +6,8 @@ from . import ( List, Session, APIRouter, Depends,
 from ..schemas.schemas_workspace import Workspace, WorkspaceCreate, WorkspaceUpdate, WorkspaceList
 from ..crud.crud_workspaces import workspace
 
+from ..schemas.schemas_invitation import InvitationToWorkspace
+
 from ..models.models_user import User
 from ..crud.crud_users import user
 from ..crud.crud_users import (
@@ -67,6 +69,29 @@ def update_workspace(
   if not current_user.is_superuser and (workspace_in_db.owner_id != current_user.id):
     raise HTTPException(status_code=400, detail="Not enough permissions")
   workspace_in_db = workspace.update(db=db, db_obj=workspace_in_db, obj_in=obj_in)
+  return workspace_in_db
+
+
+@router.post("/{obj_id}/invite",
+  summary="Invite people to a workspace",
+  description="Invite a list of users or mails to a workspace",
+  response_model=Workspace
+  )
+async def invite_to_workspace(
+  obj_id: int,
+  obj_in: InvitationToWorkspace,
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user)
+  ):
+  workspace_in_db = workspace.get_by_id(db=db, id=obj_id)
+  if workspace_in_db is None:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="workspace not found")
+  ### only owner and superuser for now
+  ### need to check workspace and scope !!!
+  if not current_user.is_superuser and (workspace_in_db.owner_id != current_user.id):
+    raise HTTPException(status_code=400, detail="Not enough permissions")
+
+  workspace_in_db = workspace.invite(db=db, db_obj=workspace_in_db, obj_in=obj_in)
   return workspace_in_db
 
 

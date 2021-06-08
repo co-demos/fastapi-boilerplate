@@ -20,6 +20,7 @@ from ..schemas.schemas_item import Item, ItemCreate
 from ..schemas.schemas_post import Post
 from ..schemas.schemas_comment import Comment
 
+from ..schemas.schemas_invitation import InvitationBasics
 
 from ..models.models_user import User as UserModel
 from ..schemas.schemas_user import User, UserInfos, UserCreate, UserUpdate, UserBasicInfos, UserUX

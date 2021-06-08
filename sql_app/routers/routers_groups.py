@@ -7,6 +7,8 @@ from fastapi.encoders import jsonable_encoder
 from ..schemas.schemas_group import UserInDBBaseLight, Group, GroupCreate, GroupUpdate, GroupList
 from ..crud.crud_groups import group
 
+from ..schemas.schemas_invitation import InvitationToGroup
+
 from ..models.models_user import User
 from ..crud.crud_users import user
 from ..crud.crud_users import (
@@ -84,6 +86,29 @@ async def update_group(
   if not current_user.is_superuser and (group_in_db.owner_id != current_user.id):
     raise HTTPException(status_code=400, detail="Not enough permissions")
   group_in_db = group.update(db=db, db_obj=group_in_db, obj_in=obj_in)
+  return group_in_db
+
+
+@router.post("/{obj_id}/invite",
+  summary="Invite people to a group",
+  description="Invite a list of users or mails to a group",
+  response_model=Group
+  )
+async def invite_to_group(
+  obj_id: int,
+  obj_in: InvitationToGroup,
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user)
+  ):
+  group_in_db = group.get_by_id(db=db, id=obj_id)
+  if group_in_db is None:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="group not found")
+  ### only owner and superuser for now
+  ### need to check group and scope !!!
+  if not current_user.is_superuser and (group_in_db.owner_id != current_user.id):
+    raise HTTPException(status_code=400, detail="Not enough permissions")
+
+  group_in_db = group.invite(db=db, db_obj=group_in_db, obj_in=obj_in)
   return group_in_db
 
 

@@ -24,6 +24,8 @@ from ..schemas.schemas_tablemeta import (
 )
 from ..crud.crud_tablemetas import tablemeta
 
+from ..schemas.schemas_invitation import InvitationToTablemeta
+
 from ..models.models_user import User
 from ..crud.crud_users import (
   get_current_user,
@@ -203,6 +205,29 @@ def update_tablemeta_data(
   print( tablemeta_data_in_db )
 
   return tablemeta_data_in_db
+
+
+@router.post("/{obj_id}/invite",
+  summary="Invite people to a tablemeta",
+  description="Invite a list of users or mails to a tablemeta",
+  response_model=Tablemeta
+  )
+async def invite_to_tablemeta(
+  obj_id: int,
+  obj_in: InvitationToTablemeta,
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user)
+  ):
+  tablemeta_in_db = tablemeta.get_by_id(db=db, id=obj_id)
+  if tablemeta_in_db is None:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="tablemeta not found")
+  ### only owner and superuser for now
+  ### need to check group and scope !!!
+  if not current_user.is_superuser and (tablemeta_in_db.owner_id != current_user.id):
+    raise HTTPException(status_code=400, detail="Not enough permissions")
+
+  tablemeta_in_db = tablemeta.invite(db=db, db_obj=tablemeta_in_db, obj_in=obj_in)
+  return tablemeta_in_db
 
 
 @router.delete("/{obj_id}/data",

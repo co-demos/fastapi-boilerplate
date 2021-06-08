@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from ..db.base_class import BaseCommons
 from ..models.models_user import User
 from ..schemas.schemas_choices import OperatorType
+from ..schemas.schemas_invitation import InvitationBasics
 
 ModelType = TypeVar("ModelType", bound=BaseCommons)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -166,6 +167,29 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     db.add(db_obj)
     db.commit()
     db.refresh(db_obj)
+    return db_obj
+
+  def invite(
+    self, db: Session, *, 
+    db_obj: ModelType,
+    obj_in: InvitationBasics
+    ) -> ModelType:
+    print("\ninvite > db_obj : ", db_obj)
+    obj_data = jsonable_encoder(db_obj)
+    print("\ninvite > obj_data : ", obj_data)
+
+    print("\ninvite > obj_in : ", obj_in)
+    obj_in_data = jsonable_encoder(obj_in)
+    print("invite > obj_in_data : ", obj_in_data)
+
+
+
+    # db_obj = self.model(**obj_in_data)
+    # print("invite > db_obj : ", db_obj)
+    # db.add(db_obj)
+    # db.commit()
+    # db.refresh(db_obj)
+
     return db_obj
 
   def remove(
