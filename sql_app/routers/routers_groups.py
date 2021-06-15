@@ -1,5 +1,5 @@
 from . import ( List, Session, APIRouter, Depends,
-  HTTPException, status,
+  HTTPException, status, BackgroundTasks,
   get_db, Query
 )
 
@@ -97,6 +97,7 @@ async def update_group(
 async def invite_to_group(
   obj_id: int,
   obj_in: InvitationToGroup,
+  background_tasks: BackgroundTasks,
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
   ):
@@ -108,7 +109,13 @@ async def invite_to_group(
   if not current_user.is_superuser and (group_in_db.owner_id != current_user.id):
     raise HTTPException(status_code=400, detail="Not enough permissions")
 
-  group_in_db = group.invite(db=db, db_obj=group_in_db, obj_in=obj_in, invitor=current_user)
+  group_in_db = group.invite(
+    db=db,
+    background_tasks=background_tasks,
+    db_obj=group_in_db,
+    obj_in=obj_in,
+    invitor=current_user
+  )
   return group_in_db
 
 

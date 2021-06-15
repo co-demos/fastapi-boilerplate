@@ -146,14 +146,17 @@ def send_invitation_email(
   name: str,
   surname: str,
   username: str,
+  token: str,
   invitation: Any,
   ):
   project_name = settings.APP_TITLE
-  subject = f"{project_name} - New invitation from user {username}"
+  subject = f"{project_name} - New invitation from {username}"
   html_template = "new_invitation.html"
-  link = f"{settings.SERVER_FRONT}/{invitation.invitation_to_item_type}/{invitation.invitation_to_item_id}"
+  item_type = invitation["invitation_to_item_type"]
+  item_id = invitation["invitation_to_item_id"]
+  link = f"{settings.SERVER_FRONT}/{item_type}/{item_id}?token={token}"
   send_email(
-    email_to=invitation.invitee,
+    email_to=invitation["invitee"],
     subject_template=subject,
     html_template=html_template,
     environment={

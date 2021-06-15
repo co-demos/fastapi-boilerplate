@@ -1,6 +1,6 @@
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 from . import ( List, Session, APIRouter, Depends,
-  HTTPException, status,
+  HTTPException, status, BackgroundTasks,
   get_db, Query
 )
 
@@ -215,6 +215,7 @@ def update_tablemeta_data(
 async def invite_to_tablemeta(
   obj_id: int,
   obj_in: InvitationToTablemeta,
+  background_tasks: BackgroundTasks,
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
   ):
@@ -226,7 +227,13 @@ async def invite_to_tablemeta(
   if not current_user.is_superuser and (tablemeta_in_db.owner_id != current_user.id):
     raise HTTPException(status_code=400, detail="Not enough permissions")
 
-  tablemeta_in_db = tablemeta.invite(db=db, db_obj=tablemeta_in_db, obj_in=obj_in, invitor=current_user)
+  tablemeta_in_db = tablemeta.invite(
+    db=db,
+    background_tasks=background_tasks,
+    db_obj=tablemeta_in_db,
+    obj_in=obj_in,
+    invitor=current_user
+  )
   return tablemeta_in_db
 
 

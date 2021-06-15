@@ -1,5 +1,5 @@
 from . import ( List, Session, APIRouter, Depends,
-  HTTPException, status,
+  HTTPException, status, BackgroundTasks,
   get_db,
 )
 
@@ -30,6 +30,7 @@ router = APIRouter()
   )
 def create_invitation_for_user(
   obj_in: InvitationCreate,
+  background_tasks: BackgroundTasks,
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
   ):

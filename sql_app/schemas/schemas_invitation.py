@@ -40,7 +40,7 @@ class InvitationToTablemeta(InvitationBasics):
 class InvitationBase(BaseModel):
   ### basic infos
   title: str = "My invitation"
-  message_title: Optional[str] = "My invitation title"
+  # message_title: Optional[str] = "My invitation title"
   message: Optional[str] = "My invitation message"
 
   ### linked data

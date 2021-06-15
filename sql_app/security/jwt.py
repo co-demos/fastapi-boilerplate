@@ -70,6 +70,23 @@ def generate_password_reset_token(email: str) :
   return encoded_jwt
 
 
+def generate_invit_token(email: str) :
+  delta = timedelta(hours=settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS)
+  now = datetime.utcnow()
+  expires = now + delta
+  exp = expires.timestamp()
+  encoded_jwt = jwt.encode(
+    {
+      "exp": exp, 
+      "nbf": now,
+      "sub": email
+    }, 
+    SECRET_KEY,
+    algorithm=ALGORITHM,
+  )
+  return encoded_jwt
+
+
 def verify_password_reset_token(token: str) -> Optional[str]:
   print("verify_password_reset_token > token : ", token)
   try:
