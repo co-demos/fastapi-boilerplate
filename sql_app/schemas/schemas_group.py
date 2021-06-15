@@ -38,19 +38,24 @@ class GroupBase(BaseModel):
   write: PermissionType = PermissionType.perm_owner
   manage: PermissionType = PermissionType.perm_owner
 
+  pending_users: Optional[List[EmailStr]] = []
+  # pending_groups: Optional[List[int]] = []
+
   authorized_users: Optional[List[EmailStr]] = []
-  authorized_groups: Optional[List[int]] = []
+  # authorized_groups: Optional[List[int]] = []
 
 # print("=== SCH-schemas_groups > GroupBase : ", GroupBase)
 
 
 class GroupCreate(GroupBase):
-  users_pending: List[EmailStr] = []
+  # users_pending: List[EmailStr] = []
+  pending_users: List[EmailStr] = []
 
 
 class GroupUpdate(GroupBase):
   users: List[UserInDBBaseLight] = []
-  users_pending: Optional[List[EmailStr]] = []
+  # users_pending: Optional[List[EmailStr]] = []
+  pending_users: Optional[List[EmailStr]] = []
 
 
 class Group(GroupUpdate):

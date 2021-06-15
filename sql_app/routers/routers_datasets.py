@@ -142,7 +142,7 @@ async def invite_to_dataset(
   if not current_user.is_superuser and (dataset_in_db.owner_id != current_user.id):
     raise HTTPException(status_code=400, detail="Not enough permissions")
 
-  dataset_in_db = dataset.invite(db=db, db_obj=dataset_in_db, obj_in=obj_in)
+  dataset_in_db = dataset.invite(db=db, db_obj=dataset_in_db, obj_in=obj_in, invitor=current_user)
   return dataset_in_db
 
 

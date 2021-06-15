@@ -16,12 +16,11 @@ class Invitee(BaseModel):
 
 class InvitationBasics(BaseModel):
   ### basic infos
-  # title: str = "My invitation"
+  message_title: Optional[str] = "My invitation title"
   message: Optional[str] = "My invitation message"
 
   ### linked data
-  # invitation_to_item_type: ItemType = ItemType.workspace
-  invitor_id: int
+  # invitor_id: int
   invitation_to_item_id: int
   invitees: Optional[List[Invitee]] = []
 
@@ -41,6 +40,7 @@ class InvitationToTablemeta(InvitationBasics):
 class InvitationBase(BaseModel):
   ### basic infos
   title: str = "My invitation"
+  message_title: Optional[str] = "My invitation title"
   message: Optional[str] = "My invitation message"
 
   ### linked data

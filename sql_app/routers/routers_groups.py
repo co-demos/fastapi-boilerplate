@@ -35,7 +35,7 @@ async def create_group_for_user(
   
   members_registred = [current_user]
   members_pending = []
-  for email in obj_in.users_pending:
+  for email in obj_in.pending_users:
     user_in_db = user.get_user_by_email(db, email=email)
     if user_in_db is None:
       members_pending.append(email)
@@ -47,7 +47,7 @@ async def create_group_for_user(
     obj_in=obj_in,
     owner_id=user_id,
     users=members_registred,
-    users_pending=members_pending
+    pending_users=members_pending
   )
 
 
@@ -108,7 +108,7 @@ async def invite_to_group(
   if not current_user.is_superuser and (group_in_db.owner_id != current_user.id):
     raise HTTPException(status_code=400, detail="Not enough permissions")
 
-  group_in_db = group.invite(db=db, db_obj=group_in_db, obj_in=obj_in)
+  group_in_db = group.invite(db=db, db_obj=group_in_db, obj_in=obj_in, invitor=current_user)
   return group_in_db
 
 

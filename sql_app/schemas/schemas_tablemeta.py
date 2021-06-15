@@ -35,6 +35,9 @@ class TablemetaBase(BaseModel):
   write: PermissionType = PermissionType.perm_owner
   manage: PermissionType = PermissionType.perm_owner
 
+  pending_users: Optional[List[EmailStr]] = []
+  pending_groups: Optional[List[int]] = []
+  
   authorized_users: Optional[List[EmailStr]] = []
   authorized_groups: Optional[List[int]] = []
 

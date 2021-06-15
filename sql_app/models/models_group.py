@@ -44,8 +44,12 @@ class Group(BaseCommons):
   manage = Column(String, default='owner-only')
   invite = Column(String, default='owner-only')
 
+
+  pending_users = Column(ARRAY(EmailType), default=[])
+  # pending_groups = Column(ARRAY(Integer), default=[])
+
   authorized_users = Column(ARRAY(EmailType), default=[])
-  authorized_groups = Column(ARRAY(Integer), default=[])
+  # authorized_groups = Column(ARRAY(Integer), default=[])
 
   ### owner
   owner_id = Column(Integer, ForeignKey("users.id"))
@@ -57,7 +61,7 @@ class Group(BaseCommons):
     secondary=group_user_assoc,
     backref="groups"
   )
-  users_pending = Column(ARRAY(EmailType), default=[])
+  # users_pending = Column(ARRAY(EmailType), default=[])
 
   def can_manage(self, user_id: int):
     return self.owner_id == user_id

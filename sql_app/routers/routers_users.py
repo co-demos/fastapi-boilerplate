@@ -48,6 +48,7 @@ from ..emails.emails import (
 router = APIRouter()
 
 
+
 ### USER FUNCTIONS
 
 @router.post("/",
@@ -67,6 +68,8 @@ def create_user(
   - **username**: choose a pseudo
   - **password**: a password chosen by the user
   """
+  print("create_user > user_in : ", user_in)
+
   # user_in_db = get_user_by_email(db, email=user_in.email)
   user_in_db = user.get_user_by_email(db, email=user_in.email)
   if user_in_db:
@@ -77,9 +80,9 @@ def create_user(
     background_tasks.add_task(
       send_new_account_email,
       email_to=user_in.email,
-      username=user_in.username,
       name=user_in.name,
       surname=user_in.surname,
+      username=user_in.username,
       password=user_in.password,
       token=email_verify_token
     )

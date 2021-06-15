@@ -31,6 +31,9 @@ class Workspace(BaseCommons):
   write = Column(String, default='owner-only')
   manage = Column(String, default='owner-only')
 
+  pending_users = Column(ARRAY(EmailType), default=[])
+  pending_groups = Column(ARRAY(Integer), default=[])
+
   authorized_users = Column(ARRAY(EmailType), default=[])
   authorized_groups = Column(ARRAY(Integer), default=[])
 

@@ -10,8 +10,9 @@ from sqlalchemy.orm import Session
 
 from ..db.base_class import BaseCommons
 from ..models.models_user import User
+from ..models.models_group import Group
 from ..schemas.schemas_choices import OperatorType
-from ..schemas.schemas_invitation import InvitationBasics
+from ..schemas.schemas_invitation import InvitationBasics, InvitationCreate
 
 ModelType = TypeVar("ModelType", bound=BaseCommons)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -172,17 +173,105 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
   def invite(
     self, db: Session, *, 
     db_obj: ModelType,
-    obj_in: InvitationBasics
+    obj_in: InvitationBasics,
+    invitor: Any
     ) -> ModelType:
     print("\ninvite > db_obj : ", db_obj)
     obj_data = jsonable_encoder(db_obj)
-    print("\ninvite > obj_data : ", obj_data)
+    print("invite > obj_data : ", obj_data)
+
+    obj_owner_id = obj_data["owner_id"]
+
+    obj_authorized_users = obj_data.get("authorized_users", [])
+    obj_authorized_groups = obj_data.get("authorized_groups", [])
+    authorized_users = obj_authorized_users or []
+    authorized_groups = obj_authorized_groups or []
+
+    obj_pending_users = obj_data.get("pending_users", [])
+    obj_pending_groups = obj_data.get("pending_groups", [])
+    pending_users = obj_pending_users or []
+    pending_groups = obj_pending_groups or []
+
+    print("invite > obj_owner_id : ", obj_owner_id)
+    print("invite > obj_authorized_users : ", obj_authorized_users)
+    print("invite > obj_authorized_groups : ", obj_authorized_groups)
 
     print("\ninvite > obj_in : ", obj_in)
-    obj_in_data = jsonable_encoder(obj_in)
-    print("invite > obj_in_data : ", obj_in_data)
+    basic_invitation = jsonable_encoder(obj_in)
+    print("invite > basic_invitation : ", basic_invitation)
+
+    print("\ninvite > invitor : ", invitor)
+    invitor_data = jsonable_encoder(invitor)
+    print("invite > invitor_data : ", invitor_data)
+    invitor_id = invitor.id
+    print("invite > invitor_id : ", invitor_id)
+    invitor_email = invitor.email
+    print("invite > invitor_email : ", invitor_email)
+
+    msg = basic_invitation["message"]
+
+    ### A/ parse invitees ###
+    invitations = []
+    for invitee in basic_invitation["invitees"] :
+      print("\ninvite > invitee : ", invitee)
+
+      ### - create invitations for invitee / user (if not invitor)
+      if invitee["invitee_type"] == "user" :
+        invitee_email = invitee["invitee_email"]
+        if invitor_email != invitee_email and invitee_email not in authorized_users :
+          invitation = InvitationCreate(
+            **basic_invitation,
+            invitee = invitee_email
+          )
+          print("invite > invitation : ", invitation)
+          invitations.append(invitation)
+          pending_users.append(invitee_email)
+
+      ### - create invitations for invitee / group
+      if invitee["invitee_type"] == "group" :
+        # get group's users & emails
+        group_id = invitee["invitee_id"]
+        group_in_db = db.query(Group).filter(Group.id == group_id).first()
+        print("invite > group_in_db : ", group_in_db)
+
+        group_manage_level = group_in_db.manage
+        print("invite > group_manage_level : ", group_manage_level)
+
+        group_owner_id = group_in_db.owner_id
+
+        ### invite group owner (if not invitor)
+        if group_owner_id not in authorized_groups :
+          group_owner_in_db = db.query(User).filter(User.id == group_owner_id).first()
+          print("invite > group_owner_in_db : ", group_owner_in_db)
+          invitation = InvitationCreate(
+            **basic_invitation,
+            invitee = group_owner_in_db.email
+          )
+          invitations.append(invitation)
+          pending_groups.append(group_id)
+
+        # group_users = group_in_db.authorized_users
+        # print("invite > group_users : ", group_users)
 
 
+    ### - send invitations to invitee
+    print("\ninvite > loop invitations ...")
+    for invit in invitations :
+      print("invite > invit : ", invit)
+
+    
+
+    ### B/ update invitor data ###
+    ### - send email to invitor resuming invitations sent
+
+
+    ### C/ update object ###
+    ### - append every invitee email as pending user
+    
+    obj_data["pending_users"] = pending_users
+    if basic_invitation["invitation_to_item_type"] != "group" :
+      obj_data["pending_groups"] = pending_groups
+    print("\ninvite > obj_data : ", obj_data)
 
     # db_obj = self.model(**obj_in_data)
     # print("invite > db_obj : ", db_obj)

@@ -56,6 +56,7 @@ class UserInfos(UserBase, UserBasicInfos, UserBasicInfosAvatar):
 class UserCreate(UserBase, UserBasicInfos, UserBasicInfosAvatar):
   ### secret
   password: str
+  read: PermissionType = PermissionType.perm_public
 
 
 class UserUX(BaseModel):

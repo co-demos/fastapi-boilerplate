@@ -44,20 +44,29 @@ def send_email(
 
   subject = JinjaTemplate(subject_template)
   template = JinjaTemplate(template_str)
-  print(">>>  send_email > template : ...",  template)
+  # print(">>>  send_email > template : ...",  template)
+  # print("send_email > email_to : ", email_to)
+  # print("send_email > subject : ", subject)
+  # print("send_email > settings.EMAILS_FROM_EMAIL : ", settings.EMAILS_FROM_EMAIL)
+  # print("send_email > environment : ", environment)
+  # print("send_email > subject_template : ", subject_template)
+  # print("send_email > html_template : ", html_template)
 
   message = emails.Message(
     subject=subject,
     html=template,
-    mail_from=(settings.EMAILS_FROM_NAME, settings.EMAILS_FROM_EMAIL),
+    # mail_from=(settings.EMAILS_FROM_NAME, settings.EMAILS_FROM_EMAIL),
+    mail_from=(settings.EMAILS_FROM_EMAIL),
   )
-  
+  print("send_email > message : ", message)
+
   response = message.send(
     to=email_to,
     render=environment,
     smtp=smtp_options
   )
-  logging.info(f"send email result: {response}")
+  print("send_email > response : ", response)
+  logging.info(f"send email > result: {response}")
 
 
 def send_test_email(
@@ -150,6 +159,8 @@ def send_invitation_email(
     environment={
       "project_name": project_name,
       "email_from": email_from,
+      "name": name,
+      "surname": surname,
       "username": username,
       "invitation": invitation,
       "link": link,

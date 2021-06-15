@@ -4,6 +4,7 @@ from sqlalchemy import (
   Boolean, Integer, String, Float, DateTime, JSON
 )
 from sqlalchemy_utils import EmailType, URLType, get_class_by_table
+from sqlalchemy.dialects.postgresql import ARRAY
 
 from ..db.database import engine_commons, engine_data
 from ..db.base_class import BaseData
@@ -40,6 +41,7 @@ field_types = {
   "bool":    { "model": Boolean,    "schema": bool },
   "date":    { "model": String,     "schema": Union[str, datetime.datetime] },
   "tag":     { "model": String,     "schema": Union[str, List[str]] },
+  # "tag":     { "model": ARRAY(String),     "schema": List[str] },
   "rating":  { "model": String,     "schema": str },
   "url":     { "model": URLType,    "schema": AnyUrl },
   "email":   { "model": EmailType,  "schema": EmailStr },

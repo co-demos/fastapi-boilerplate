@@ -129,6 +129,14 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     return db.query(User).filter(User.email == email).first()
 
 
+  def get_user_by_id(
+    self, db: Session, 
+    id: int
+    ):
+    # print("get_user_by_id > id : ", id)
+    return db.query(User).filter(User.id == id).first()
+
+
   def authenticate_user(
     self, db: Session,
     user_email: str,
@@ -159,6 +167,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
       hashed_password=get_password_hash(user_in.password),
       is_active=superuser,
       is_superuser=superuser,
+      read=user_in.read
     )
     print("create_user_in_db > db_user : ", db_user)
     self.create(db=db, obj_in=db_user)
