@@ -6,6 +6,7 @@ from pydantic import BaseModel, EmailStr
 # from uuid import UUID
 
 from .schemas_choices import ItemType, InvitationStatus, InviteeType
+from .schemas_auths import AuthsInfosBasics
 
 
 class Invitee(BaseModel):
@@ -23,6 +24,9 @@ class InvitationBasics(BaseModel):
   # invitor_id: int
   invitation_to_item_id: int
   invitees: Optional[List[Invitee]] = []
+
+  # auth levels
+  auths: Optional[AuthsInfosBasics]
 
 class InvitationToGroup(InvitationBasics):
   invitation_to_item_type: ItemType = ItemType.group
@@ -48,6 +52,9 @@ class InvitationBase(BaseModel):
   invitation_to_item_type: ItemType = ItemType.workspace
   invitation_to_item_id: int
   invitee: EmailStr
+
+  # auth levels
+  auths: Optional[AuthsInfosBasics]
 
 # print("=== SCH-schemas_invitation > InvitationBase : ", InvitationBase)
 

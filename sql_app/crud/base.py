@@ -15,6 +15,7 @@ from ..models.models_invitation import Invitation
 
 from ..schemas.schemas_choices import OperatorType
 from ..schemas.schemas_invitation import InvitationBasics, InvitationCreate
+from ..schemas.schemas_auths import AuthInfos
 
 from ..emails.emails import send_invitation_email
 

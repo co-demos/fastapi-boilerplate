@@ -31,5 +31,7 @@ class Invitation(BaseCommons):
   invitation_status = Column(String, index=True) # pending | accepted | refused
   invitee = Column(EmailType)
 
+  auths = Column(JSON)
+
   def can_manage(self, user_id: int):
     return self.owner_id == user_id

@@ -95,3 +95,13 @@ def verify_password_reset_token(token: str) -> Optional[str]:
     return decoded_token["sub"]
   except jwt.JWTError:
     return None
+
+
+def verify_invit_token(token: str) -> Optional[str]:
+  print("verify_invit_token > token : ", token)
+  try:
+    decoded_token = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    print("verify_invit_token > decoded_token : ", decoded_token)
+    return decoded_token["sub"]
+  except jwt.JWTError:
+    return None
