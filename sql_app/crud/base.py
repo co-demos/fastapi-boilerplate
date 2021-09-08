@@ -15,7 +15,7 @@ from ..models.models_invitation import Invitation
 
 from ..schemas.schemas_choices import OperatorType
 from ..schemas.schemas_invitation import InvitationBasics, InvitationCreate
-from ..schemas.schemas_auths import AuthInfos
+from ..schemas.schemas_auths import AuthInfos, UserAuthInfos, GroupAuthInfos, UserAuthPending, GroupAuthPending
 
 from ..emails.emails import send_invitation_email
 
@@ -192,13 +192,19 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     obj_authorized_users = obj_data.get("authorized_users", [])
     obj_authorized_groups = obj_data.get("authorized_groups", [])
+    
     authorized_users = obj_authorized_users or []
+    authorized_users_emails = [ i["user_email"] for i in obj_authorized_users ]
     authorized_groups = obj_authorized_groups or []
+    authorized_groups_ids = [ i["group_id"] for i in obj_authorized_groups ]
 
     obj_pending_users = obj_data.get("pending_users", [])
     obj_pending_groups = obj_data.get("pending_groups", [])
+    
     pending_users = obj_pending_users or []
     pending_groups = obj_pending_groups or []
+    pending_users_emails = [ i["user_email"] for i in obj_pending_users ]
+    pending_groups_ids = [ i["group_id"] for i in obj_pending_groups ]
 
     print("invite > obj_owner_id : ", obj_owner_id)
     print("invite > obj_authorized_users : ", obj_authorized_users)
@@ -227,16 +233,18 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
       ### - create invitations for invitee / user (if not invitor)
       if invitee["invitee_type"] == "user" :
         invitee_email = invitee["invitee_email"]
-        if invitor_email != invitee_email and invitee_email not in authorized_users :
+        invitee_id = invitee["invitee_id"]
+        if invitor_email != invitee_email and invitee_email not in authorized_users_emails and invitee_email not in pending_users_emails:
           invitation = InvitationCreate(
             **basic_invitation,
-            invitee = invitee_email
+            invitee = invitee_email,
+            invitee_type = "user",
+            invitee_id = invitee_id
           )
           print("invite > invitation : ", invitation)
           invitations.append(invitation)
-          pending_users.append(invitee_email)
 
-      ### - create invitations for invitee / group
+      ### - create invitations for group
       if invitee["invitee_type"] == "group" :
         # get group's users & emails
         group_id = invitee["invitee_id"]
@@ -245,7 +253,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         # print("invite > group_manage_level : ", group_manage_level)
 
         ### invite group owner (if not invitor)
-        if group_id not in authorized_groups :
+        if group_id not in authorized_groups_ids and group_id not in pending_groups_ids :
           group_in_db = db.query(Group).filter(Group.id == group_id).first()
           print("invite > group_in_db : ", group_in_db)
 
@@ -255,31 +263,56 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
           invitation = InvitationCreate(
             **basic_invitation,
-            invitee = group_owner_in_db.email
+            invitee = group_owner_in_db.email,
+            invitee_type = "group",
+            invitee_id = group_owner_in_db.id
           )
           invitations.append(invitation)
-          pending_groups.append(group_id)
 
         # group_users = group_in_db.authorized_users
         # print("invite > group_users : ", group_users)
 
 
-    ### - send invitations to invitee
+    ### - register and send invitations to invitees
     print("\ninvite > loop invitations ...")
     for invit in invitations :
       print("\ninvite > invit : ", invit)
       invit_data = jsonable_encoder(invit)
       print("invite > invit_data : ", invit_data)
-      invitation_for_db = Invitation(**invit_data)
-      print("invite > invitation_for_db : ", invitation_for_db)
+      invitation_for_db = Invitation(
+        **invit_data,
+        owner_id = invitor_id
+      )
+      # print("invite > invitation_for_db - A : ", invitation_for_db)
       
-      # db.add(invitation_for_db)
-      # db.commit()
-      # db.refresh(db_obj)
-      
-      invit_verify_token = generate_invit_token(email=invitation_for_db.invitee)
-      print("invite > invit_verify_token : ", invit_verify_token)
+      # save invitation in DB
+      db.add(invitation_for_db)
+      db.commit()
+      db.refresh(invitation_for_db)
+      # print("invite > invitation_for_db - B : ", invitation_for_db)
+      print("invite > invitation_for_db.id : ", invitation_for_db.id )
 
+      # update pending users list for object
+      if invit_data["invitee_type"] == "user":
+        pending_user = UserAuthPending(
+          invitation_id = invitation_for_db.id,
+          user_id = invit_data["invitee_id"],
+          user_email = invit_data["invitee"],
+        )
+        pending_users.append(pending_user.dict())
+
+      # update pending groups list for object
+      if invit_data["invitee_type"] == "group":
+        pending_group = GroupAuthPending(
+          invitation_id = invitation_for_db.id,
+          group_id = invit_data["invitee_id"]
+        )
+        pending_groups.append(pending_group.dict())
+
+      invit_verify_token = generate_invit_token(email=invitation_for_db.invitee)
+      # print("invite > invit_verify_token : ", invit_verify_token)
+
+      # send invitation email
       background_tasks.add_task(
         send_invitation_email,
         email_from = invitor.email,
@@ -292,20 +325,40 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     ### B/ update invitor data ###
     ### - send email to invitor resuming invitations sent
-
+    # background_tasks.add_task(
+    #   send_invitation_email,
+    #   email_from = invitor.email,
+    #   name = invitor.name,
+    #   surname = invitor.surname,
+    #   username = invitor.username,
+    #   token = invit_verify_token,
+    #   invitation = invit_data
+    # )
 
     ### C/ update object ###
-    ### - append every invitee email as pending user
+    ### - append every invitee as pending user / group
+
+    print("\ninvite > pending_users B : ", pending_users)
+    print("invite > pending_groups B : ", pending_groups)
+
+    # pending_users = [ p.dict() for p in pending_users]
+    # pending_groups = [ p.dict() for p in pending_groups]
+    # print("\ninvite > pending_users B : ", pending_users)
+    # print("invite > pending_groups B : ", pending_groups)
+
+    # obj_data["pending_users"] = pending_users
+    # if basic_invitation["invitation_to_item_type"] != "group" :
+    #   obj_data["pending_groups"] = pending_groups
+    # print("\ninvite > obj_data : ", obj_data)
     
-    obj_data["pending_users"] = pending_users
+    setattr(db_obj, "pending_users", pending_users)
     if basic_invitation["invitation_to_item_type"] != "group" :
-      obj_data["pending_groups"] = pending_groups
-    print("\ninvite > obj_data : ", obj_data)
-    # db_obj = self.model(**obj_in_data)
-    # print("invite > db_obj : ", db_obj)
-    # db.add(db_obj)
-    # db.commit()
-    # db.refresh(db_obj)
+      setattr(db_obj, "pending_groups", pending_groups)
+    print("\ninvite > db_obj : ", db_obj)
+
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
 
     return db_obj
 

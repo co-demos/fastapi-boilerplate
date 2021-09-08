@@ -71,7 +71,7 @@ def generate_password_reset_token(email: str) :
 
 
 def generate_invit_token(email: str) :
-  delta = timedelta(hours=settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS)
+  delta = timedelta(days=settings.INVITATION_TOKEN_EXPIRE_DAYS)
   now = datetime.utcnow()
   expires = now + delta
   exp = expires.timestamp()

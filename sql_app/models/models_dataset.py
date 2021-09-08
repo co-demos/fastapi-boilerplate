@@ -32,11 +32,17 @@ class Dataset(BaseCommons):
   write = Column(String, default='owner-only')
   manage = Column(String, default='owner-only')
 
-  pending_users = Column(ARRAY(EmailType), default=[])
-  pending_groups = Column(ARRAY(Integer), default=[])
+  # pending_users = Column(ARRAY(EmailType), default=[])
+  # pending_groups = Column(ARRAY(Integer), default=[])
 
-  authorized_users = Column(ARRAY(EmailType), default=[])
-  authorized_groups = Column(ARRAY(Integer), default=[])
+  # authorized_users = Column(ARRAY(EmailType), default=[])
+  # authorized_groups = Column(ARRAY(Integer), default=[])
+
+  pending_users = Column(ARRAY(JSON), default=[])
+  pending_groups = Column(ARRAY(JSON), default=[])
+
+  authorized_users = Column(ARRAY(JSON), default=[])
+  authorized_groups = Column(ARRAY(JSON), default=[])
 
   ### foreign keys
   owner_id = Column(Integer, ForeignKey("users.id"))

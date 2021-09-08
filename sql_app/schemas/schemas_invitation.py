@@ -17,7 +17,7 @@ class Invitee(BaseModel):
 
 class InvitationBasics(BaseModel):
   ### basic infos
-  message_title: Optional[str] = "My invitation title"
+  title: Optional[str] = "My invitation title"
   message: Optional[str] = "My invitation message"
 
   ### linked data
@@ -51,7 +51,10 @@ class InvitationBase(BaseModel):
   invitation_status: InvitationStatus = InvitationStatus.pending
   invitation_to_item_type: ItemType = ItemType.workspace
   invitation_to_item_id: int
+
   invitee: EmailStr
+  invitee_type: Optional[str]
+  invitee_id: Optional[int]
 
   # auth levels
   auths: Optional[AuthsInfosBasics]

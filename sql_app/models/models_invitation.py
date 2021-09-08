@@ -29,7 +29,10 @@ class Invitation(BaseCommons):
   invitation_to_item_type = Column(String)
   invitation_to_item_id = Column(Integer)
   invitation_status = Column(String, index=True) # pending | accepted | refused
+  
   invitee = Column(EmailType)
+  invitee_type = Column(String)
+  invitee_id = Column(Integer)
 
   auths = Column(JSON)
 

@@ -10,7 +10,6 @@ from ..security.jwt import (
   OAuth2PasswordBearer, OAuth2PasswordRequestForm, SecurityScopes,
   SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES,
   pwd_context, oauth2_scheme,
-  create_access_token
 )
 
 from .base import CRUDBase

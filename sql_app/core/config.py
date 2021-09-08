@@ -109,6 +109,8 @@ class Settings(BaseSettings):
   EMAIL_TEMPLATES_DIR: str = "/sql_app/emails/email-templates/build"
   EMAILS_ENABLED: bool = False
 
+  INVITATION_TOKEN_EXPIRE_DAYS: int = 60
+
   @validator("EMAILS_ENABLED", pre=True)
   def get_emails_enabled(cls, v: bool, values: Dict[str, Any]) -> bool:
     # print("... values :") 

@@ -26,3 +26,24 @@ class AuthInfos(AuthsInfosBasics):
   created_date: Optional[datetime.datetime]
   accepted_date: Optional[datetime.datetime]
 
+
+class UserAuthPending(BaseModel):
+  invitation_id: int
+  # invitation_status: str = None
+  user_id: Optional[int] = None
+  user_email: str = None
+
+
+class GroupAuthPending(BaseModel):
+  invitation_id: int
+  # invitation_status: str = None
+  group_id: int = None
+
+
+class UserAuthInfos(AuthsInfosBasics):
+  user_id: Optional[int] = None
+  user_email: str = None
+
+
+class GroupAuthInfos(AuthsInfosBasics):
+  group_id: int = None
