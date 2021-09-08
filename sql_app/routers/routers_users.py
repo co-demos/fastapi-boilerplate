@@ -12,7 +12,6 @@ from . import ( settings,
 
   # crud_items,
   crud_posts,
-
   crud_comments,
 )
 
@@ -28,6 +27,7 @@ from ..schemas.schemas_token import TokenAccess, TokenAccessRefresh
 from ..schemas.schemas_message import Msg
 
 from ..crud.crud_users import user, get_current_active_user, get_current_active_user_refresh, get_password_hash
+from ..crud.crud_invitations import invitation
 
 from ..security.jwt import ( JWTError, jwt, CryptContext, 
   OAuth2PasswordBearer, OAuth2PasswordRequestForm,
@@ -266,6 +266,32 @@ async def read_own_posts(
   user_id = current_user.id
   user_posts = crud_posts.get_user_posts(db=db, user_id=user_id)
   return [{"posts": user_posts, "owner": current_user.email, "owner_id": current_user.id}]
+
+
+@router.get("/me/invitations/",
+  summary="Get user's own posts",
+  description="Get connected/authenticated user's own posts",
+ )
+async def read_own_invitations(
+  current_user: UserModel = Depends(get_current_active_user),
+  db: Session = Depends(get_db)
+  ):
+  # print("read_own_invitations > current_user : ", current_user)
+  user_id = current_user.id
+  user_email = current_user.email
+  # print("read_own_invitations > user_id : ", user_id)
+  # print("read_own_invitations > user_email : ", user_email)
+
+  user_invits_sent = invitation.get_multi_by_owner(db=db, owner_id=user_id)
+  # print("read_own_invitations > user_invits_sent : ", user_invits_sent)
+
+  user_invits_received = invitation.get_multi_received(db=db, user_email=user_email)
+  # print("read_own_invitations > user_invits_received : ", user_invits_received)
+
+  return {
+    "invitations_sent": user_invits_sent,
+    "invitations_received": user_invits_received,
+  }
 
 
 @router.get("/me/comments/",

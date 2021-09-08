@@ -192,19 +192,21 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     obj_authorized_users = obj_data.get("authorized_users", [])
     obj_authorized_groups = obj_data.get("authorized_groups", [])
-    
+    print("invite > obj_authorized_users : ", obj_authorized_users)
+
     authorized_users = obj_authorized_users or []
-    authorized_users_emails = [ i["user_email"] for i in obj_authorized_users ]
+    print("invite > authorized_users : ", authorized_users)
+    authorized_users_emails = [ i["user_email"] for i in authorized_users ]
     authorized_groups = obj_authorized_groups or []
-    authorized_groups_ids = [ i["group_id"] for i in obj_authorized_groups ]
+    authorized_groups_ids = [ i["group_id"] for i in authorized_groups ]
 
     obj_pending_users = obj_data.get("pending_users", [])
     obj_pending_groups = obj_data.get("pending_groups", [])
     
     pending_users = obj_pending_users or []
     pending_groups = obj_pending_groups or []
-    pending_users_emails = [ i["user_email"] for i in obj_pending_users ]
-    pending_groups_ids = [ i["group_id"] for i in obj_pending_groups ]
+    pending_users_emails = [ i["user_email"] for i in pending_users ]
+    pending_groups_ids = [ i["group_id"] for i in pending_groups ]
 
     print("invite > obj_owner_id : ", obj_owner_id)
     print("invite > obj_authorized_users : ", obj_authorized_users)
