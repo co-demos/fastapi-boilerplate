@@ -5,7 +5,7 @@ import datetime
 from pydantic import BaseModel, EmailStr
 # from uuid import UUID
 
-from .schemas_choices import ItemType, InvitationStatus, InviteeType
+from .schemas_choices import ItemType, InvitationStatus, InviteeType, InvitationStatusAction
 from .schemas_auths import AuthsInfosBasics
 
 
@@ -39,6 +39,12 @@ class InvitationToDataset(InvitationBasics):
 
 class InvitationToTablemeta(InvitationBasics):
   invitation_to_item_type: ItemType = ItemType.table
+
+
+class InvitationResponse(BaseModel):
+  ### basic infos
+  invitation_id: int
+  action: InvitationStatusAction
 
 
 class InvitationBase(BaseModel):

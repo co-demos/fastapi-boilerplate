@@ -5,7 +5,7 @@ from . import ( List, Session, APIRouter, Depends,
 
 from fastapi.encoders import jsonable_encoder
 
-from ..schemas.schemas_invitation import Invitation, InvitationCreate, InvitationUpdate, InvitationList
+from ..schemas.schemas_invitation import Invitation, InvitationCreate, InvitationUpdate, InvitationList, InvitationResponse
 from ..crud.crud_invitations import invitation
 
 from ..models.models_user import User
@@ -62,6 +62,41 @@ def read_invitation(
   invitation_in_db = invitation.get_by_id(db, id=obj_id)
   if invitation_in_db is None:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="invitation not found")
+  return invitation_in_db
+
+
+@router.post("/{obj_id}",
+  summary="Accept / refuse a invitation",
+  description="Accept / refuse a invitation by its id",
+  response_model=Invitation
+  )
+def respond_to_invitation(
+  obj_id: int,
+  obj_in: InvitationResponse,
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user)
+  ):
+  invitation_in_db = invitation.get_by_id(db=db, id=obj_id)
+  if invitation_in_db is None:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="invitation not found")
+  ### only owner and superuser for now
+  print("\nrespond_to_invitation > obj_in : ", obj_in)
+  print("respond_to_invitation > current_user.email : ", current_user.email)
+  print("respond_to_invitation > invitation_in_db : ", invitation_in_db)
+  if obj_in.action == 'accept' : 
+    status = 'accepted'
+  if obj_in.action == 'refuse' : 
+    status = 'refused'
+  update_status = {
+    'invitation_status' : status
+  }
+  print("respond_to_invitation > update_status : ", update_status)
+
+  ### need to check group and scope !!!
+  if not current_user.is_superuser and (invitation_in_db.invitee != current_user.email):
+    raise HTTPException(status_code=400, detail="Not enough permissions")
+
+  # invitation_in_db = invitation.update(db=db, db_obj=invitation_in_db, obj_in=update_status)
   return invitation_in_db
 
 

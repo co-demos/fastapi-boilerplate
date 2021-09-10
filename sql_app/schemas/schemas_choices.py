@@ -39,3 +39,8 @@ class OperatorType(str, Enum):
   or_ = "or"
   and_ = "and"
   not_ = "not"
+
+
+class InvitationStatusAction(str, Enum):
+  accept = "accept"
+  refuse = "refuse"
