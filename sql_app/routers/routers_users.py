@@ -199,7 +199,7 @@ async def read_user_ux(
   db: Session = Depends(get_db)
   ):
   current_user_data = jsonable_encoder(current_user)
-  print("update_user_ux > current_user_data : ", current_user_data)
+  print("read_user_ux > current_user_data : ", current_user_data)
   return current_user_data
 
 

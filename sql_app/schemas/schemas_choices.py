@@ -44,3 +44,32 @@ class OperatorType(str, Enum):
 class InvitationStatusAction(str, Enum):
   accept = "accept"
   refuse = "refuse"
+
+
+status_dict = {
+  "accept": "accepted",
+  "refuse": "refused",
+}
+
+# pending_dict = {
+#   "group": "pending_groups",
+#   "user": "pending_users",
+# }
+# authorized_dict = {
+#   "group": "authorized_groups",
+#   "user": "authorized_users",
+# }
+invitee_id_dict = {
+  "group": {
+    "in_invit": "invitee_id",
+    "in_item": "group_id",
+    "pending_field": "pending_groups",
+    "authorized_field": "authorized_groups"
+  },
+  "user": {
+    "in_invit": "invitee",
+    "in_item": "user_email",
+    "pending_field": "pending_users",
+    "authorized_field": "authorized_users" 
+  },
+}

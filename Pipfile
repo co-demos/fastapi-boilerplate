@@ -26,6 +26,7 @@ asyncio = "*"
 emails = "*"
 jinja2 = "*"
 tenacity = "*"
+websockets = "*"
 
 [dev-packages]
 

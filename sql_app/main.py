@@ -12,8 +12,9 @@ from fastapi.openapi.utils import get_openapi
 from .core.config import settings
 from .core.tags_metadata import tags_metadata
 
+import socketio
 # from fastapi_socketio import SocketManager
-from .websockets import SocketManager
+# from .websockets import SocketManager
 
 from .db.database import engine_commons, database_commons, database_data
 from .db.base_class import BaseCommons
@@ -57,6 +58,7 @@ app = FastAPI(
   redoc_url=f"{settings.API_V1_STR}/redoc",
   debug=True
 )
+print("\nmain.py > app : ", app.__dict__)
 
 
 ### CORS
@@ -76,16 +78,6 @@ app.add_middleware(
 )
 
 
-### SOCKET IO
-
-# cf : https://pypi.org/project/fastapi-socketio/
-socket_manager = SocketManager(
-  app=app,
-  cors_allowed_origins=origins
-)
-
-from .websockets.routers_websockets import *
-
 
 ### ROUTERS
 
@@ -95,6 +87,34 @@ app.include_router(
   api_router,
   prefix=settings.API_V1_STR
 )
+
+
+
+### SOCKET IO
+
+# cf : https://pypi.org/project/fastapi-socketio/
+# socket_manager = SocketManager(
+#   app=app,
+#   mount_location = "/ws",
+#   socketio_path = "socket.io",
+#   cors_allowed_origins=origins
+# )
+# print("\nmain.py > socket_manager : ", socket_manager.__dict__)
+
+sio = socketio.AsyncServer(
+    # async_mode='asgi',
+    # cors_allowed_origins='*'
+    async_mode='asgi',
+    cors_allowed_origins=[]
+)
+subapi = socketio.ASGIApp(
+    socketio_server=sio,
+    other_asgi_app=app,
+    socketio_path='/socket.io'
+)
+app.mount("/ws", subapi)
+
+from .websockets.routers_websockets import *
 
 
 ### OPENAPI

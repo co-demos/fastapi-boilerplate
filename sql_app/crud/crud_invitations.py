@@ -6,6 +6,7 @@ from ..db.database import get_db
 from .base import CRUDBase
 from ..models.models_invitation import Invitation
 from ..schemas.schemas_invitation import InvitationCreate, InvitationUpdate
+from ..schemas.schemas_choices import InvitationStatusAction
 
 
 class CRUDInvitation(CRUDBase[Invitation, InvitationCreate, InvitationUpdate]):
@@ -22,6 +23,18 @@ class CRUDInvitation(CRUDBase[Invitation, InvitationCreate, InvitationUpdate]):
       .limit(limit)
       .all()
     )
+
+  def update_status(
+    self, db: Session, *,
+    db_obj: Invitation,
+    status: InvitationStatusAction
+    ):
+    setattr(db_obj, 'invitation_status', status)
+    print("update > db_obj : ", db_obj)
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
 
 invitation = CRUDInvitation(Invitation)
 

@@ -14,7 +14,9 @@ from . import (
   routers_searches,
 
   routers_posts,
-  routers_comments
+  routers_comments,
+
+  # routers_websockets,
 )
 
 api_router = APIRouter()
@@ -80,3 +82,10 @@ api_router.include_router(
   prefix="/comments",
   tags=["comments"]
 )
+
+
+# api_router.include_router(
+#   routers_websockets.router,
+#   prefix="/ws",
+#   tags=["ws"]
+# )
