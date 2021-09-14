@@ -21,6 +21,18 @@ class ItemType(str, Enum):
   table = "table"
 
 
+class ItemTypeExtended(str, Enum):
+  user = "user"
+  group = "group"
+  workspace = "workspace"
+  dataset = "dataset"
+  table = "table"
+  invitation = "invitation"
+  message = "message"
+  comment = "comment"
+  moderation = "moderation"
+
+
 class ItemTypes(str, Enum):
   users = "users"
   groups = "groups"
@@ -42,6 +54,17 @@ class OperatorType(str, Enum):
 
 
 class InvitationStatusAction(str, Enum):
+  accept = "accept"
+  refuse = "refuse"
+
+
+class EmitAction(str, Enum):
+  add = "add"
+  join = "join"
+  comment = "comment"
+  edit = "edit"
+  invite = "invite"
+  delete = "delete"
   accept = "accept"
   refuse = "refuse"
 

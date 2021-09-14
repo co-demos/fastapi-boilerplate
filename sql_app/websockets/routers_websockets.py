@@ -3,6 +3,8 @@ from . import ( List, Session, APIRouter, Depends,
   get_db,
 )
 
+from ..schemas.schemas_sockets import CreateOwnRoom, BroadcastAction
+
 from ..crud.crud_users import (
   get_current_user,
 )
@@ -23,13 +25,15 @@ namespaces :
 # router = APIRouter()
 
 @sio.on("connect")
-async def io_connect(
-  sid, environ
-  ):
+async def io_connect( sid, environ ):
   print("\nio_connect > sid : ", sid)
   print("io_connect > environ : ", environ)
-  # print("io_connect > sid : ", sid)
   await sio.emit('handshake', { 'sid': sid })
+
+@sio.on("disconnect")
+async def io_connect( sid ):
+  print("\nio_disconnect > sid : ", sid)
+
 
 # @router.sio.on('*')
 # @app.sio.on('*')
@@ -37,19 +41,37 @@ async def io_connect(
 #   print("\nio_catch_all > sid : ", sid)
 
 
-# @router.sio.on("connect")
-# @app.sio.on("connect")
-# @sio.on("connect")
-# async def io_connect(
-#   sid,
-#   ):
-#   print("\nio_connect > sid : ", sid)
-#   await app.sio.emit('hello', sid)
-#   # await app.sio.emit('test_sio_resp', 'Testing socket ok')
+@sio.on("join_own_room")
+async def io_join_own_room(
+  sid,
+  data: CreateOwnRoom,
+  ):
+  print("\njoin_own_room > sid : ", sid)
+  print("join_own_room > data : ", data)
+  user_email = data["user_email"]
+  print("join_own_room > user_email : ", user_email)
+
+  ## create own room for user
+  sio.enter_room( sid, user_email )
+  await sio.emit('own_room', f'room created for : {user_email}')
 
 
-# @router.sio.on("join")
-# @app.sio.on("join")
+@sio.on("broadcast_action")
+async def io_broadcast_action(
+  sid,
+  data: BroadcastAction,
+  ):
+  print("\nbroadcast_action > sid : ", sid)
+  print("broadcast_action > data : ", data)
+
+  from_user_email = data["from_user_email"]
+  rooms = data["target_rooms"]
+  data = "tadaaaa"
+
+  ## broadcast msg room to user
+  await sio.emit('action_message', data, to=rooms, skip_sid=sid)
+
+
 # @sio.on("join")
 # async def io_join(
 #   sid,
@@ -58,14 +80,7 @@ async def io_connect(
 #   print("\nio_join > sid : ", sid)
 #   print("io_join > args : ", args)
 #   print("io_join > kwargs : ", kwargs)
-
-# @router.sio.on("test")
-# @sio.on("test")
-# async def io_test(
-#   sid,
-#   data
-#   ):
-#   await app.sio.emit('test_sio_resp', 'Testing socket ok')
+#   ## authenticate / get user 
 
 
 # @router.sio.on("chat_test", namespace="/chat")

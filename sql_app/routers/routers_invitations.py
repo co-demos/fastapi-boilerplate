@@ -84,7 +84,7 @@ def read_invitation(
   description="Accept / refuse a invitation by its id",
   response_model=Invitation
   )
-def respond_to_invitation(
+async def respond_to_invitation(
   obj_id: int,
   obj_in: InvitationResponse,
   db: Session = Depends(get_db),
@@ -93,22 +93,22 @@ def respond_to_invitation(
   invitation_in_db = invitation.get_by_id(db=db, id=obj_id)
   if invitation_in_db is None:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="invitation not found")
-  ### only owner and superuser for now
+  
   print("\nrespond_to_invitation > obj_in : ", obj_in)
   print("respond_to_invitation > current_user.email : ", current_user.email)
   print("respond_to_invitation > invitation_in_db : ", invitation_in_db)
   invit_status = status_dict[obj_in.action]
   print("respond_to_invitation > invit_status : ", invit_status)
 
-  ### need to check group and scope !!!
+  ### check if user is allowed to respond 
   if not current_user.is_superuser and (invitation_in_db.invitee != current_user.email):
     raise HTTPException(status_code=400, detail="Not enough permissions")
 
-  # update invitation
+  ### update invitation
   invitation_in_db = invitation.update_status(db=db, db_obj=invitation_in_db, status=invit_status)
   invitation_data = jsonable_encoder(invitation_in_db)
 
-  # update target object
+  ### update target object
   item_type = invitation_in_db.invitation_to_item_type
   item_id = invitation_in_db.invitation_to_item_id
   invitee_type = invitation_in_db.invitee_type
@@ -131,7 +131,6 @@ def respond_to_invitation(
   update_pending = [ i for i in item_pending if i[ item_dict_fields["in_item"] ] != invitee_id ]
   print("respond_to_invitation > update_pending : ", update_pending)
   
-  # update_authorized = item_authorized
   update_authorized = [ i for i in item_authorized if i[ item_dict_fields["in_item"] ] != invitee_id ]
 
   if invit_status == "accepted" :

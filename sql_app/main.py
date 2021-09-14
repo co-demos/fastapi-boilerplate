@@ -77,19 +77,6 @@ app.add_middleware(
   allow_headers=["*"],
 )
 
-
-
-### ROUTERS
-
-from .routers.routers import api_router
-
-app.include_router(
-  api_router,
-  prefix=settings.API_V1_STR
-)
-
-
-
 ### SOCKET IO
 
 # cf : https://pypi.org/project/fastapi-socketio/
@@ -113,6 +100,17 @@ subapi = socketio.ASGIApp(
     socketio_path='/socket.io'
 )
 app.mount("/ws", subapi)
+
+
+
+### ROUTERS
+
+from .routers.routers import api_router
+
+app.include_router(
+  api_router,
+  prefix=settings.API_V1_STR
+)
 
 from .websockets.routers_websockets import *
 
