@@ -150,10 +150,16 @@ async def respond_to_invitation(
   print("respond_to_invitation > item_pending : ", item_pending )
   print("respond_to_invitation > item_authorized : ", item_authorized )
 
-  update_pending = [ i for i in item_pending if i[ item_dict_fields["in_item"] ] != invitee_id ]
-  print("respond_to_invitation > update_pending : ", update_pending)
-  
-  update_authorized = [ i for i in item_authorized if i[ item_dict_fields["in_item"] ] != invitee_id ]
+  if item_pending and len(item_pending) :
+    update_pending = [ i for i in item_pending if i[ item_dict_fields["in_item"] ] != invitee_id ]
+    print("respond_to_invitation > update_pending : ", update_pending)
+  else : 
+    update_pending = []
+
+  if item_authorized and len(item_authorized) :
+    update_authorized = [ i for i in item_authorized if i[ item_dict_fields["in_item"] ] != invitee_id ]
+  else :
+    update_authorized = []
 
   if invit_status == "accepted" :
     time_accept = datetime.datetime.utcnow()

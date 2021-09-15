@@ -5,7 +5,10 @@ import datetime
 from pydantic import BaseModel, EmailStr
 # from uuid import UUID
 
-from .schemas_choices import ItemTypeExtended, InvitationStatusAction, EmitAction
+from .schemas_choices import ( 
+  ItemTypeExtended, InvitationStatusAction, 
+  EmitAction, CallbackMethod
+)
 # from .schemas_auths import AuthsInfosBasics
 
 
@@ -16,6 +19,13 @@ class SocketBase(BaseModel):
 class CreateOwnRoom(SocketBase):
   user_email: Optional[EmailStr]
   user_id: Optional[int]
+
+
+class Callback(BaseModel):
+  method: CallbackMethod
+  url: Optional[str]
+  item_type: ItemTypeExtended
+  get_list: bool = False
 
 
 class BroadcastAction(BaseModel):
@@ -33,4 +43,5 @@ class BroadcastAction(BaseModel):
   item_id: int
 
   action: EmitAction
+  callback: Optional[Callback]
 

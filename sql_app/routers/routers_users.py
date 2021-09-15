@@ -299,10 +299,12 @@ async def read_own_invitations(
   user_invits_received_extended = [ read_invitation(obj_id=invit.id, db=db) for invit in user_invits_received ]
   # print("read_own_invitations > user_invits_received_extended : ", user_invits_received_extended)
 
-  return {
-    "invitations_sent": user_invits_sent_extended,
-    "invitations_received": user_invits_received_extended,
-  }
+  # return {
+  #   "invitations_sent": user_invits_sent_extended,
+  #   "invitations_received": user_invits_received_extended,
+  # }
+
+  return user_invits_sent_extended + user_invits_received_extended
 
 
 @router.get("/me/comments/",

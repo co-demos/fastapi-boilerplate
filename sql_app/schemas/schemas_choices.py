@@ -31,6 +31,7 @@ class ItemTypeExtended(str, Enum):
   message = "message"
   comment = "comment"
   moderation = "moderation"
+  item = "item"
 
 
 class ItemTypes(str, Enum):
@@ -70,6 +71,33 @@ class EmitAction(str, Enum):
   read = "read"
   like = "like"
 
+
+class CallbackMethod(str, Enum):
+  get = "get"
+  put = "put"
+  post = "post"
+  delete = "delete"
+
+class ListTypes(str, Enum):
+  user = "user"
+  shared = "shared"
+  mix = "mix"
+
+  # get_item = "get_item"
+  # get_invitations = "get_invitations"
+  # get_workspaces = "get_workspaces"
+  # get_datasets = "get_datasets"
+  # get_tablemetas = "get_tablemetas"
+  # get_groups = "get_groups"
+  # get_messages = "get_messages"
+
+  # append_item = "append_item"
+  # append_invitation = "append_invitation"
+  # append_workspace = "append_workspace"
+  # append_dataset = "append_dataset"
+  # append_tablemeta = "append_tablemeta"
+  # append_group = "append_group"
+  # append_message = "append_message"
 
 status_dict = {
   "accept": "accepted",

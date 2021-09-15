@@ -75,6 +75,7 @@ async def io_broadcast_action(
     "item_type": data["item_type"],
     "item_id": data["item_id"],
     "action": data["action"],
+    "callback": data["callback"],
     "message": f'{from_user_email} {action_done} {data["item_type"]} : {data["item_id"]} ',
   }
 
