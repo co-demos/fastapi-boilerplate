@@ -129,12 +129,14 @@ class UserInDBBaseLight(BaseModel):
   ### meta
   item_type: str = "user"
   id: int = None
+  
   email: EmailStr
   username: str = "Eli"
   name: Optional[str] = "Elinor"
   surname: Optional[str] = "Ostrom"
   locale: Optional[str] = "en"
   description: Optional[str] = "User description"
+  
   class Config:
     orm_mode = True
 

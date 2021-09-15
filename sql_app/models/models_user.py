@@ -57,6 +57,7 @@ class User(BaseCommons):
   # my_groups = relationship("Group", back_populates="owner")
 
   # my_invitations = relationship("Invitation", back_populates="owner")
+  # my_invitations = relationship("Invitation", back_populates="owner")
   # my_notifications = relationship("Invitation")
 
   # shared_workspaces = relationship("Workspace", back_populates="sharing")

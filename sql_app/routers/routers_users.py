@@ -1,4 +1,5 @@
-print(">>>>>> import routers_user.py ...")
+print(">>>>>> import routers.routers_user.py ...")
+
 from pydantic.networks import EmailStr
 
 from . import ( settings,
@@ -19,7 +20,7 @@ from ..schemas.schemas_item import Item, ItemCreate
 from ..schemas.schemas_post import Post
 from ..schemas.schemas_comment import Comment
 
-from ..schemas.schemas_invitation import InvitationBasics
+from ..schemas.schemas_invitation import Invitation, InvitationBasics
 
 from ..models.models_user import User as UserModel
 from ..schemas.schemas_user import User, UserInfos, UserCreate, UserUpdate, UserBasicInfos, UserUX
@@ -36,6 +37,8 @@ from ..security.jwt import ( JWTError, jwt, CryptContext,
   pwd_context, oauth2_scheme,
   create_access_token, verify_password_reset_token, generate_password_reset_token, 
 )
+
+from .routers_invitations import read_invitation
 
 
 from ..emails.emails import (
@@ -119,6 +122,8 @@ def read_user(
       status_code=status.HTTP_404_NOT_FOUND,
       detail="User not found"
     )
+  user_dict = jsonable_encoder(user_in_db)
+  print("read_user > user_dict : ", user_dict)
   return user_in_db
 
 
@@ -269,8 +274,8 @@ async def read_own_posts(
 
 
 @router.get("/me/invitations/",
-  summary="Get user's own posts",
-  description="Get connected/authenticated user's own posts",
+  summary="Get user's own invitations",
+  description="Get connected/authenticated user's own invitations",
  )
 async def read_own_invitations(
   current_user: UserModel = Depends(get_current_active_user),
@@ -282,15 +287,21 @@ async def read_own_invitations(
   # print("read_own_invitations > user_id : ", user_id)
   # print("read_own_invitations > user_email : ", user_email)
 
-  user_invits_sent = invitation.get_multi_by_owner(db=db, owner_id=user_id)
+  user_invits_sent = invitation.get_multi_by_owner(db=db, owner_id=user_id, limit=None)
   # print("read_own_invitations > user_invits_sent : ", user_invits_sent)
+  # user_invits_sent_extended = [ Invitation.from_orm(invit) for invit in user_invits_sent ]
+  user_invits_sent_extended = [ read_invitation(obj_id=invit.id, db=db) for invit in user_invits_sent ]
+  # print("read_own_invitations > user_invits_sent_extended : ", user_invits_sent_extended)
 
-  user_invits_received = invitation.get_multi_received(db=db, user_email=user_email)
+  user_invits_received = invitation.get_multi_received(db=db, user_email=user_email, limit=None)
   # print("read_own_invitations > user_invits_received : ", user_invits_received)
+  # user_invits_received_extended = [ Invitation.from_orm(invit) for invit in user_invits_received ]
+  user_invits_received_extended = [ read_invitation(obj_id=invit.id, db=db) for invit in user_invits_received ]
+  # print("read_own_invitations > user_invits_received_extended : ", user_invits_received_extended)
 
   return {
-    "invitations_sent": user_invits_sent,
-    "invitations_received": user_invits_received,
+    "invitations_sent": user_invits_sent_extended,
+    "invitations_received": user_invits_received_extended,
   }
 
 

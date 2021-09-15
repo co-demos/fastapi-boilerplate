@@ -1,4 +1,5 @@
-print(">>>>>> import routers.py ...")
+print(">>>>>> import routers.routers.py ...")
+
 from fastapi import APIRouter, Security
 # from ..core.config import settings
 

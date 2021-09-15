@@ -1,3 +1,5 @@
+print(">>>>>> import routers.routers_invitations.py ...")
+
 from . import ( List, Session, APIRouter, Depends,
   HTTPException, status, BackgroundTasks,
   get_db,
@@ -66,17 +68,37 @@ def create_invitation_for_user(
 @router.get("/{obj_id}",
   summary="Get a invitation",
   description="Get a invitation by its id",
-  response_model=Invitation,
+  # response_model=Invitation,
   )
 def read_invitation(
   obj_id: int, 
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
   ):
+  # print("\nread_invitation > current_user.__dict__ : ", current_user.__dict__)
+  # print("read_invitation > obj_id : ", obj_id)
   invitation_in_db = invitation.get_by_id(db, id=obj_id)
   if invitation_in_db is None:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="invitation not found")
-  return invitation_in_db
+  # print("read_invitation > invitation_in_db : ", invitation_in_db)
+  # print("read_invitation > invitation_in_db.owner_id : ", invitation_in_db.owner_id)
+  # print("read_invitation > invitation_in_db.owner : ", invitation_in_db.owner)
+  
+  invitation_model = Invitation.from_orm(invitation_in_db)
+  invitation_dict = jsonable_encoder(invitation_model)
+  # print("read_invitation > invitation_dict (simple): ", invitation_dict)
+
+  item_type = invitation_in_db.invitation_to_item_type
+  item_id = invitation_in_db.invitation_to_item_id
+  item_crud = crud_choices[ item_type ]
+  item_in_db = item_crud.get_by_id( db=db, id=item_id )
+  item_data = jsonable_encoder(item_in_db)
+
+  invitation_dict["invitation_item"] = item_data
+  # print("read_invitation > invitation_dict (extended): ", invitation_dict)
+
+  # return invitation_in_db
+  return invitation_dict
 
 
 @router.post("/{obj_id}",

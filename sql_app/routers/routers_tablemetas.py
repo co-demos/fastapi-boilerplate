@@ -1,3 +1,5 @@
+print(">>>>>> import routers.routers_tablemetas.py ...")
+
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 from . import ( List, Session, APIRouter, Depends,
   HTTPException, status, BackgroundTasks,

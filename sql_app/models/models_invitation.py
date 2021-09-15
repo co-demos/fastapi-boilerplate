@@ -1,6 +1,6 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, JSON
 from sqlalchemy_utils import EmailType, URLType
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy.dialects.postgresql import ARRAY
 
 import datetime
@@ -23,7 +23,11 @@ class Invitation(BaseCommons):
 
   ### owner
   owner_id = Column(Integer, ForeignKey("users.id"))
-  owner = relationship("User", backref="my_invitations")
+  owner = relationship("User")
+  # owner = relationship("User", back_populates="my_invitations")
+  # owner = relationship("User", backref="my_invitations")
+  # owner = relationship("User", backref=backref("invitations", uselist=False) )
+  # owner = relationship("User", backref=backref("invitation", uselist=False) )
 
   ### invitation data
   invitation_to_item_type = Column(String)

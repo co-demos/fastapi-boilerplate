@@ -20,6 +20,10 @@ class CreateOwnRoom(SocketBase):
 
 class BroadcastAction(BaseModel):
 
+  from_user_username: Optional[str]
+  from_user_name: Optional[str]
+  from_user_surname: Optional[str]
+  from_user_username: Optional[str]
   from_user_email: EmailStr
   # from_user_id: Optional[int]
 

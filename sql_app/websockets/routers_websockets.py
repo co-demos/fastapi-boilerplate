@@ -1,9 +1,12 @@
+print(">>>>>> import routers.routers_websockets.py ...")
+
 from . import ( List, Session, APIRouter, Depends,
   HTTPException, status,
   get_db,
 )
 
 from ..schemas.schemas_sockets import CreateOwnRoom, BroadcastAction
+from ..schemas.schemas_choices import messages_dict
 
 from ..crud.crud_users import (
   get_current_user,
@@ -27,8 +30,8 @@ namespaces :
 @sio.on("connect")
 async def io_connect( sid, environ ):
   print("\nio_connect > sid : ", sid)
-  print("io_connect > environ : ", environ)
-  await sio.emit('handshake', { 'sid': sid })
+  # print("io_connect > environ : ", environ)
+  await sio.emit('handshake', { 'sid': sid }, to=sid)
 
 @sio.on("disconnect")
 async def io_connect( sid ):
@@ -53,7 +56,7 @@ async def io_join_own_room(
 
   ## create own room for user
   sio.enter_room( sid, user_email )
-  await sio.emit('own_room', f'room created for : {user_email}')
+  await sio.emit('own_room', f'room created for : {user_email}', to=sid)
 
 
 @sio.on("broadcast_action")
@@ -65,11 +68,19 @@ async def io_broadcast_action(
   print("broadcast_action > data : ", data)
 
   from_user_email = data["from_user_email"]
+  action_done = messages_dict[ data["action"] ]
   rooms = data["target_rooms"]
-  data = "tadaaaa"
+  data = {
+    "origin_user": from_user_email,
+    "item_type": data["item_type"],
+    "item_id": data["item_id"],
+    "action": data["action"],
+    "message": f'{from_user_email} {action_done} {data["item_type"]} : {data["item_id"]} ',
+  }
 
-  ## broadcast msg room to user
-  await sio.emit('action_message', data, to=rooms, skip_sid=sid)
+  ## broadcast msg room to target users
+  for room in rooms:
+    await sio.emit('action_message', data, to=room, skip_sid=sid)
 
 
 # @sio.on("join")

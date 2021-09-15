@@ -67,11 +67,24 @@ class EmitAction(str, Enum):
   delete = "delete"
   accept = "accept"
   refuse = "refuse"
+  read = "read"
+  like = "like"
 
 
 status_dict = {
   "accept": "accepted",
   "refuse": "refused",
+}
+
+messages_dict = {
+  "accept": "accepted your",
+  "refuse": "refused your",
+  "add": "added you to",
+  "join": "joined you on",
+  "comment": "commented your",
+  "edit": "edited your",
+  "invite": "invited you to",
+  "delete": "deleted your",
 }
 
 # pending_dict = {

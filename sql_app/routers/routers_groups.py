@@ -1,3 +1,5 @@
+print(">>>>>> import routers.routers_groups.py ...")
+
 from . import ( List, Session, APIRouter, Depends,
   HTTPException, status, BackgroundTasks,
   get_db, Query

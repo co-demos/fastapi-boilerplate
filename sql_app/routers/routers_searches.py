@@ -1,3 +1,5 @@
+print(">>>>>> import routers.routers_searches.py ...")
+
 from . import ( List, Session, APIRouter, Depends,
   HTTPException, status,
   get_db, Query

@@ -68,13 +68,24 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     skip: int = 0,
     limit: int = 100,
     ) -> List[ModelType]:
-    return (
-      db.query(self.model)
-      .filter(self.model.owner_id == owner_id)
-      .offset(skip)
-      .limit(limit)
-      .all()
-    )
+
+    # return (
+    #   db.query(self.model)
+    #   .filter(self.model.owner_id == owner_id)
+    #   .offset(skip)
+    #   .limit(limit)
+    #   .all()
+    # )
+
+    items_in_db = db.query(self.model).filter(self.model.owner_id == owner_id)
+
+    if skip > 0 :
+      items_in_db = items_in_db.offset(skip)
+    if limit and limit > 0 :
+      items_in_db = items_in_db.limit(limit)
+
+    return items_in_db.all()
+
 
   def search_multi_by_fields(
     self, db: Session, *, 
@@ -120,12 +131,19 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     results_count = results_all.count()
     print("search_multi_by_fields > results_count : ", results_count)
 
-    results = (
-      results_all
-      .offset(skip)
-      .limit(limit)
-      .all()
-    )
+    results = results_all
+    if skip > 0 :
+      results = results.offset(skip)
+    if limit and limit > 0 :
+      results = results.limit(limit)
+    results = results.all()
+
+    # results = (
+    #   results_all
+    #   .offset(skip)
+    #   .limit(limit)
+    #   .all()
+    # )
 
     print("search_multi_by_fields > results - end : ", results)
     return results, results_count

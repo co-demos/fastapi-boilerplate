@@ -8,6 +8,8 @@ from pydantic import BaseModel, EmailStr
 from .schemas_choices import ItemType, InvitationStatus, InviteeType, InvitationStatusAction
 from .schemas_auths import AuthsInfosBasics
 
+from .schemas_user import User, UserInDBBaseLight
+
 
 class Invitee(BaseModel):
   invitee_type: InviteeType = InviteeType.user
@@ -85,6 +87,10 @@ class Invitation(InvitationBase):
 
   ### owner
   owner_id: int
+  owner: UserInDBBaseLight
+
+  ### invitation item
+  # invitation_item = Any
 
   class Config:
     orm_mode = True

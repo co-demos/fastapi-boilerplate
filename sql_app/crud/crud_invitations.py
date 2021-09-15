@@ -15,14 +15,17 @@ class CRUDInvitation(CRUDBase[Invitation, InvitationCreate, InvitationUpdate]):
     user_email: str,
     skip: int = 0,
     limit: int = 100,
-    ):
-    return (
-      db.query(self.model)
-      .filter(self.model.invitee == user_email)
-      .offset(skip)
-      .limit(limit)
-      .all()
-    )
+    ) -> List[Invitation]:
+
+    items_in_db = db.query(self.model).filter(self.model.invitee == user_email)
+
+    if skip > 0 :
+      items_in_db = items_in_db.offset(skip)
+    if limit and limit > 0 :
+      items_in_db = items_in_db.limit(limit)
+
+    return items_in_db.all()
+
 
   def update_status(
     self, db: Session, *,
@@ -35,6 +38,7 @@ class CRUDInvitation(CRUDBase[Invitation, InvitationCreate, InvitationUpdate]):
     db.commit()
     db.refresh(db_obj)
     return db_obj
+
 
 invitation = CRUDInvitation(Invitation)
 
