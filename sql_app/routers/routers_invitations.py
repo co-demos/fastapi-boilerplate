@@ -75,15 +75,23 @@ def read_invitation(
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
   ):
-  # print("\nread_invitation > current_user.__dict__ : ", current_user.__dict__)
+  print("\nread_invitation > current_user.__dict__ : ", current_user.__dict__)
+  print("read_invitation > current_user.email : ", current_user.email)
+  print("read_invitation > current_user.id : ", current_user.id)
   # print("read_invitation > obj_id : ", obj_id)
   invitation_in_db = invitation.get_by_id(db, id=obj_id)
   if invitation_in_db is None:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="invitation not found")
-  # print("read_invitation > invitation_in_db : ", invitation_in_db)
-  # print("read_invitation > invitation_in_db.owner_id : ", invitation_in_db.owner_id)
-  # print("read_invitation > invitation_in_db.owner : ", invitation_in_db.owner)
+  print("read_invitation > invitation_in_db : ", invitation_in_db)
+  print("read_invitation > invitation_in_db.owner_id : ", invitation_in_db.owner_id)
+  print("read_invitation > invitation_in_db.owner : ", invitation_in_db.owner)
   
+  ### check if user is allowed to read 
+  is_owner = (invitation_in_db.owner_id != current_user.id)
+  is_sender = (invitation_in_db.invitee != current_user.email)
+  if not current_user.is_superuser and not is_owner and not is_sender :
+    raise HTTPException(status_code=400, detail="Not enough permissions")
+
   invitation_model = Invitation.from_orm(invitation_in_db)
   invitation_dict = jsonable_encoder(invitation_model)
   # print("read_invitation > invitation_dict (simple): ", invitation_dict)
@@ -230,11 +238,57 @@ def delete_invitation(
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
   ):
-  print("delete_invitation > obj_id : ", obj_id)
-  # invitation_in_db = invitation.get_by_id(db=db, id=id)
-  # print("delete_invitation > invitation_in_db : ", invitation_in_db)
-  # if not invitation_in_db:
-  #   raise HTTPException(status_code=404, detail="invitation not found")
-  invitation_deleted = invitation.remove(db=db, id=obj_id, current_user=current_user)
-  print("delete_invitation > invitation_deleted : ", invitation_deleted)
-  return invitation_deleted
+  print("\ndelete_invitation > obj_id : ", obj_id)
+  print("delete_invitation > current_user.email : ", current_user.email)
+  
+  invitation_in_db = invitation.get_by_id(db=db, id=obj_id)
+  print("delete_invitation > invitation_in_db : ", invitation_in_db)
+  if not invitation_in_db:
+    raise HTTPException(status_code=404, detail="invitation not found")
+
+  ### check if user is allowed to delete 
+  if not current_user.is_superuser and (invitation_in_db.owner_id != current_user.id):
+    raise HTTPException(status_code=400, detail="Not enough permissions")
+
+  invitation_data = jsonable_encoder(invitation_in_db)
+  print("delete_invitation > invitation_data : ", invitation_data)
+
+  ### update target object
+  item_type = invitation_in_db.invitation_to_item_type
+  item_id = invitation_in_db.invitation_to_item_id
+  invitee_type = invitation_in_db.invitee_type
+  print("delete_invitation > item_type : ", item_type)
+  print("delete_invitation > item_id : ", item_id)
+  print("delete_invitation > invitee_type : ", invitee_type)
+
+  item_crud = crud_choices[ item_type ]
+  item_in_db = item_crud.get_by_id( db=db, id=item_id )
+  item_data = jsonable_encoder(item_in_db)
+  print("delete_invitation > item_data : ", item_data )
+
+  item_dict_fields = invitee_id_dict[invitee_type]
+  invitee_id = invitation_data[ item_dict_fields["in_invit"] ]
+  item_pending = item_data[ item_dict_fields["pending_field"] ]
+  item_authorized = item_data[ item_dict_fields["authorized_field"] ]
+  print("delete_invitation > item_pending : ", item_pending )
+  print("delete_invitation > item_authorized : ", item_authorized )
+
+  ### delete invitee from pending_users
+  if item_pending and len(item_pending) :
+    update_pending = [ i for i in item_pending if i[ item_dict_fields["in_item"] ] != invitee_id ]
+    print("delete_invitation > update_pending : ", update_pending)
+  else : 
+    update_pending = []
+
+  update_data = {
+    item_dict_fields["pending_field"]: update_pending,
+  }
+  print("\nrespond_to_invitation > update_data : ", update_data)
+
+  # item_in_db = item_crud.update(db=db, db_obj=item_in_db, obj_in=update_data)
+  
+  ### delete invit for good
+  # invitation_deleted = invitation.remove(db=db, id=obj_id, current_user=current_user)
+  # print("delete_invitation > invitation_deleted : ", invitation_deleted)
+  # return invitation_deleted
+  return invitation_in_db

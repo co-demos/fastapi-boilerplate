@@ -81,6 +81,7 @@ async def io_broadcast_action(
 
   ## broadcast msg room to target users
   for room in rooms:
+    print("broadcast_action > room : ", room)
     await sio.emit('action_message', data, to=room, skip_sid=sid)
 
 
