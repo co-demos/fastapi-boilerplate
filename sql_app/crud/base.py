@@ -100,10 +100,12 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     user_email: str,
     skip: int = 0,
     limit: int = 100,
+    group_ids: list = [],
     ) -> List[ModelType]:
 
     print("\nget_multi_by_authorized_user > user_id : ", user_id)
     print("get_multi_by_authorized_user > user_email : ", user_email)
+    print("get_multi_by_authorized_user > group_ids : ", group_ids)
     user_ref = { "user_email": user_email }
     print("get_multi_by_authorized_user > user_ref : ", user_ref)
     

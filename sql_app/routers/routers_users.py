@@ -325,12 +325,38 @@ async def read_shared(
   user_email = current_user.email
   print("read_shared > user_email : ", user_email)
 
-  shared_workspaces = workspace.get_multi_by_authorized_user(db=db, user_id=user_id, user_email=user_email, limit=None)
-  print("read_shared > shared_workspaces : ", shared_workspaces)
+  user_groups = group.get_multi_by_owner(db=db, owner_id=user_id, limit=None)
+  user_groups_ids = [ group.id for group in user_groups ]
+  print("read_shared > user_groups_ids : ", user_groups_ids)
 
   shared_groups = group.get_multi_by_authorized_user(db=db, user_id=user_id, user_email=user_email, limit=None)
-  shared_datasets = dataset.get_multi_by_authorized_user(db=db, user_id=user_id, user_email=user_email, limit=None)
-  shared_tablemeta = tablemeta.get_multi_by_authorized_user(db=db, user_id=user_id, user_email=user_email, limit=None)
+  shared_groups_ids = [ group.id for group in shared_groups ]
+  print("read_shared > shared_groups_ids : ", shared_groups_ids)
+
+  authorized_groups = user_groups_ids + shared_groups_ids
+  print("\nread_shared > authorized_groups : ", authorized_groups)
+
+  shared_workspaces = workspace.get_multi_by_authorized_user(
+    db=db, 
+    user_id=user_id, 
+    user_email=user_email, 
+    limit=None,
+    group_ids=authorized_groups,
+  )
+  shared_datasets = dataset.get_multi_by_authorized_user(
+    db=db, 
+    user_id=user_id, 
+    user_email=user_email, 
+    limit=None,
+    group_ids=authorized_groups,
+  )
+  shared_tablemeta = tablemeta.get_multi_by_authorized_user(
+    db=db, 
+    user_id=user_id, 
+    user_email=user_email, 
+    limit=None,
+    group_ids=authorized_groups,
+  )
 
   results = {
     "shared_workspaces": shared_workspaces,
