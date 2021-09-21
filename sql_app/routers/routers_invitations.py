@@ -285,10 +285,10 @@ def delete_invitation(
   }
   print("\nrespond_to_invitation > update_data : ", update_data)
 
-  # item_in_db = item_crud.update(db=db, db_obj=item_in_db, obj_in=update_data)
+  item_in_db = item_crud.update(db=db, db_obj=item_in_db, obj_in=update_data)
   
   ### delete invit for good
-  # invitation_deleted = invitation.remove(db=db, id=obj_id, current_user=current_user)
-  # print("delete_invitation > invitation_deleted : ", invitation_deleted)
-  # return invitation_deleted
-  return invitation_in_db
+  invitation_deleted = invitation.remove(db=db, id=obj_id, current_user=current_user)
+  print("delete_invitation > invitation_deleted : ", invitation_deleted)
+  return invitation_deleted
+  # return invitation_in_db

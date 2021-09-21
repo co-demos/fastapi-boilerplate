@@ -30,6 +30,11 @@ from ..schemas.schemas_message import Msg
 from ..crud.crud_users import user, get_current_active_user, get_current_active_user_refresh, get_password_hash
 from ..crud.crud_invitations import invitation
 
+from ..crud.crud_groups import group
+from ..crud.crud_workspaces import workspace
+from ..crud.crud_datasets import dataset
+from ..crud.crud_tablemetas import tablemeta
+
 from ..security.jwt import ( JWTError, jwt, CryptContext, 
   OAuth2PasswordBearer, OAuth2PasswordRequestForm,
   SECRET_KEY, ALGORITHM, 
@@ -305,6 +310,36 @@ async def read_own_invitations(
   # }
 
   return user_invits_sent_extended + user_invits_received_extended
+
+
+@router.get("/me/shared/",
+  summary="Get user's shared items",
+  description="Get connected/authenticated user's shared item : workspaces - datasets - tablemeta - groups",
+ )
+async def read_shared(
+  current_user: UserModel = Depends(get_current_active_user),
+  db: Session = Depends(get_db)
+  ):
+  print("\nread_shared > current_user : ", current_user)
+  user_id = current_user.id
+  user_email = current_user.email
+  print("read_shared > user_email : ", user_email)
+
+  shared_workspaces = workspace.get_multi_by_authorized_user(db=db, user_id=user_id, user_email=user_email, limit=None)
+  print("read_shared > shared_workspaces : ", shared_workspaces)
+
+  shared_groups = group.get_multi_by_authorized_user(db=db, user_id=user_id, user_email=user_email, limit=None)
+  shared_datasets = dataset.get_multi_by_authorized_user(db=db, user_id=user_id, user_email=user_email, limit=None)
+  shared_tablemeta = tablemeta.get_multi_by_authorized_user(db=db, user_id=user_id, user_email=user_email, limit=None)
+
+  results = {
+    "shared_workspaces": shared_workspaces,
+    "shared_groups": shared_groups,
+    "shared_datasets": shared_datasets,
+    "shared_tablemeta": shared_tablemeta,
+  }
+
+  return results
 
 
 @router.get("/me/comments/",

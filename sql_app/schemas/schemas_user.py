@@ -84,7 +84,7 @@ class UserInDBBase(UserInfos, UserUX):
 
   my_groups: List[Group] = []
   # my_groups: "List[Group]" = []
-  groups: List[Group] = []
+  # groups: List[Group] = []
   
   # my_invitations: List[Invitation] = []
   # my_notification: List[Notifications] = []

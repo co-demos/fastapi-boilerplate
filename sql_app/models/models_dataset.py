@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, JSON
 from sqlalchemy_utils import EmailType, URLType
 from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 
 import datetime
 
@@ -34,15 +34,18 @@ class Dataset(BaseCommons):
 
   # pending_users = Column(ARRAY(EmailType), default=[])
   # pending_groups = Column(ARRAY(Integer), default=[])
-
   # authorized_users = Column(ARRAY(EmailType), default=[])
   # authorized_groups = Column(ARRAY(Integer), default=[])
 
-  pending_users = Column(ARRAY(JSON), default=[])
-  pending_groups = Column(ARRAY(JSON), default=[])
+  # pending_users = Column(ARRAY(JSON), default=[])
+  # pending_groups = Column(ARRAY(JSON), default=[])
+  # authorized_users = Column(ARRAY(JSON), default=[])
+  # authorized_groups = Column(ARRAY(JSON), default=[])
 
-  authorized_users = Column(ARRAY(JSON), default=[])
-  authorized_groups = Column(ARRAY(JSON), default=[])
+  pending_users = Column(JSONB)
+  pending_groups = Column(JSONB)
+  authorized_users = Column(JSONB)
+  authorized_groups = Column(JSONB)
 
   ### foreign keys
   owner_id = Column(Integer, ForeignKey("users.id"))

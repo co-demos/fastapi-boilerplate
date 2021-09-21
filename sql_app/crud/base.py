@@ -1,12 +1,16 @@
 print(">>>>>> import crud.base.py ...")
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 
+import json
+
 from fastapi import HTTPException, BackgroundTasks
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 
-from sqlalchemy import and_, or_, not_
+from sqlalchemy import and_, or_, not_, func, tuple_, text, cast
 from sqlalchemy.orm import Session
+# from sqlalchemy.dialects.postgresql import JSONB
+# from sqlalchemy.sql.expression import literal_column
 
 from ..db.base_class import BaseCommons
 from ..models.models_user import User
@@ -24,6 +28,9 @@ from ..security.jwt import generate_invit_token
 ModelType = TypeVar("ModelType", bound=BaseCommons)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
+
+# authorized_users_value = literal_column('authorized_users.value', type_=JSONB)
+# user_email_value = literal_column('user_email.value', type_=JSONB)
 
 
 class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
@@ -78,6 +85,38 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     # )
 
     items_in_db = db.query(self.model).filter(self.model.owner_id == owner_id)
+
+    if skip > 0 :
+      items_in_db = items_in_db.offset(skip)
+    if limit and limit > 0 :
+      items_in_db = items_in_db.limit(limit)
+
+    return items_in_db.all()
+
+
+  def get_multi_by_authorized_user(
+    self, db: Session, *,
+    user_id: int,
+    user_email: str,
+    skip: int = 0,
+    limit: int = 100,
+    ) -> List[ModelType]:
+
+    print("\nget_multi_by_authorized_user > user_id : ", user_id)
+    print("get_multi_by_authorized_user > user_email : ", user_email)
+    user_ref = { "user_email": user_email }
+    print("get_multi_by_authorized_user > user_ref : ", user_ref)
+    
+    items_in_db = db.query(self.model).filter(
+      self.model.owner_id != user_id, 
+      self.model.authorized_users.isnot(None),
+    )
+    print("get_multi_by_authorized_user > items_in_db.count() : ", items_in_db.count())
+    for i in items_in_db.all() :
+      print( f"... get_multi_by_authorized_user > {i.id} > i.authorized_users : ", i.authorized_users )
+
+    items_in_db = items_in_db.filter( self.model.authorized_users.contains([user_ref]) )
+    print("\nget_multi_by_authorized_user > items_in_db : ", items_in_db)
 
     if skip > 0 :
       items_in_db = items_in_db.offset(skip)
