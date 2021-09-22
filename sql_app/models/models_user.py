@@ -40,7 +40,8 @@ class User(BaseCommons):
   is_superuser = Column(Boolean, default=False)
 
   ### access auths
-  read = Column(String, default='public')
+  read = Column(String, default='owner+groups+users')
+  comment = Column(String, default='owner+groups+users')
 
   ### relationships
   items = relationship("Item", back_populates="owner")

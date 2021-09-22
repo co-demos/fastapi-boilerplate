@@ -129,11 +129,6 @@ def read_tablemeta(
   current_user: User = Depends(get_current_user)
   ):
   tablemeta_in_db = tablemeta.get_by_id(db=db, id=obj_id, user=current_user)
-  # if tablemeta_in_db is None:
-  #   raise HTTPException(
-  #     status_code=status.HTTP_404_NOT_FOUND,
-  #     detail="tablemeta not found"
-  # )
   return tablemeta_in_db
 
 
@@ -149,11 +144,6 @@ def read_tablemeta_data(
   ):
   # tablemeta_data_in_db = tablemeta.get_table_data(db=db, tablemeta_id=obj_id, user=current_user)
   tablemeta_data_in_db = tablemeta.get_table_data(db=db, tablemeta_id=obj_id, user=current_user)
-  # if tablemeta_data_in_db is None:
-  #   raise HTTPException(
-  #     status_code=status.HTTP_404_NOT_FOUND,
-  #     detail="tablemeta not found"
-  # )
 
   print("\n...read_tablemeta_data > tablemeta_data_in_db ... " )
   print( tablemeta_data_in_db )
@@ -172,13 +162,7 @@ def update_tablemeta(
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
   ):
-  tablemeta_in_db = tablemeta.get_by_id(db, id=obj_id, user=current_user)
-  # if tablemeta_in_db is None:
-  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="tablemeta not found")
-  ### only owner and superuser for now
-  ### need to check group and scope !!!
-  # if not current_user.is_superuser and (tablemeta_in_db.owner_id != current_user.id):
-  #   raise HTTPException(status_code=400, detail="Not enough permissions")
+  tablemeta_in_db = tablemeta.get_by_id(db, id=obj_id, user=current_user, req_type="write")
   tablemeta_in_db = tablemeta.update(db=db, db_obj=tablemeta_in_db, obj_in=obj_in)
   return tablemeta_in_db
 
@@ -194,10 +178,6 @@ def update_tablemeta_data(
   current_user: User = Depends(get_current_user)
   ):
   tablemeta_in_db = tablemeta.get_by_id(db, id=obj_id, user=current_user, req_type="write")
-  # if tablemeta_in_db is None:
-  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="tablemeta not found")
-  if not current_user.is_superuser and (tablemeta_in_db.owner_id != current_user.id):
-    raise HTTPException(status_code=400, detail="Not enough permissions")
   tablemeta_data_in_db = tablemeta.update_table_data_row(db=db, tablemeta_id=obj_id, obj_in=obj_in)
   if tablemeta_data_in_db is None:
     raise HTTPException(
@@ -223,13 +203,6 @@ async def invite_to_tablemeta(
   current_user: User = Depends(get_current_user)
   ):
   tablemeta_in_db = tablemeta.get_by_id(db=db, id=obj_id, user=current_user, req_type="manage")
-  # if tablemeta_in_db is None:
-  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="tablemeta not found")
-  ### only owner and superuser for now
-  ### need to check group and scope !!!
-  # if not current_user.is_superuser and (tablemeta_in_db.owner_id != current_user.id):
-  #   raise HTTPException(status_code=400, detail="Not enough permissions")
-
   tablemeta_in_db = tablemeta.invite(
     db=db,
     background_tasks=background_tasks,
@@ -253,10 +226,6 @@ def delete_tablemeta_data(
   print("\n...delete_tablemeta_data > obj_id : ", obj_id )
   print("...delete_tablemeta_data > obj_in : ", obj_in )
   tablemeta_in_db = tablemeta.get_by_id(db, id=obj_id, user=current_user, req_type="manage")
-  # if tablemeta_in_db is None:
-  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="tablemeta not found")
-  # if not current_user.is_superuser and (tablemeta_in_db.owner_id != current_user.id):
-  #   raise HTTPException(status_code=400, detail="Not enough permissions")
   tablemeta_data_in_db = tablemeta.remove_table_data_row(db=db, tablemeta_id=obj_id, obj_in=obj_in)
   print("\n...delete_tablemeta_data > tablemeta_data_in_db ... " )
   print( tablemeta_data_in_db )

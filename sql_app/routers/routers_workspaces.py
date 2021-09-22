@@ -47,8 +47,6 @@ def read_workspace(
   current_user: User = Depends(get_current_user)
   ):
   workspace_in_db = workspace.get_by_id(db, id=obj_id, user=current_user, req_type="read")
-  # if workspace_in_db is None:
-  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="workspace not found")
   return workspace_in_db
 
 
@@ -64,12 +62,6 @@ def update_workspace(
   current_user: User = Depends(get_current_user)
   ):
   workspace_in_db = workspace.get_by_id(db=db, id=obj_id, user=current_user, req_type="write")
-  # if workspace_in_db is None:
-  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="workspace not found")
-  ### only owner and superuser for now
-  ### need to check group and scope !!!
-  # if not current_user.is_superuser and (workspace_in_db.owner_id != current_user.id):
-  #   raise HTTPException(status_code=400, detail="Not enough permissions")
   workspace_in_db = workspace.update(db=db, db_obj=workspace_in_db, obj_in=obj_in)
   return workspace_in_db
 
@@ -87,13 +79,6 @@ async def invite_to_workspace(
   current_user: User = Depends(get_current_user)
   ):
   workspace_in_db = workspace.get_by_id(db=db, id=obj_id, user=current_user, req_type="manage")
-  # if workspace_in_db is None:
-  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="workspace not found")
-  ### only owner and superuser for now
-  ### need to check workspace and scope !!!
-  # if not current_user.is_superuser and (workspace_in_db.owner_id != current_user.id):
-  #   raise HTTPException(status_code=400, detail="Not enough permissions")
-
   workspace_in_db = workspace.invite(
     db=db,
     background_tasks=background_tasks,
@@ -129,10 +114,6 @@ def delete_workspace(
   current_user: User = Depends(get_current_user)
   ):
   print("delete_workspace > obj_id : ", obj_id)
-  # workspace_in_db = workspace.get_by_id(db=db, id=id)
-  # print("delete_workspace > workspace_in_db : ", workspace_in_db)
-  # if not workspace_in_db:
-  #   raise HTTPException(status_code=404, detail="workspace not found")
   workspace_deleted = workspace.remove(db=db, id=obj_id, current_user=current_user)
   print("delete_workspace > workspace_deleted : ", workspace_deleted)
   return workspace_deleted

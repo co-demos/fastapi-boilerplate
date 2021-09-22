@@ -29,15 +29,21 @@ api_router.include_router(
 )
 
 api_router.include_router(
-  routers_groups.router,
-  prefix="/groups",
-  tags=["groups"]
+  routers_searches.router,
+  prefix="/searches",
+  tags=["searches"]
 )
 
 api_router.include_router(
   routers_invitations.router,
   prefix="/invitations",
   tags=["invitations"]
+)
+
+api_router.include_router(
+  routers_groups.router,
+  prefix="/groups",
+  tags=["groups"]
 )
 
 api_router.include_router(
@@ -58,12 +64,6 @@ api_router.include_router(
   tags=["tables"]
 )
 
-api_router.include_router(
-  routers_searches.router,
-  prefix="/searches",
-  tags=["searches"]
-)
-
 
 ### tutorial routes
 
@@ -72,14 +72,14 @@ api_router.include_router(
 #   prefix="/items",
 #   tags=["items"]
 # )
-api_router.include_router(
-  routers_posts.router,
-  prefix="/posts",
-  tags=["posts"]
-)
-api_router.include_router(
-  routers_comments.router,
-  prefix="/comments",
-  tags=["comments"]
-)
+# api_router.include_router(
+#   routers_posts.router,
+#   prefix="/posts",
+#   tags=["posts"]
+# )
+# api_router.include_router(
+#   routers_comments.router,
+#   prefix="/comments",
+#   tags=["comments"]
+# )
 

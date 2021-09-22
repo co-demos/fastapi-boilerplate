@@ -91,11 +91,6 @@ def read_dataset(
   current_user: User = Depends(get_current_user)
   ):
   dataset_in_db = dataset.get_by_id(db=db, id=obj_id, user=current_user, req_type="read")
-  # if dataset_in_db is None:
-  #   raise HTTPException(
-  #     status_code=status.HTTP_404_NOT_FOUND,
-  #     detail="dataset not found"
-  # )
 
   print("\n...read_dataset > dataset_in_db ... " )
   pp.pprint( dataset_in_db )
@@ -115,12 +110,6 @@ def update_dataset(
   current_user: User = Depends(get_current_user)
   ):
   dataset_in_db = dataset.get_by_id(db, id=obj_id, user=current_user, req_type="write")
-  # if dataset_in_db is None:
-  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="dataset not found")
-  ### only owner and superuser for now
-  ### need to check group and scope !!!
-  # if not current_user.is_superuser and (dataset_in_db.owner_id != current_user.id):
-  #   raise HTTPException(status_code=400, detail="Not enough permissions")
   dataset_in_db = dataset.update(db=db, db_obj=dataset_in_db, obj_in=obj_in)
   return dataset_in_db
 
@@ -138,13 +127,6 @@ async def invite_to_dataset(
   current_user: User = Depends(get_current_user)
   ):
   dataset_in_db = dataset.get_by_id(db=db, id=obj_id, user=current_user, req_type="manage")
-  # if dataset_in_db is None:
-  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="dataset not found")
-  ### only owner and superuser for now
-  ### need to check group and scope !!!
-  # if not current_user.is_superuser and (dataset_in_db.owner_id != current_user.id):
-  #   raise HTTPException(status_code=400, detail="Not enough permissions")
-
   dataset_in_db = dataset.invite(
     db=db,
     background_tasks=background_tasks,

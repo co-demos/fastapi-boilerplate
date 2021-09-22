@@ -85,6 +85,7 @@ class RequestType(str, Enum):
   patch = "patch"
   write = "write"
   manage = "manage"
+  response = "response"
 
 
 class ListTypes(str, Enum):

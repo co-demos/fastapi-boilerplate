@@ -27,7 +27,13 @@ from ..schemas.schemas_user import User, UserInfos, UserCreate, UserUpdate, User
 from ..schemas.schemas_token import TokenAccess, TokenAccessRefresh
 from ..schemas.schemas_message import Msg
 
-from ..crud.crud_users import user, get_current_active_user, get_current_active_user_refresh, get_password_hash
+from ..crud.crud_users import (
+  user, 
+  get_current_user, 
+  get_current_active_user, 
+  get_current_active_user_refresh, 
+  get_password_hash
+)
 from ..crud.crud_invitations import invitation
 
 from ..crud.crud_groups import group
@@ -106,7 +112,8 @@ def create_user(
 def read_users(
   skip: int = 0,
   limit: int = 100, 
-  db: Session = Depends(get_db)
+  db: Session = Depends(get_db),
+  current_user: UserModel = Depends(get_current_active_user),
   ):
   users_in_db = user.get_multi(db, skip=skip, limit=limit)
   return users_in_db
@@ -119,16 +126,11 @@ def read_users(
  )
 def read_user(
   user_id: int,
-  db: Session = Depends(get_db)
+  db: Session = Depends(get_db),
+  current_user: UserModel = Depends(get_current_active_user),
   ):
-  user_in_db = user.get_by_id(db, id=user_id)
-  if user_in_db is None:
-    raise HTTPException(
-      status_code=status.HTTP_404_NOT_FOUND,
-      detail="User not found"
-    )
-  user_dict = jsonable_encoder(user_in_db)
-  print("read_user > user_dict : ", user_dict)
+  print("read_user > current_user : ", current_user)
+  user_in_db = user.get_by_id(db, id=user_id, user=current_user, req_type="read")
   return user_in_db
 
 
@@ -148,20 +150,6 @@ def delete_user(
     "user_deleted_email": user_deleted.email,
     "message": "This user has been deleted successfully." 
   }
-
-
-# @router.post("/{user_id}/items/",
-#   summary="Create an item for any user",
-#   description="Create an item to another user given the user id",
-#   response_model=Item,
-#   status_code=status.HTTP_201_CREATED
-# )
-# def create_item_for_user(
-#   user_id: int, 
-#   item: ItemCreate,
-#   db: Session = Depends(get_db)
-#   ):
-#   return crud_items.create_user_item(db=db, item=item, user_id=user_id)
 
 
 
@@ -191,8 +179,8 @@ async def update_user(
   ):
   print("\nupdate_user > user_in : ", user_in)
   
-  current_user_data = jsonable_encoder(current_user)
-  print("update_user > current_user_data : ", current_user_data)
+  # current_user_data = jsonable_encoder(current_user)
+  # print("update_user > current_user_data : ", current_user_data)
   
   user_in_db = user.update(db, db_obj=current_user, obj_in=user_in)
   print("update_user > user_in_db : ", user_in_db)
@@ -233,23 +221,23 @@ async def update_user_ux(
   return jsonable_encoder(user_in_db)
 
 
-@router.patch("/me/update_avatar",
-  summary="Update user avatar",
-  description="Update user avatar by uploading a file",
-  response_model=User
-  )
-async def update_user_avatar(
-  uploaded_file: UploadFile = File(...),
-  current_user: UserModel = Depends(get_current_active_user),
-  db: Session = Depends(get_db)
-  ):
-  user_id = current_user.id
-  with open ("media/"+uploaded_file.filename, "wb+") as file_object:
-    shutil.copyfileobj(uploaded_file.file, file_object)
-  field = "avatar_url"
-  url = str("media/"+uploaded_file.filename)
-  # return update_user_field_in_db(db=db, user_id=user_id, field=field, value=url)
-  return user.update(db=db, user_id=user_id, field=field, value=url)
+# @router.patch("/me/update_avatar",
+#   summary="Update user avatar",
+#   description="Update user avatar by uploading a file",
+#   response_model=User
+#   )
+# async def update_user_avatar(
+#   uploaded_file: UploadFile = File(...),
+#   current_user: UserModel = Depends(get_current_active_user),
+#   db: Session = Depends(get_db)
+#   ):
+#   user_id = current_user.id
+#   with open ("media/"+uploaded_file.filename, "wb+") as file_object:
+#     shutil.copyfileobj(uploaded_file.file, file_object)
+#   field = "avatar_url"
+#   url = str("media/"+uploaded_file.filename)
+#   # return update_user_field_in_db(db=db, user_id=user_id, field=field, value=url)
+#   return user.update(db=db, user_id=user_id, field=field, value=url)
 
 
 # @router.get("/me/items/",
@@ -265,17 +253,28 @@ async def update_user_avatar(
 #   return [{"items": user_items, "owner": current_user.email, "owner_id": current_user.id}]
 
 
-@router.get("/me/posts/",
-  summary="Get user's own posts",
-  description="Get connected/authenticated user's own posts",
+# @router.get("/me/posts/",
+#   summary="Get user's own posts",
+#   description="Get connected/authenticated user's own posts",
+#  )
+# async def read_own_posts(
+#   current_user: UserModel = Depends(get_current_active_user),
+#   db: Session = Depends(get_db)
+#   ):
+#   user_id = current_user.id
+#   user_posts = crud_posts.get_user_posts(db=db, user_id=user_id)
+#   return [{"posts": user_posts, "owner": current_user.email, "owner_id": current_user.id}]
+
+@router.get("/me/groups/",
+  summary="Get user's groups",
+  description="Get connected/authenticated user's groups",
  )
-async def read_own_posts(
+async def read_own_groups(
   current_user: UserModel = Depends(get_current_active_user),
   db: Session = Depends(get_db)
   ):
-  user_id = current_user.id
-  user_posts = crud_posts.get_user_posts(db=db, user_id=user_id)
-  return [{"posts": user_posts, "owner": current_user.email, "owner_id": current_user.id}]
+  groups_in_db = user.get_user_groups(db, current_user=current_user)
+  return groups_in_db
 
 
 @router.get("/me/invitations/",
@@ -287,27 +286,22 @@ async def read_own_invitations(
   db: Session = Depends(get_db)
   ):
   # print("read_own_invitations > current_user : ", current_user)
-  user_id = current_user.id
-  user_email = current_user.email
+  # user_id = current_user.id
+  # user_email = current_user.email
   # print("read_own_invitations > user_id : ", user_id)
   # print("read_own_invitations > user_email : ", user_email)
 
-  user_invits_sent = invitation.get_multi_by_owner(db=db, owner_id=user_id, limit=None)
+  user_invits_sent = invitation.get_multi_by_owner(db=db, owner_id=current_user.id, limit=None)
   print("read_own_invitations > user_invits_sent : ", user_invits_sent)
   # user_invits_sent_extended = [ Invitation.from_orm(invit) for invit in user_invits_sent ]
   user_invits_sent_extended = [ read_invitation(obj_id=invit.id, db=db, current_user=current_user ) for invit in user_invits_sent ]
   # print("read_own_invitations > user_invits_sent_extended : ", user_invits_sent_extended)
 
-  user_invits_received = invitation.get_multi_received(db=db, user_email=user_email, limit=None)
+  user_invits_received = invitation.get_multi_received(db=db, user=current_user, limit=None)
   print("read_own_invitations > user_invits_received : ", user_invits_received)
   # user_invits_received_extended = [ Invitation.from_orm(invit) for invit in user_invits_received ]
   user_invits_received_extended = [ read_invitation(obj_id=invit.id, db=db, current_user=current_user ) for invit in user_invits_received ]
   # print("read_own_invitations > user_invits_received_extended : ", user_invits_received_extended)
-
-  # return {
-  #   "invitations_sent": user_invits_sent_extended,
-  #   "invitations_received": user_invits_received_extended,
-  # }
 
   return user_invits_sent_extended + user_invits_received_extended
 
@@ -368,17 +362,17 @@ async def read_shared(
   return results
 
 
-@router.get("/me/comments/",
-  summary="Get user's own comments",
-  description="Get connected/authenticated user's own comments",
-  )
-async def read_own_comments(
-  current_user: UserModel = Depends(get_current_active_user),
-  db: Session = Depends(get_db)
-  ):
-  user_id = current_user.id
-  user_comments = crud_comments.get_user_comments(db=db, user_id=user_id)
-  return [{"comments": user_comments, "owner": current_user.email, "owner_id": current_user.id}]
+# @router.get("/me/comments/",
+#   summary="Get user's own comments",
+#   description="Get connected/authenticated user's own comments",
+#   )
+# async def read_own_comments(
+#   current_user: UserModel = Depends(get_current_active_user),
+#   db: Session = Depends(get_db)
+#   ):
+#   user_id = current_user.id
+#   user_comments = crud_comments.get_user_comments(db=db, user_id=user_id)
+#   return [{"comments": user_comments, "owner": current_user.email, "owner_id": current_user.id}]
 
 
 ### AUTH ROUTES

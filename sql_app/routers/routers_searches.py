@@ -61,8 +61,8 @@ ITEM_TYPES = {
 }
 
 @router.get("/by_type/{item_type}",
-  summary="Search for a list of groups",
-  description="Get groups given a string query",
+  summary="Search for items by type",
+  description="Get items given a type and a query",
   # response_model=List[ITEM_TYPES[item_type]["model"]]
   )
 async def search_by_type(
@@ -90,8 +90,8 @@ async def search_by_type(
 
 
 @router.get("/any",
-  summary="Search for a list of groups",
-  description="Get groups given a string query",
+  summary="Search any item ",
+  description="Get items given a string query",
   )
 async def search_any(
   q: str = Query("", min_length=3),

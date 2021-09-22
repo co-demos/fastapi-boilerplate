@@ -64,8 +64,6 @@ async def read_group(
   current_user: User = Depends(get_current_user)
   ):
   group_in_db = group.get_by_id(db, id=obj_id, user=current_user, req_type="read")
-  # if group_in_db is None:
-  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="group not found")
   return group_in_db
 
 
@@ -81,12 +79,6 @@ async def update_group(
   current_user: User = Depends(get_current_user)
   ):
   group_in_db = group.get_by_id(db=db, id=obj_id, user=current_user, req_type="write")
-  # if group_in_db is None:
-  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="group not found")
-  ### only owner and superuser for now
-  ### need to check group and scope !!!
-  # if not current_user.is_superuser and (group_in_db.owner_id != current_user.id):
-  #   raise HTTPException(status_code=400, detail="Not enough permissions")
   group_in_db = group.update(db=db, db_obj=group_in_db, obj_in=obj_in)
   return group_in_db
 
@@ -104,13 +96,6 @@ async def invite_to_group(
   current_user: User = Depends(get_current_user)
   ):
   group_in_db = group.get_by_id(db=db, id=obj_id, user=current_user, req_type="manage")
-  # if group_in_db is None:
-  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="group not found")
-  ### only owner and superuser for now
-  ### need to check group and scope !!!
-  # if not current_user.is_superuser and (group_in_db.owner_id != current_user.id):
-  #   raise HTTPException(status_code=400, detail="Not enough permissions")
-
   group_in_db = group.invite(
     db=db,
     background_tasks=background_tasks,
@@ -165,10 +150,6 @@ async def delete_group(
   current_user: User = Depends(get_current_user)
   ):
   print("delete_group > obj_id : ", obj_id)
-  # group_in_db = group.get_by_id(db=db, id=id)
-  # print("delete_group > group_in_db : ", group_in_db)
-  # if not group_in_db:
-  #   raise HTTPException(status_code=404, detail="group not found")
   group_deleted = group.remove(db=db, id=obj_id, current_user=current_user)
   print("delete_group > group_deleted : ", group_deleted)
   return group_deleted

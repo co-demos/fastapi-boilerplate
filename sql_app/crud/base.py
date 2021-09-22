@@ -36,98 +36,10 @@ UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 AUTHS_EXCEPTIONS = {
   "invitations" : { 
     "user_field": "email", 
-    "item_field": "invitee"
+    "item_field": "invitee",
+    "level_fields": [ "read", "response" ]
   },
 }
-
-def checkUserAuth(
-  item,
-  current_user: User,
-  level_field: str,
-  auth_exception = None,
-  ):
-  
-  print("\ncheckUserAuth > level_field : ", level_field)
-  # print("checkUserAuth > item.id : ", item.id)
-  print(f"checkUserAuth > current_user.id : {current_user.id} / current_user.email : {current_user.email} ")
-  
-  check = False
-
-  item_owner_id = getattr( item, "owner_id", None )
-  item_auth = getattr( item, level_field, None )
-  # print("checkUserAuth > item_owner_id : ", item_owner_id)
-  # print("checkUserAuth > item_auth : ", item_auth)
-
-  item_authorized_users = getattr( item, "authorized_users", [] )
-  item_authorized_groups = getattr( item, "authorized_groups", [] )
-  # print("checkUserAuth > item_authorized_users : ", item_authorized_users)
-  # print("checkUserAuth > item_authorized_groups : ", item_authorized_groups)
-  
-  print(f"checkUserAuth > id : {item.id} / title : {item.title} / owner_id {item_owner_id} ")
-
-  user_auth_level = False
-
-  if item_authorized_users:
-    user_in_authorized_users = list(filter(lambda user: user['user_email'] == current_user.email, item_authorized_users))
-    # print("checkUserAuth > user_in_authorized_users : ", user_in_authorized_users)
-
-    if user_in_authorized_users:
-      user_auths = user_in_authorized_users[0]["auths"]
-      user_auth_level = user_auths.get(level_field, False)
-  # print("checkUserAuth > user_auth_level : ", user_auth_level)
-
-  if item_auth and item_auth == "public":
-    check = True
-  
-  elif item_auth and item_auth == "owner-only":
-    check = item_owner_id == current_user.id
-    # print("checkUserAuth > item_owner_id : ", item_owner_id)
-    # print("checkUserAuth > current_user.id : ", current_user.id)
-  
-  elif item_auth and item_auth == "owner+groups":
-    check = user_auth_level or item_owner_id == current_user.id
-  
-  elif item_auth and item_auth == "owner+groups+users":
-    check = current_user != None
-  
-  else: # check in case item_auth is None => owner can do everything
-    check = item_owner_id == current_user.id
-
-  if auth_exception and not check :
-    left_user = getattr( current_user, auth_exception["user_field"] )
-    right_item = getattr( item, auth_exception["item_field"] )
-    check = right_item == left_user
-
-  print(f"checkUserAuth > {level_field} > check : ", check)
-  return check
-
-
-def checkUserAuthAgainstItem(
-  db: Session,
-  item,
-  tablename: str,
-  current_user: User,
-  req_type: Optional[RequestType] = "read",
-  ):
-  auth_check = None
-  
-  if item:
-    # print("\ncheckUserAuthAgainstItem > req_type : ", req_type)
-    # print("checkUserAuthAgainstItem > current_user.__dict__ : ", current_user.__dict__)
-    user_superuser = current_user.is_superuser
-    # print("checkUserAuthAgainstItem > user_superuser : ", user_superuser)
-    
-    if user_superuser :
-      auth_check = True
-    else :
-      auth_exception = AUTHS_EXCEPTIONS.get(tablename,  None)
-      # print("checkUserAuthAgainstItem > auth_exception : ", auth_exception)
-      auth_check = checkUserAuth( item, current_user, req_type, auth_exception )
-
-  print("\ncheckUserAuthAgainstItem > auth_check : ", auth_check)
-  if not auth_check:
-    raise HTTPException(status_code=400, detail=f"Not enough permissions to {req_type} on {tablename} table / item.id : {item.id}")
-  return auth_check
 
 
 
@@ -145,7 +57,128 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     self.tablename_singlar = model.__tablename__[:-1]
     self.tablename_plural = model.__tablename__
 
+
+  ###  AUTH CHECK RELATED
+
+  def get_user_groups(
+    self, db: Session, *,
+    current_user: User,
+    ):
+    user_id = current_user.id
+    user_ref = { "user_email": current_user.email }
+    # filter groups user is in authorized users
+    groups_in_db = db.query(Group).filter( 
+      or_(
+        Group.owner_id == user_id,
+        Group.authorized_users.contains([user_ref]),
+      )
+    )
+    return groups_in_db.all()
+
+  def check_user_auth(
+    self, db: Session,
+    item,
+    current_user: User,
+    level_field: str,
+    auth_exception = None,
+    ):
+    
+    print("\ncheck_user_auth > level_field : ", level_field)
+    print(f"check_user_auth > current_user.id : {current_user.id} / current_user.email : {current_user.email} ")
+    
+    check = False
+
+    item_owner_id = getattr( item, "owner_id", None )
+    item_auth = getattr( item, level_field, None )
+
+    item_authorized_users = getattr( item, "authorized_users", [] )
+    item_authorized_groups = getattr( item, "authorized_groups", [] )
+    # print("check_user_auth > item_authorized_users : ", item_authorized_users)
+    # print("check_user_auth > item_authorized_groups : ", item_authorized_groups)
+    
+    print(f"check_user_auth > id : {item.id} / owner_id {item_owner_id} ")
+
+    user_auth_level = False
+
+    ### get item's authorized users list
+    if item_authorized_users:
+      user_in_authorized_users = list(filter(lambda user: user['user_email'] == current_user.email, item_authorized_users))
+      # print("check_user_auth > user_in_authorized_users : ", user_in_authorized_users)
+      if user_in_authorized_users:
+        user_auths = user_in_authorized_users[0]["auths"]
+        user_auth_level = user_auths.get(level_field, False)
+    # print("check_user_auth > user_auth_level : ", user_auth_level)
+
+    ### get item's authorized users list
+    if item_authorized_groups:
+      user_groups = self.get_user_groups( db=db, current_user=current_user )
+      user_groups_ids = set([ group.id for group in user_groups ])
+      print("check_user_auth > user_groups_ids : ", user_groups_ids)
+      print("check_user_auth > item_authorized_groups : ", item_authorized_groups)
+      authorized_group_ids = set([ group["id"] for group in item_authorized_groups ])
+      authorized_groups_ids_for_user = user_groups_ids.intersection(authorized_group_ids)
+      print("check_user_auth > authorized_groups_ids_for_user : ", authorized_groups_ids_for_user)
+      ### get group auth object in item for every id 
+
+    ### compute check depending on item_auth level
+    if item_auth and item_auth == "public":
+      check = True
+    
+    elif item_auth and item_auth == "owner-only":
+      check = item_owner_id == current_user.id
+      # print("check_user_auth > item_owner_id : ", item_owner_id)
+      # print("check_user_auth > current_user.id : ", current_user.id)
+    
+    elif item_auth and item_auth == "owner+groups":
+      check = user_auth_level or item_owner_id == current_user.id
+    
+    elif item_auth and item_auth == "owner+groups+users":
+      check = current_user != None
+    
+    else: # check in case item_auth is None => owner can do everything
+      check = item_owner_id == current_user.id
+
+    if auth_exception and not check:
+      is_level = level_field in auth_exception["level_fields"]
+      left_user = getattr( current_user, auth_exception["user_field"] )
+      right_item = getattr( item, auth_exception["item_field"] )
+      check = is_level and right_item == left_user
+
+    print(f"check_user_auth > {level_field} > check : ", check)
+    return check
+
+
+  def check_user_auth_against_item(
+    self, db: Session,
+    item,
+    tablename: str,
+    current_user: User,
+    req_type: Optional[RequestType] = "read",
+    ):
+
+    auth_check = None
+    
+    if item:
+      # print("\ncheck_user_auth_against_item > req_type : ", req_type)
+      # print("check_user_auth_against_item > current_user.__dict__ : ", current_user.__dict__)
+      user_superuser = current_user.is_superuser
+      # print("check_user_auth_against_item > user_superuser : ", user_superuser)
+      
+      if user_superuser :
+        auth_check = True
+      else :
+        auth_exception = AUTHS_EXCEPTIONS.get(tablename,  None)
+        # print("check_user_auth_against_item > auth_exception : ", auth_exception)
+        auth_check = self.check_user_auth( db, item, current_user, req_type, auth_exception )
+
+    print("\ncheck_user_auth_against_item > auth_check : ", auth_check)
+    if not auth_check:
+      raise HTTPException(status_code=400, detail=f"Not enough permissions to {req_type} on {tablename} table / item.id : {item.id}")
+    return auth_check
+
+
   ### GET REQUESTS
+
   def get_by_id(
     self, db: Session, 
     id: Any,
@@ -160,7 +193,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
       raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{self.tablename_singlar} not found")
     
     if get_auth_check :
-      check_auth = checkUserAuthAgainstItem(db, result, self.tablename_plural, user, req_type)
+      check_auth = self.check_user_auth_against_item(db, result, self.tablename_plural, user, req_type)
     
     return result
 
@@ -176,9 +209,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
       raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{self.tablename_singlar} not found")
     
     if get_auth_check :
-      check_auth = checkUserAuthAgainstItem(db, result, self.tablename_plural, user, req_type)
+      check_auth = self.check_user_auth_against_item(db, result, self.tablename_plural, user, req_type)
     
     return result
+
 
   ### GET MULTI REQUESTS
 
@@ -589,7 +623,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     # print("remove > current_user.__dict__ : ", current_user.__dict__)
     # if not current_user.is_superuser and (obj.owner_id == current_user.id):
     #   raise HTTPException(status_code=400, detail="Not enough permissions")
-    check_auth = checkUserAuthAgainstItem(db, obj, self.tablename_plural, user, "manage")
+    check_auth = self.check_user_auth_against_item(db, obj, self.tablename_plural, user, "manage")
     print("remove > END > obj : ", obj)
     db.delete(obj)
     db.commit()

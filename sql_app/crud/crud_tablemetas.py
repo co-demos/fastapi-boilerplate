@@ -39,7 +39,7 @@ class CRUDTablemeta(CRUDBase[Tablemeta, TablemetaCreate, TablemetaUpdate]):
     tablemeta_id: int,
     user: User,
     ):
-    table_meta_in_db = self.get_by_id(db, tablemeta_id, user=user )
+    table_meta_in_db = self.get_by_id(db, tablemeta_id, user=user, req_type="read" )
     print("\n...CRUDTablemeta > get_table_data > table_meta_in_db :", table_meta_in_db )
     table_data_uuid = table_meta_in_db.table_data_uuid
     table_data_fields = table_meta_in_db.table_fields
