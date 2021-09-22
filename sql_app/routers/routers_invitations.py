@@ -75,22 +75,22 @@ def read_invitation(
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
   ):
-  print("\nread_invitation > current_user.__dict__ : ", current_user.__dict__)
-  print("read_invitation > current_user.email : ", current_user.email)
+  # print("\nread_invitation > current_user.__dict__ : ", current_user.__dict__)
+  print("\nread_invitation > current_user.email : ", current_user.email)
   print("read_invitation > current_user.id : ", current_user.id)
   # print("read_invitation > obj_id : ", obj_id)
-  invitation_in_db = invitation.get_by_id(db, id=obj_id)
-  if invitation_in_db is None:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="invitation not found")
+  invitation_in_db = invitation.get_by_id(db, id=obj_id, user=current_user, req_type="read")
+  # if invitation_in_db is None:
+  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="invitation not found")
   print("read_invitation > invitation_in_db : ", invitation_in_db)
   print("read_invitation > invitation_in_db.owner_id : ", invitation_in_db.owner_id)
   print("read_invitation > invitation_in_db.owner : ", invitation_in_db.owner)
   
   ### check if user is allowed to read 
-  is_owner = (invitation_in_db.owner_id != current_user.id)
-  is_sender = (invitation_in_db.invitee != current_user.email)
-  if not current_user.is_superuser and not is_owner and not is_sender :
-    raise HTTPException(status_code=400, detail="Not enough permissions")
+  # is_owner = (invitation_in_db.owner_id != current_user.id)
+  # is_sender = (invitation_in_db.invitee != current_user.email)
+  # if not current_user.is_superuser and not is_owner and not is_sender :
+  #   raise HTTPException(status_code=400, detail="Not enough permissions")
 
   invitation_model = Invitation.from_orm(invitation_in_db)
   invitation_dict = jsonable_encoder(invitation_model)
@@ -99,7 +99,7 @@ def read_invitation(
   item_type = invitation_in_db.invitation_to_item_type
   item_id = invitation_in_db.invitation_to_item_id
   item_crud = crud_choices[ item_type ]
-  item_in_db = item_crud.get_by_id( db=db, id=item_id )
+  item_in_db = item_crud.get_by_id( db=db, id=item_id, user=current_user, get_auth_check=False )
   item_data = jsonable_encoder(item_in_db)
 
   invitation_dict["invitation_item"] = item_data
@@ -120,9 +120,9 @@ async def respond_to_invitation(
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
   ):
-  invitation_in_db = invitation.get_by_id(db=db, id=obj_id)
-  if invitation_in_db is None:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="invitation not found")
+  invitation_in_db = invitation.get_by_id(db=db, id=obj_id, user=current_user)
+  # if invitation_in_db is None:
+  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="invitation not found")
   
   print("\nrespond_to_invitation > obj_in : ", obj_in)
   print("respond_to_invitation > current_user.email : ", current_user.email)
@@ -147,7 +147,7 @@ async def respond_to_invitation(
   print("respond_to_invitation > invitee_type : ", invitee_type)
   
   item_crud = crud_choices[ item_type ]
-  item_in_db = item_crud.get_by_id( db=db, id=item_id )
+  item_in_db = item_crud.get_by_id( db=db, id=item_id, user=current_user )
   item_data = jsonable_encoder(item_in_db)
   print("respond_to_invitation > item_data : ", item_data )
 
@@ -203,29 +203,29 @@ def update_invitation(
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
   ):
-  invitation_in_db = invitation.get_by_id(db=db, id=obj_id)
-  if invitation_in_db is None:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="invitation not found")
+  invitation_in_db = invitation.get_by_id(db=db, id=obj_id, user=current_user, req_type="write")
+  # if invitation_in_db is None:
+  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="invitation not found")
   ### only owner and superuser for now
   ### need to check group and scope !!!
-  if not current_user.is_superuser and (invitation_in_db.owner_id != current_user.id):
-    raise HTTPException(status_code=400, detail="Not enough permissions")
+  # if not current_user.is_superuser and (invitation_in_db.owner_id != current_user.id):
+  #   raise HTTPException(status_code=400, detail="Not enough permissions")
   invitation_in_db = invitation.update(db=db, db_obj=invitation_in_db, obj_in=obj_in)
   return invitation_in_db
 
 
-@router.get("/",
-  summary="Get a list of all invitations",
-  description="Get all invitations given a limit",
-  response_model=List[Invitation]
-)
-def read_invitations(
-  skip: int = 0, limit: int = 100, 
-  current_user: User = Depends(get_current_user),
-  db: Session = Depends(get_db),
-  ):
-  invitations = invitation.get_multi(db=db, skip=skip, limit=limit)
-  return invitations
+# @router.get("/",
+#   summary="Get a list of all invitations",
+#   description="Get all invitations given a limit",
+#   response_model=List[Invitation]
+# )
+# def read_invitations(
+#   skip: int = 0, limit: int = 100, 
+#   current_user: User = Depends(get_current_user),
+#   db: Session = Depends(get_db),
+#   ):
+#   invitations = invitation.get_multi(db=db, skip=skip, limit=limit)
+#   return invitations
 
 
 @router.delete("/{obj_id}",
@@ -241,14 +241,14 @@ def delete_invitation(
   print("\ndelete_invitation > obj_id : ", obj_id)
   print("delete_invitation > current_user.email : ", current_user.email)
   
-  invitation_in_db = invitation.get_by_id(db=db, id=obj_id)
+  invitation_in_db = invitation.get_by_id(db=db, id=obj_id, user=current_user, req_type="manage")
   print("delete_invitation > invitation_in_db : ", invitation_in_db)
-  if not invitation_in_db:
-    raise HTTPException(status_code=404, detail="invitation not found")
+  # if not invitation_in_db:
+  #   raise HTTPException(status_code=404, detail="invitation not found")
 
   ### check if user is allowed to delete 
-  if not current_user.is_superuser and (invitation_in_db.owner_id != current_user.id):
-    raise HTTPException(status_code=400, detail="Not enough permissions")
+  # if not current_user.is_superuser and (invitation_in_db.owner_id != current_user.id):
+  #   raise HTTPException(status_code=400, detail="Not enough permissions")
 
   invitation_data = jsonable_encoder(invitation_in_db)
   print("delete_invitation > invitation_data : ", invitation_data)
@@ -262,7 +262,7 @@ def delete_invitation(
   print("delete_invitation > invitee_type : ", invitee_type)
 
   item_crud = crud_choices[ item_type ]
-  item_in_db = item_crud.get_by_id( db=db, id=item_id )
+  item_in_db = item_crud.get_by_id( db=db, id=item_id, user=current_user, req_type="manage" )
   item_data = jsonable_encoder(item_in_db)
   print("delete_invitation > item_data : ", item_data )
 

@@ -78,6 +78,15 @@ class CallbackMethod(str, Enum):
   post = "post"
   delete = "delete"
 
+
+class RequestType(str, Enum):
+  read = "read"
+  comment = "comment"
+  patch = "patch"
+  write = "write"
+  manage = "manage"
+
+
 class ListTypes(str, Enum):
   user = "user"
   shared = "shared"

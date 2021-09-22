@@ -46,9 +46,9 @@ def read_workspace(
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
   ):
-  workspace_in_db = workspace.get_by_id(db, id=obj_id)
-  if workspace_in_db is None:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="workspace not found")
+  workspace_in_db = workspace.get_by_id(db, id=obj_id, user=current_user, req_type="read")
+  # if workspace_in_db is None:
+  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="workspace not found")
   return workspace_in_db
 
 
@@ -63,13 +63,13 @@ def update_workspace(
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
   ):
-  workspace_in_db = workspace.get_by_id(db=db, id=obj_id)
-  if workspace_in_db is None:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="workspace not found")
+  workspace_in_db = workspace.get_by_id(db=db, id=obj_id, user=current_user, req_type="write")
+  # if workspace_in_db is None:
+  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="workspace not found")
   ### only owner and superuser for now
   ### need to check group and scope !!!
-  if not current_user.is_superuser and (workspace_in_db.owner_id != current_user.id):
-    raise HTTPException(status_code=400, detail="Not enough permissions")
+  # if not current_user.is_superuser and (workspace_in_db.owner_id != current_user.id):
+  #   raise HTTPException(status_code=400, detail="Not enough permissions")
   workspace_in_db = workspace.update(db=db, db_obj=workspace_in_db, obj_in=obj_in)
   return workspace_in_db
 
@@ -86,13 +86,13 @@ async def invite_to_workspace(
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
   ):
-  workspace_in_db = workspace.get_by_id(db=db, id=obj_id)
-  if workspace_in_db is None:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="workspace not found")
+  workspace_in_db = workspace.get_by_id(db=db, id=obj_id, user=current_user, req_type="manage")
+  # if workspace_in_db is None:
+  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="workspace not found")
   ### only owner and superuser for now
   ### need to check workspace and scope !!!
-  if not current_user.is_superuser and (workspace_in_db.owner_id != current_user.id):
-    raise HTTPException(status_code=400, detail="Not enough permissions")
+  # if not current_user.is_superuser and (workspace_in_db.owner_id != current_user.id):
+  #   raise HTTPException(status_code=400, detail="Not enough permissions")
 
   workspace_in_db = workspace.invite(
     db=db,

@@ -48,6 +48,7 @@ async def get_current_user(
   token: str = Depends(oauth2_scheme)
   ):
   print("\nget_current_user > security_scopes.scopes : ", security_scopes.scopes)
+  
   if security_scopes.scopes:
     authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
   else:
@@ -58,6 +59,7 @@ async def get_current_user(
     detail="Could not validate credentials",
     headers={"WWW-Authenticate": authenticate_value}
   )
+
   try:
     payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     print("get_current_user > payload : ", payload)
@@ -70,6 +72,7 @@ async def get_current_user(
     token_data = TokenData(scopes=token_scopes, username=username)
   except JWTError:
     raise credentials_exception
+  
   user_in_db = user.get_user_by_email(db, email=token_data.username)
   if user is None:
     raise credentials_exception
@@ -80,6 +83,8 @@ async def get_current_user(
         detail="Not enough permissions",
         headers={"WWW-Authenticate": authenticate_value},
       )
+
+  print("\n")
   return user_in_db
 
 

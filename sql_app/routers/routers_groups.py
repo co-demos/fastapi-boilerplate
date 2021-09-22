@@ -63,9 +63,9 @@ async def read_group(
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
   ):
-  group_in_db = group.get_by_id(db, id=obj_id)
-  if group_in_db is None:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="group not found")
+  group_in_db = group.get_by_id(db, id=obj_id, user=current_user, req_type="read")
+  # if group_in_db is None:
+  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="group not found")
   return group_in_db
 
 
@@ -80,13 +80,13 @@ async def update_group(
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
   ):
-  group_in_db = group.get_by_id(db=db, id=obj_id)
-  if group_in_db is None:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="group not found")
+  group_in_db = group.get_by_id(db=db, id=obj_id, user=current_user, req_type="write")
+  # if group_in_db is None:
+  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="group not found")
   ### only owner and superuser for now
   ### need to check group and scope !!!
-  if not current_user.is_superuser and (group_in_db.owner_id != current_user.id):
-    raise HTTPException(status_code=400, detail="Not enough permissions")
+  # if not current_user.is_superuser and (group_in_db.owner_id != current_user.id):
+  #   raise HTTPException(status_code=400, detail="Not enough permissions")
   group_in_db = group.update(db=db, db_obj=group_in_db, obj_in=obj_in)
   return group_in_db
 
@@ -103,13 +103,13 @@ async def invite_to_group(
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
   ):
-  group_in_db = group.get_by_id(db=db, id=obj_id)
-  if group_in_db is None:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="group not found")
+  group_in_db = group.get_by_id(db=db, id=obj_id, user=current_user, req_type="manage")
+  # if group_in_db is None:
+  #   raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="group not found")
   ### only owner and superuser for now
   ### need to check group and scope !!!
-  if not current_user.is_superuser and (group_in_db.owner_id != current_user.id):
-    raise HTTPException(status_code=400, detail="Not enough permissions")
+  # if not current_user.is_superuser and (group_in_db.owner_id != current_user.id):
+  #   raise HTTPException(status_code=400, detail="Not enough permissions")
 
   group_in_db = group.invite(
     db=db,

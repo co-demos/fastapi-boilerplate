@@ -293,13 +293,13 @@ async def read_own_invitations(
   # print("read_own_invitations > user_email : ", user_email)
 
   user_invits_sent = invitation.get_multi_by_owner(db=db, owner_id=user_id, limit=None)
-  # print("read_own_invitations > user_invits_sent : ", user_invits_sent)
+  print("read_own_invitations > user_invits_sent : ", user_invits_sent)
   # user_invits_sent_extended = [ Invitation.from_orm(invit) for invit in user_invits_sent ]
   user_invits_sent_extended = [ read_invitation(obj_id=invit.id, db=db, current_user=current_user ) for invit in user_invits_sent ]
   # print("read_own_invitations > user_invits_sent_extended : ", user_invits_sent_extended)
 
   user_invits_received = invitation.get_multi_received(db=db, user_email=user_email, limit=None)
-  # print("read_own_invitations > user_invits_received : ", user_invits_received)
+  print("read_own_invitations > user_invits_received : ", user_invits_received)
   # user_invits_received_extended = [ Invitation.from_orm(invit) for invit in user_invits_received ]
   user_invits_received_extended = [ read_invitation(obj_id=invit.id, db=db, current_user=current_user ) for invit in user_invits_received ]
   # print("read_own_invitations > user_invits_received_extended : ", user_invits_received_extended)

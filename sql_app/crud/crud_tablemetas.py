@@ -1,11 +1,12 @@
 from . import (pp, Session)
 
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any, Union, Optional
 from fastapi.encoders import jsonable_encoder
 
 from ..db.database import get_db
 
 from .base import CRUDBase
+from ..models.models_user import User
 from ..models.models_tablemeta import Tablemeta
 from ..schemas.schemas_tablemeta import TablemetaCreate, TablemetaUpdate
 
@@ -35,10 +36,11 @@ class CRUDTablemeta(CRUDBase[Tablemeta, TablemetaCreate, TablemetaUpdate]):
   
   def get_tabledata_model(
     self, db,
-    tablemeta_id: int
+    tablemeta_id: int,
+    user: User,
     ):
-    table_meta_in_db = self.get_by_id(db, tablemeta_id)
-    # print("\n...CRUDTablemeta > get_table_data > table_meta_in_db :", table_meta_in_db )
+    table_meta_in_db = self.get_by_id(db, tablemeta_id, user=user )
+    print("\n...CRUDTablemeta > get_table_data > table_meta_in_db :", table_meta_in_db )
     table_data_uuid = table_meta_in_db.table_data_uuid
     table_data_fields = table_meta_in_db.table_fields
     # print("\n...CRUDTablemeta > get_table_data > table_data_uuid :", table_data_uuid )
@@ -54,18 +56,20 @@ class CRUDTablemeta(CRUDBase[Tablemeta, TablemetaCreate, TablemetaUpdate]):
   def get_table_data(
     self, db: Session,
     tablemeta_id: int,
+    user: User,
     skip: int = 0, limit: int = 100
     ):
     """
     Get table_data (in engine_data) from a table_meta object (in engin_commons)
     """
+    print("\n...CRUDTablemeta > get_table_data > tablemeta_id :", tablemeta_id )
 
     # table_meta_in_db = self.get_by_id(db, tablemeta_id)
     # table_data_uuid = table_meta_in_db.table_data_uuid
     # table_data_fields = table_meta_in_db.table_fields
     # table_data_obj = TableDataBuilder(db, table_data_uuid, table_data_fields)
     # table_data_model = table_data_obj.get_table_model
-    table_data_model = self.get_tabledata_model(db, tablemeta_id)
+    table_data_model = self.get_tabledata_model(db, tablemeta_id, user=user)
 
     ### 2/ query db with model
     table_data = (

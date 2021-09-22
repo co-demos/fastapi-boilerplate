@@ -40,7 +40,7 @@ def create_item_for_user(
   response_model=ItemList
   )
 def read_item(item_id: int , db: Session = Depends(get_db)):
-  item_in_db = item.get_by_id(db, id=item_id)
+  item_in_db = item.get_by_id(db, id=item_id, user=current_user)
   if item_in_db is None:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="item not found")
   return item_in_db
