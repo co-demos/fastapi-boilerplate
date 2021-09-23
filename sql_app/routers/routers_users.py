@@ -29,7 +29,8 @@ from ..schemas.schemas_message import Msg
 
 from ..crud.crud_users import (
   user, 
-  get_current_user, 
+  get_current_user,
+  get_current_user_optional,
   get_current_active_user, 
   get_current_active_user_refresh, 
   get_password_hash
@@ -115,7 +116,7 @@ def read_users(
   db: Session = Depends(get_db),
   current_user: UserModel = Depends(get_current_active_user),
   ):
-  users_in_db = user.get_multi(db, skip=skip, limit=limit)
+  users_in_db = user.get_multi(db, skip=skip, limit=limit, user=current_user, req_type="read")
   return users_in_db
 
 
@@ -182,6 +183,7 @@ async def update_user(
   # current_user_data = jsonable_encoder(current_user)
   # print("update_user > current_user_data : ", current_user_data)
   
+  user_in_db = user.get_by_id(db=db, id=obj_id, user=current_user, req_type="write")
   user_in_db = user.update(db, db_obj=current_user, obj_in=user_in)
   print("update_user > user_in_db : ", user_in_db)
   return user_in_db

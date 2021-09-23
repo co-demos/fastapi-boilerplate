@@ -31,6 +31,7 @@ from ..schemas.schemas_invitation import InvitationToTablemeta
 from ..models.models_user import User
 from ..crud.crud_users import (
   get_current_user,
+  get_current_user_optional,
   get_current_active_user,
 )
 from ..models.models_tabledata import TableDataBuilder, CreateFieldsCodes
@@ -120,13 +121,13 @@ def create_tablemeta_for_user(
 
 @router.get("/{obj_id}",
   summary="Get a tablemeta",
-  description="Get a tablemeta by its id",
+  description="Get a tablemeta by its id - authentication is optional",
   response_model=Tablemeta
   )
 def read_tablemeta(
   obj_id: int,
   db: Session = Depends(get_db),
-  current_user: User = Depends(get_current_user)
+  current_user: User = Depends(get_current_user_optional)
   ):
   tablemeta_in_db = tablemeta.get_by_id(db=db, id=obj_id, user=current_user)
   return tablemeta_in_db
@@ -134,13 +135,13 @@ def read_tablemeta(
 
 @router.get("/{obj_id}/data",
   summary="Get a tablemeta's data",
-  description="Get a tablemeta's data by its id",
+  description="Get a tablemeta's data by its id - authentication is optional",
   )
   # response_model=Tablemeta
 def read_tablemeta_data(
   obj_id: int,
   db: Session = Depends(get_db),
-  current_user: User = Depends(get_current_user)
+  current_user: User = Depends(get_current_user_optional)
   ):
   # tablemeta_data_in_db = tablemeta.get_table_data(db=db, tablemeta_id=obj_id, user=current_user)
   tablemeta_data_in_db = tablemeta.get_table_data(db=db, tablemeta_id=obj_id, user=current_user)
@@ -235,18 +236,18 @@ def delete_tablemeta_data(
 
 @router.get("/dataset/{dataset_id}",
   summary="Get a list of all tablemetas for a dataset",
-  description="Get all tablemetas of a dataset given and a limit",
+  description="Get all tablemetas of a dataset given and a limit - authentication is optional",
   response_model=List[Tablemeta]
   )
 def read_tablemetas(
   dataset_id: int,
   skip: int = 0, limit: int = 100,
   db: Session = Depends(get_db),
-  current_user: User = Depends(get_current_user),
+  current_user: User = Depends(get_current_user_optional),
   ):
   print("\n...read_tablemetas > current_user :", current_user )
   print("...read_tablemetas > dataset_id :", dataset_id )
-  tablemetas = tablemeta.get_multi_by_dataset(db=db, dataset_id=dataset_id, skip=skip, limit=limit)
+  tablemetas = tablemeta.get_multi_by_dataset(db=db, dataset_id=dataset_id, skip=skip, limit=limit, user=current_user, req_type="read")
   return tablemetas
 
 

@@ -14,6 +14,7 @@ from . import ( List, Query,
 
 from ..crud.crud_users import (
   get_current_user,
+  get_current_user_optional,
 )
 
 from ..models.models_user import User

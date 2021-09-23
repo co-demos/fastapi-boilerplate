@@ -9,7 +9,7 @@ from ..security.jwt import (
   JWTError, jwt, CryptContext,
   OAuth2PasswordBearer, OAuth2PasswordRequestForm, SecurityScopes,
   SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES,
-  pwd_context, oauth2_scheme,
+  pwd_context, oauth2_scheme, oauth2_scheme_optional
 )
 
 from .base import CRUDBase
@@ -25,7 +25,9 @@ FIELDS_UPDATE = [
   "name",
   "surname",
   "description",
-  "avatar_url"
+  "avatar_url",
+  # "read"
+  # "comment"
 ]
 
 
@@ -42,18 +44,18 @@ def get_password_hash(password):
   return pwd_context.hash(password)
 
 
-async def get_current_user(
-  security_scopes: SecurityScopes,
+
+def get_user_from_token(
+  security_scopes = None,
   db: Session = Depends(get_db),
-  token: str = Depends(oauth2_scheme)
+  token: str = None
   ):
-  print("\nget_current_user > security_scopes.scopes : ", security_scopes.scopes)
-  
-  if security_scopes.scopes:
+
+  if security_scopes and security_scopes.scopes:
     authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
   else:
     authenticate_value = f"Bearer"
-  print("get_current_user > token : ", token)
+  print("get_user_from_token > token : ", token)
   credentials_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
     detail="Could not validate credentials",
@@ -62,13 +64,13 @@ async def get_current_user(
 
   try:
     payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    print("get_current_user > payload : ", payload)
+    print("get_user_from_token > payload : ", payload)
     username: str = payload.get("sub")
-    print("get_current_user > username : ", username)
+    print("get_user_from_token > username : ", username)
     if username is None:
       raise credentials_exception
     token_scopes = payload.get("scopes", [])
-    print("get_current_user > token_scopes : ", token_scopes)
+    print("get_user_from_token > token_scopes : ", token_scopes)
     token_data = TokenData(scopes=token_scopes, username=username)
   except JWTError:
     raise credentials_exception
@@ -83,6 +85,102 @@ async def get_current_user(
         detail="Not enough permissions",
         headers={"WWW-Authenticate": authenticate_value},
       )
+
+  print("\n")
+  return user_in_db  
+
+
+async def get_current_user(
+  security_scopes: SecurityScopes,
+  db: Session = Depends(get_db),
+  token: str = Depends(oauth2_scheme)
+  ):
+  print("\nget_current_user > security_scopes.scopes : ", security_scopes.scopes)
+  
+  # if security_scopes.scopes:
+  #   authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
+  # else:
+  #   authenticate_value = f"Bearer"
+  # print("get_current_user > token : ", token)
+  # credentials_exception = HTTPException(
+  #   status_code=status.HTTP_401_UNAUTHORIZED,
+  #   detail="Could not validate credentials",
+  #   headers={"WWW-Authenticate": authenticate_value}
+  # )
+
+  user_in_db = get_user_from_token(
+    security_scopes=security_scopes,
+    db=db,
+    token=token,
+  )
+
+  # try:
+  #   payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+  #   print("get_current_user > payload : ", payload)
+  #   username: str = payload.get("sub")
+  #   print("get_current_user > username : ", username)
+  #   if username is None:
+  #     raise credentials_exception
+  #   token_scopes = payload.get("scopes", [])
+  #   print("get_current_user > token_scopes : ", token_scopes)
+  #   token_data = TokenData(scopes=token_scopes, username=username)
+  # except JWTError:
+  #   raise credentials_exception
+  
+  # user_in_db = user.get_user_by_email(db, email=token_data.username)
+  # if user is None:
+  #   raise credentials_exception
+  # for scope in security_scopes.scopes:
+  #   if scope not in token_data.scopes:
+  #     raise HTTPException(
+  #       status_code=status.HTTP_401_UNAUTHORIZED,
+  #       detail="Not enough permissions",
+  #       headers={"WWW-Authenticate": authenticate_value},
+  #     )
+
+  print("\n")
+  return user_in_db
+
+
+async def get_current_user_optional(
+  security_scopes: SecurityScopes,
+  db: Session = Depends(get_db),
+  token: str = Depends(oauth2_scheme_optional)
+  ):
+  print("\nget_current_user_optional > security_scopes.scopes : ", security_scopes.scopes)
+
+  if token:
+    user_in_db = get_user_from_token(
+      security_scopes=security_scopes,
+      db=db,
+      token=token,
+    )
+    # try:
+    #   payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    #   print("get_current_user_optional > payload : ", payload)
+    #   username: str = payload.get("sub")
+    #   print("get_current_user_optional > username : ", username)
+    #   if username is None:
+    #     raise credentials_exception
+    #   token_scopes = payload.get("scopes", [])
+    #   print("get_current_user_optional > token_scopes : ", token_scopes)
+    #   token_data = TokenData(scopes=token_scopes, username=username)
+    # except JWTError:
+    #   raise credentials_exception
+    
+    # user_in_db = user.get_user_by_email(db, email=token_data.username)
+    # if user is None:
+    #   raise credentials_exception
+    # for scope in security_scopes.scopes:
+    #   if scope not in token_data.scopes:
+    #     raise HTTPException(
+    #       status_code=status.HTTP_401_UNAUTHORIZED,
+    #       detail="Not enough permissions",
+    #       headers={"WWW-Authenticate": authenticate_value},
+    #    )
+  
+  else:
+    user_in_db = None
 
   print("\n")
   return user_in_db

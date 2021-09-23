@@ -5,6 +5,8 @@ from . import ( List, Session, APIRouter, Depends,
   get_db, Query
 )
 
+from typing import Optional
+
 from ..schemas.schemas_workspace import Workspace, WorkspaceCreate, WorkspaceUpdate, WorkspaceList
 from ..crud.crud_workspaces import workspace
 
@@ -14,6 +16,7 @@ from ..models.models_user import User
 from ..crud.crud_users import user
 from ..crud.crud_users import (
   get_current_user,
+  get_current_user_optional,
   get_current_active_user,
 )
 
@@ -38,13 +41,13 @@ def create_workspace_for_user(
 
 @router.get("/{obj_id}",
   summary="Get a workspace",
-  description="Get a workspace by its id",
+  description="Get a workspace by its id - authentication is optional",
   response_model=Workspace,
   )
 def read_workspace(
   obj_id: int, 
   db: Session = Depends(get_db),
-  current_user: User = Depends(get_current_user)
+  current_user: User = Depends(get_current_user_optional)
   ):
   workspace_in_db = workspace.get_by_id(db, id=obj_id, user=current_user, req_type="read")
   return workspace_in_db
@@ -96,10 +99,10 @@ async def invite_to_workspace(
   )
 def read_workspaces(
   skip: int = 0, limit: int = 100, 
-  current_user: User = Depends(get_current_user),
+  current_user: User = Depends(get_current_user_optional),
   db: Session = Depends(get_db),
   ):
-  workspaces = workspace.get_multi(db=db, skip=skip, limit=limit)
+  workspaces = workspace.get_multi(db=db, skip=skip, limit=limit, user=current_user, req_type="read")
   return workspaces
 
 

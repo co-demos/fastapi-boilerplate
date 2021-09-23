@@ -9,8 +9,6 @@ from pydantic import BaseModel
 
 from sqlalchemy import and_, or_, not_, func, tuple_, text, cast
 from sqlalchemy.orm import Session
-# from sqlalchemy.dialects.postgresql import JSONB
-# from sqlalchemy.sql.expression import literal_column
 
 from ..db.base_class import BaseCommons
 from ..models.models_user import User
@@ -29,10 +27,8 @@ ModelType = TypeVar("ModelType", bound=BaseCommons)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
-# authorized_users_value = literal_column('authorized_users.value', type_=JSONB)
-# user_email_value = literal_column('user_email.value', type_=JSONB)
 
-
+### exceptions for special cases
 AUTHS_EXCEPTIONS = {
   "invitations" : { 
     "user_field": "email", 
@@ -40,7 +36,6 @@ AUTHS_EXCEPTIONS = {
     "level_fields": [ "read", "response" ]
   },
 }
-
 
 
 class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
@@ -147,7 +142,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     print(f"check_user_auth > {level_field} > check : ", check)
     return check
 
-
   def check_user_auth_against_item(
     self, db: Session,
     item,
@@ -197,21 +191,21 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     
     return result
 
-  def get_by_title(
-    self, db: Session,
-    title: str,
-    user: Optional[User] = None,
-    get_auth_check: bool = True,
-    req_type: Optional[RequestType] = "read"
-    ) -> ModelType:
-    result = db.query(self.model).filter(self.model.title == title).first()
-    if result is None:
-      raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{self.tablename_singlar} not found")
+  # def get_by_title(
+  #   self, db: Session,
+  #   title: str,
+  #   user: Optional[User] = None,
+  #   get_auth_check: bool = True,
+  #   req_type: Optional[RequestType] = "read"
+  #   ) -> ModelType:
+  #   result = db.query(self.model).filter(self.model.title == title).first()
+  #   if result is None:
+  #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{self.tablename_singlar} not found")
     
-    if get_auth_check :
-      check_auth = self.check_user_auth_against_item(db, result, self.tablename_plural, user, req_type)
+  #   if get_auth_check :
+  #     check_auth = self.check_user_auth_against_item(db, result, self.tablename_plural, user, req_type)
     
-    return result
+  #   return result
 
 
   ### GET MULTI REQUESTS
@@ -220,13 +214,47 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     self, db: Session, *, 
     skip: int = 0,
     limit: int = 100,
+    user: Optional[User] = None,
+    req_type: Optional[RequestType] = "read"
     ) -> List[ModelType]:
+
+    print("\nget_multi > user : ", user)
+    print("get_multi > req_type : ", req_type)
+
+    results = db.query(self.model)
+
+    ### filter given user and item's auth level
+    search_args = [
+      self.model.read == "public",
+    ]
+    if user:
+      # search user's items
+      search_args.append(self.model.owner_id == user.id)
+      
+      # search items opened to users
+      search_args.append(self.model.read == "owner+groups+users")
+
+      # search items shared with user
+      user_ref = { "user_email": user.email }
+      search_args.append(self.model.authorized_users.contains([user_ref]))
+
+      # search items shared with groups user is part of (if self.model has a authorized_groups attribute)
+      if getattr(self.model, "authorized_groups", None):
+        user_groups = self.get_user_groups( db=db, current_user=user )
+        user_groups_ids = set([ group.id for group in user_groups ])
+        user_groups_refs = [ {"group_id" : group_id } for group_id in user_groups_ids ]
+        print("get_multi > user_groups_refs : ", user_groups_refs)
+        for group_ref in user_groups_refs:
+          search_args.append(self.model.authorized_groups.contains([group_ref]))
+
+    results = results.filter( or_(*search_args) )
+
     results = (
-      db.query(self.model)
-      .offset(skip)
+      results.offset(skip)
       .limit(limit)
       .all()
     )
+
     return results
 
   def get_multi_by_owner(
@@ -235,14 +263,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     skip: int = 0,
     limit: int = 100,
     ) -> List[ModelType]:
-
-    # return (
-    #   db.query(self.model)
-    #   .filter(self.model.owner_id == owner_id)
-    #   .offset(skip)
-    #   .limit(limit)
-    #   .all()
-    # )
 
     items_in_db = db.query(self.model).filter(self.model.owner_id == owner_id)
 
@@ -308,17 +328,21 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     skip: int = 0,
     limit: int = 100,
     operator: OperatorType = OperatorType.or_,
+    user: Optional[User] = None,
+    req_type: Optional[RequestType] = "read"
     ) -> List[ModelType]:
     
     print("\nsearch_multi_by_fields > q : ", q)
     print("search_multi_by_fields > auth_level : ", auth_level)
     print("search_multi_by_fields > fields : ", fields)
-    print("search_multi_by_fields > self.model : ", self.model)
+    # print("search_multi_by_fields > self.model : ", self.model)
     # print("search_multi_by_fields > self.model.__dict__ : ", self.model.__dict__)
+
+    print("search_multi_by_fields > user : ", user)
+    print("search_multi_by_fields > req_type : ", req_type)
 
     db_query = db.query(self.model)
     results = db_query
-    # print("search_mu/lti_by_fields > results - 1 : ", results)
 
     search_args = []
     for field in fields : 
@@ -350,13 +374,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     if limit and limit > 0 :
       results = results.limit(limit)
     results = results.all()
-
-    # results = (
-    #   results_all
-    #   .offset(skip)
-    #   .limit(limit)
-    #   .all()
-    # )
 
     print("search_multi_by_fields > results - end : ", results)
     return results, results_count
@@ -619,12 +636,28 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     print("remove > current_user.id : ", current_user.id)
     obj = db.query(self.model).get(id)
     if not obj:
-      raise HTTPException(status_code=404, detail="object not found")
-    # print("remove > current_user.__dict__ : ", current_user.__dict__)
-    # if not current_user.is_superuser and (obj.owner_id == current_user.id):
-    #   raise HTTPException(status_code=400, detail="Not enough permissions")
-    check_auth = self.check_user_auth_against_item(db, obj, self.tablename_plural, user, "manage")
-    print("remove > END > obj : ", obj)
+      # raise HTTPException(status_code=404, detail="object not found")
+      raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{self.tablename_singlar} not found")
+    
+    ### check auth to delete
+    check_auth = self.check_user_auth_against_item(db, obj, self.tablename_plural, current_user, "manage")
+
+    ### delete object
     db.delete(obj)
+
+    ### delete corresponding invitations
+    related_invitations = db.query(Invitation).filter(
+      and_(
+        Invitation.invitation_to_item_type == self.tablename_singlar,
+        Invitation.invitation_to_item_id == id,
+      )
+    ).delete()
+    # for invit in related_invitations.all() :
+    #   db.delete(invit)
+    print("remove > related_invitations : ", related_invitations)
+
+    ### update related items (e.g. delete a dataset referenced in a workspace)
+    ### TO DO 
+
     db.commit()
     return obj

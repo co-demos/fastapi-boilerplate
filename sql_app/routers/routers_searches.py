@@ -27,6 +27,7 @@ from ..crud.crud_tablemetas import tablemeta
 
 from ..crud.crud_users import (
   get_current_user,
+  get_current_user_optional,
   get_current_active_user,
 )
 
@@ -62,7 +63,7 @@ ITEM_TYPES = {
 
 @router.get("/by_type/{item_type}",
   summary="Search for items by type",
-  description="Get items given a type and a query",
+  description="Get items given a type and a query - authentication is optional",
   # response_model=List[ITEM_TYPES[item_type]["model"]]
   )
 async def search_by_type(
@@ -71,7 +72,7 @@ async def search_by_type(
   auth_type: PermissionType = Query([PermissionType.perm_public]),
   operator: OperatorType = OperatorType.or_,
   skip: int = 0, limit: int = 100, 
-  current_user: User = Depends(get_current_user),
+  current_user: User = Depends(get_current_user_optional),
   db: Session = Depends(get_db),
   ):
   print("\nsearch_by_type > q : ", q)
@@ -83,7 +84,9 @@ async def search_by_type(
     q=q,
     fields=ITEM_TYPES[item_type]["fields"],
     auth_level=auth_type,
-    operator=operator, 
+    operator=operator,
+    user=current_user,
+    req_type="read"
   )
   print("search_by_type > items_in_db : ", items_in_db)
   return items_in_db
@@ -91,7 +94,7 @@ async def search_by_type(
 
 @router.get("/any",
   summary="Search any item ",
-  description="Get items given a string query",
+  description="Get items given a string query - authentication is optional",
   )
 async def search_any(
   q: str = Query("", min_length=3),
@@ -99,7 +102,7 @@ async def search_any(
   auth_type: PermissionType = Query([PermissionType.perm_public]),
   operator: OperatorType = OperatorType.or_,
   skip: int = 0, limit: int = 100, 
-  current_user: User = Depends(get_current_user),
+  current_user: User = Depends(get_current_user_optional),
   db: Session = Depends(get_db),
   ):
   print("\nsearch_any > q : ", q)
@@ -113,7 +116,9 @@ async def search_any(
       q=q,
       fields=ITEM_TYPES[item_type]["fields"],
       auth_level=auth_type,
-      operator=operator, 
+      operator=operator,
+      user=current_user,
+      req_type="read"
     )
     # print("search_any > items_in_db : ", items_in_db)
     items_results = {}

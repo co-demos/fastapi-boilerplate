@@ -8,9 +8,10 @@ from . import ( List, Session, APIRouter, Depends,
 from ..schemas.schemas_sockets import CreateOwnRoom, BroadcastAction
 from ..schemas.schemas_choices import messages_dict
 
-from ..crud.crud_users import (
-  get_current_user,
-)
+# from ..crud.crud_users import (
+#   get_current_user,
+#   get_current_user_optional,
+# )
 
 from ..main import sio
 

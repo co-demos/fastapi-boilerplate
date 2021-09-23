@@ -205,7 +205,7 @@ def update_invitation(
 #   current_user: User = Depends(get_current_user),
 #   db: Session = Depends(get_db),
 #   ):
-#   invitations = invitation.get_multi(db=db, skip=skip, limit=limit)
+#   invitations = invitation.get_multi(db=db, skip=skip, limit=limit, user=current_user, req_type="read")
 #   return invitations
 
 

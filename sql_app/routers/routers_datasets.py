@@ -15,6 +15,7 @@ from ..schemas.schemas_invitation import InvitationToDataset
 from ..models.models_user import User
 from ..crud.crud_users import (
   get_current_user,
+  get_current_user_optional,
   get_current_active_user,
 )
 
@@ -82,13 +83,13 @@ def create_dataset_for_user(
 
 @router.get("/{obj_id}",
   summary="Get a dataset",
-  description="Get a dataset by its id",
+  description="Get a dataset by its id - authentication is optional",
   response_model=Dataset
   )
 def read_dataset(
   obj_id: int,
   db: Session = Depends(get_db),
-  current_user: User = Depends(get_current_user)
+  current_user: User = Depends(get_current_user_optional)
   ):
   dataset_in_db = dataset.get_by_id(db=db, id=obj_id, user=current_user, req_type="read")
 
@@ -139,15 +140,15 @@ async def invite_to_dataset(
 
 @router.get("/",
   summary="Get a list of all datasets",
-  description="Get all datasets given a limit",
+  description="Get all datasets given a limit - authentication is optional",
   response_model=List[Dataset]
   )
 def read_datasets(
   skip: int = 0, limit: int = 100,
   db: Session = Depends(get_db),
-  current_user: User = Depends(get_current_user),
+  current_user: User = Depends(get_current_user_optional),
   ):
-  datasets = dataset.get_multi(db=db, skip=skip, limit=limit)
+  datasets = dataset.get_multi(db=db, skip=skip, limit=limit, user=current_user, req_type="read")
   return datasets
 
 

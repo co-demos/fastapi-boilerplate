@@ -11,6 +11,7 @@ from ..crud.crud_items import item
 from ..models.models_user import User
 from ..crud.crud_users import (
   get_current_user,
+  get_current_user_optional,
 )
 
 

@@ -15,6 +15,7 @@ from ..models.models_user import User
 from ..crud.crud_users import user
 from ..crud.crud_users import (
   get_current_user,
+  get_current_user_optional,
   get_current_active_user,
 )
 
@@ -55,13 +56,13 @@ async def create_group_for_user(
 
 @router.get("/{obj_id}",
   summary="Get a group",
-  description="Get a group by its id",
+  description="Get a group by its id - authentication is optional",
   response_model=Group,
   )
 async def read_group(
   obj_id: int, 
   db: Session = Depends(get_db),
-  current_user: User = Depends(get_current_user)
+  current_user: User = Depends(get_current_user_optional)
   ):
   group_in_db = group.get_by_id(db, id=obj_id, user=current_user, req_type="read")
   return group_in_db
@@ -108,15 +109,15 @@ async def invite_to_group(
 
 @router.get("/",
   summary="Get a list of all groups",
-  description="Get all groups given a limit",
+  description="Get all groups given a limit - authentication is optional",
   response_model=List[Group]
   )
 async def read_groups(
   skip: int = 0, limit: int = 100, 
-  current_user: User = Depends(get_current_user),
+  current_user: User = Depends(get_current_user_optional),
   db: Session = Depends(get_db),
   ):
-  groups = group.get_multi(db=db, skip=skip, limit=limit)
+  groups = group.get_multi(db=db, skip=skip, limit=limit, user=current_user, req_type="read")
   return groups
 
 

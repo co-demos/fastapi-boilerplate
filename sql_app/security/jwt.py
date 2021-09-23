@@ -37,6 +37,23 @@ oauth2_scheme = OAuth2PasswordBearer(
   },
 )
 
+oauth2_scheme_optional = OAuth2PasswordBearer(
+  tokenUrl="users/token",
+  auto_error=False, ### don't throw error if not authenticatted
+  scopes={
+    "me": "Read information about the current user.",
+
+    "shared": "Shared data.",
+
+    "read": "Read data.",
+    "comment": "Comment data.",
+    "patch": "patch data.",
+    "manage": "Manage data.",
+
+    "refresh": "Refresh token scope.",
+  },
+)
+
 
 def create_access_token(
   data: dict,
