@@ -183,7 +183,7 @@ async def update_user(
   # current_user_data = jsonable_encoder(current_user)
   # print("update_user > current_user_data : ", current_user_data)
   
-  user_in_db = user.get_by_id(db=db, id=obj_id, user=current_user, req_type="write")
+  user_in_db = user.get_by_id(db=db, id=current_user.id, user=current_user, req_type="write")
   user_in_db = user.update(db, db_obj=current_user, obj_in=user_in)
   print("update_user > user_in_db : ", user_in_db)
   return user_in_db

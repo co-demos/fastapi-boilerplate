@@ -35,6 +35,11 @@ AUTHS_EXCEPTIONS = {
     "item_field": "invitee",
     "level_fields": [ "read", "response" ]
   },
+  "users" : { 
+    "user_field": "id", 
+    "item_field": "id",
+    "level_fields": [ "write", "manage" ]
+  },
 }
 
 
