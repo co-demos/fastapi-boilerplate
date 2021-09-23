@@ -50,13 +50,15 @@ class UserInfos(UserBase, UserBasicInfos, UserBasicInfosAvatar):
   created_date: Optional[datetime.datetime]
   modif_date: Optional[datetime.datetime]
   ### access auths
-  read: PermissionType = PermissionType.perm_public
+  read: PermissionType = PermissionType.perm_users
+  comment: PermissionType = PermissionType.perm_users
 
 
 class UserCreate(UserBase, UserBasicInfos, UserBasicInfosAvatar):
   ### secret
   password: str
-  read: PermissionType = PermissionType.perm_public
+  read: PermissionType = PermissionType.perm_users
+  comment: PermissionType = PermissionType.perm_users
 
 
 class UserUX(BaseModel):

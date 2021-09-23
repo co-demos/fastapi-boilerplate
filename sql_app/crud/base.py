@@ -110,10 +110,9 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
       user_groups_ids = set([ group.id for group in user_groups ])
       print("check_user_auth > user_groups_ids : ", user_groups_ids)
       print("check_user_auth > item_authorized_groups : ", item_authorized_groups)
-      authorized_group_ids = set([ group["id"] for group in item_authorized_groups ])
+      authorized_group_ids = set([ group["group_id"] for group in item_authorized_groups ])
       authorized_groups_ids_for_user = user_groups_ids.intersection(authorized_group_ids)
       print("check_user_auth > authorized_groups_ids_for_user : ", authorized_groups_ids_for_user)
-      ### get group auth object in item for every id 
 
     ### compute check depending on item_auth level
     if item_auth and item_auth == "public":
@@ -227,25 +226,30 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     search_args = [
       self.model.read == "public",
     ]
+
     if user:
-      # search user's items
-      search_args.append(self.model.owner_id == user.id)
-      
+
       # search items opened to users
       search_args.append(self.model.read == "owner+groups+users")
 
-      # search items shared with user
-      user_ref = { "user_email": user.email }
-      search_args.append(self.model.authorized_users.contains([user_ref]))
+      # search user's items
+      if self.tablename_singlar == "user" :
+        search_args.append(self.model.id == user.id)
 
-      # search items shared with groups user is part of (if self.model has a authorized_groups attribute)
-      if getattr(self.model, "authorized_groups", None):
-        user_groups = self.get_user_groups( db=db, current_user=user )
-        user_groups_ids = set([ group.id for group in user_groups ])
-        user_groups_refs = [ {"group_id" : group_id } for group_id in user_groups_ids ]
-        print("get_multi > user_groups_refs : ", user_groups_refs)
-        for group_ref in user_groups_refs:
-          search_args.append(self.model.authorized_groups.contains([group_ref]))
+      else : 
+        search_args.append(self.model.owner_id == user.id)
+        # search items shared with user
+        user_ref = { "user_email": user.email }
+        search_args.append(self.model.authorized_users.contains([user_ref]))
+
+        # search items shared with groups user is part of (if self.model has a authorized_groups attribute)
+        if getattr(self.model, "authorized_groups", None):
+          user_groups = self.get_user_groups( db=db, current_user=user )
+          user_groups_ids = set([ group.id for group in user_groups ])
+          user_groups_refs = [ {"group_id" : group_id } for group_id in user_groups_ids ]
+          print("get_multi > user_groups_refs : ", user_groups_refs)
+          for group_ref in user_groups_refs:
+            search_args.append(self.model.authorized_groups.contains([group_ref]))
 
     results = results.filter( or_(*search_args) )
 
@@ -324,7 +328,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     self, db: Session, *, 
     q: str,
     fields: List[str],
-    auth_level: str,
+    # auth_level: str,
     skip: int = 0,
     limit: int = 100,
     operator: OperatorType = OperatorType.or_,
@@ -333,7 +337,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     ) -> List[ModelType]:
     
     print("\nsearch_multi_by_fields > q : ", q)
-    print("search_multi_by_fields > auth_level : ", auth_level)
+    # print("search_multi_by_fields > auth_level : ", auth_level)
     print("search_multi_by_fields > fields : ", fields)
     # print("search_multi_by_fields > self.model : ", self.model)
     # print("search_multi_by_fields > self.model.__dict__ : ", self.model.__dict__)
@@ -342,9 +346,48 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     print("search_multi_by_fields > req_type : ", req_type)
 
     db_query = db.query(self.model)
-    results = db_query
+
+    search_args_user = []
+
+    ### limit to public items if not user
+    if not user:
+      search_args_user.append( self.model.read == "public" )
+    
+    ### filter items if user
+    else :
+      search_args_user_temp = []
+
+      # search items opened to users
+      search_args_user_temp.append(self.model.read == "owner+groups+users")
+
+      # search user's items
+      if self.tablename_singlar == "user" :
+        search_args_user_temp.append(self.model.id == user.id)
+      
+      else : 
+        search_args_user_temp.append(self.model.owner_id == user.id)
+
+        # search items shared with user
+        user_ref = { "user_email": user.email }
+        search_args_user_temp.append(self.model.authorized_users.contains([user_ref]))
+
+        # search items shared with groups user is part of (if self.model has a authorized_groups attribute)
+        if getattr(self.model, "authorized_groups", None):
+          user_groups = self.get_user_groups( db=db, current_user=user )
+          user_groups_ids = set([ group.id for group in user_groups ])
+          user_groups_refs = [ {"group_id" : group_id } for group_id in user_groups_ids ]
+          print("get_multi > user_groups_refs : ", user_groups_refs)
+          for group_ref in user_groups_refs:
+            search_args_user_temp.append(self.model.authorized_groups.contains([group_ref]))
+
+        search_args_user.append( or_(*search_args_user_temp) )
+
+    db_query = db_query.filter(*search_args_user)
+
 
     search_args = []
+
+    # parse query 
     for field in fields : 
       column = getattr(self.model, field, None)
       filter_col = column.ilike(f"%{q}%") ### substring match
@@ -358,6 +401,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
       filter_arg = not_(*search_args)
     if operator == "and" :
       filter_arg = and_(*search_args)
+
 
     results_all = (
       db_query

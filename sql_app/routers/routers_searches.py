@@ -69,7 +69,7 @@ ITEM_TYPES = {
 async def search_by_type(
   q: str = Query("", min_length=3),
   item_type: ItemTypes = ItemTypes.groups,
-  auth_type: PermissionType = Query([PermissionType.perm_public]),
+  # auth_type: PermissionType = Query([PermissionType.perm_public]),
   operator: OperatorType = OperatorType.or_,
   skip: int = 0, limit: int = 100, 
   current_user: User = Depends(get_current_user_optional),
@@ -83,7 +83,7 @@ async def search_by_type(
     db=db,
     q=q,
     fields=ITEM_TYPES[item_type]["fields"],
-    auth_level=auth_type,
+    # auth_level=auth_type,
     operator=operator,
     user=current_user,
     req_type="read"
@@ -99,7 +99,7 @@ async def search_by_type(
 async def search_any(
   q: str = Query("", min_length=3),
   item_types: List[ItemTypes] = Query([ItemTypes.groups]),
-  auth_type: PermissionType = Query([PermissionType.perm_public]),
+  # auth_type: PermissionType = Query([PermissionType.perm_public]),
   operator: OperatorType = OperatorType.or_,
   skip: int = 0, limit: int = 100, 
   current_user: User = Depends(get_current_user_optional),
@@ -111,11 +111,12 @@ async def search_any(
 
   results = {}
   for item_type in item_types :
+    print("search_any > item_type : ", item_type)
     items_in_db, count = ITEM_TYPES[item_type]["crud"].search_multi_by_fields(
       db=db,
       q=q,
       fields=ITEM_TYPES[item_type]["fields"],
-      auth_level=auth_type,
+      # auth_level=auth_type,
       operator=operator,
       user=current_user,
       req_type="read"
