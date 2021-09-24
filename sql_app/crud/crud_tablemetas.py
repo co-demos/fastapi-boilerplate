@@ -86,6 +86,7 @@ class CRUDTablemeta(CRUDBase[Tablemeta, TablemetaCreate, TablemetaUpdate]):
     self, db: Session, *,
     tablemeta_id: int,
     obj_in: Dict[str, Any],
+    current_user: User,
     ):
     """
     Update table_data (in engine_data) from a table_meta object (in engin_commons)
@@ -99,7 +100,7 @@ class CRUDTablemeta(CRUDBase[Tablemeta, TablemetaCreate, TablemetaUpdate]):
     # table_data_fields = table_meta_in_db.table_fields
     # table_data_obj = TableDataBuilder(db, table_data_uuid, table_data_fields)
     # table_data_model = table_data_obj.get_table_model
-    table_data_model = self.get_tabledata_model(db, tablemeta_id)
+    table_data_model = self.get_tabledata_model(db, tablemeta_id, user=current_user)
 
     if obj_in.update_type == "cell":
       data_in = obj_in.table_data_cell
@@ -146,12 +147,13 @@ class CRUDTablemeta(CRUDBase[Tablemeta, TablemetaCreate, TablemetaUpdate]):
     self, db: Session, *,
     tablemeta_id: int,
     obj_in: Dict[str, Any],
+    current_user: User,
     ):
     """
     Remove table_data (in engine_data) from a table_meta object (in engin_commons)
     """
     print("\nupdate_table_data_row > obj_in : ", obj_in)
-    table_data_model = self.get_tabledata_model(db, tablemeta_id)
+    table_data_model = self.get_tabledata_model(db, tablemeta_id, user=current_user)
     row_id = obj_in.table_data_row_id
     db_row = db.query(table_data_model).filter(table_data_model.id == row_id).first()
     db.delete(db_row)
@@ -160,5 +162,3 @@ class CRUDTablemeta(CRUDBase[Tablemeta, TablemetaCreate, TablemetaUpdate]):
 
 
 tablemeta = CRUDTablemeta(Tablemeta)
-
-
