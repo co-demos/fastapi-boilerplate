@@ -227,7 +227,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     self, db: Session, 
     email: str
     ):
-    # print("get_user_by_email > email : ", email)
+    print("get_user_by_email > email : ", email)
     return db.query(User).filter(User.email == email).first()
 
 

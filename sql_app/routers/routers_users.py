@@ -395,10 +395,10 @@ async def login_for_access_token(
   - **userrname**: here enter the user's email
   - **password**: the user's password
   """
-  # print("login_for_access_token > form_data : ", form_data)
-  # print("login_for_access_token > form_data.username : ", form_data.username)
-  # print("login_for_access_token > form_data.password : ", form_data.password)
-  # print("login_for_access_token > form_data.scopes : ", form_data.scopes)
+  print("login_for_access_token > form_data : ", form_data)
+  print("login_for_access_token > form_data.username : ", form_data.username)
+  print("login_for_access_token > form_data.password : ", form_data.password)
+  print("login_for_access_token > form_data.scopes : ", form_data.scopes)
   user_in_db = user.authenticate_user(db, form_data.username, form_data.password)
   if not user_in_db:
     raise HTTPException(
@@ -408,9 +408,9 @@ async def login_for_access_token(
     )
   access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
   refresh_token_expires = timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
-  # print("login_for_access_token > user_in_db : ", user_in_db)
-  # print("login_for_access_token > form_data.scopes : ", form_data.scopes)
-  # print("login_for_access_token > form_data.username : ", form_data.username)
+  print("login_for_access_token > user_in_db : ", user_in_db)
+  print("login_for_access_token > form_data.scopes : ", form_data.scopes)
+  print("login_for_access_token > form_data.username : ", form_data.username)
   access_token = create_access_token(
     data={
       "sub": user_in_db.email, 

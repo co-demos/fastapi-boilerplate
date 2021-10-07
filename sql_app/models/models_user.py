@@ -44,9 +44,9 @@ class User(BaseCommons):
   comment = Column(String, default='owner+groups+users')
 
   ### relationships
-  items = relationship("Item", back_populates="owner")
-  posts = relationship("Post", back_populates="owner")
-  comments = relationship("Comment", back_populates="owner")
+  # items = relationship("Item", back_populates="owner")
+  # posts = relationship("Post", back_populates="owner")
+  # comments = relationship("Comment", back_populates="owner")
 
   ### relationships / data patch items
   # my_workspaces = relationship("Workspace", back_populates="owner")

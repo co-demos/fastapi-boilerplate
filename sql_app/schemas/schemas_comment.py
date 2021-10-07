@@ -34,6 +34,7 @@ class CommentBasics(BaseModel):
   ### patch data  (optional)
   has_patch: bool = False
   patch_id: Optional[int]
+  patch_data: Optional[Patch]
 
   ### owner (as optional to include not registred users)
   owner_email: Optional[EmailStr]

@@ -12,9 +12,9 @@ from .schemas_workspace import Workspace
 from .schemas_dataset import Dataset
 from .schemas_tablemeta import Tablemeta
 
-from .schemas_item import Item
-from .schemas_post import Post
-from .schemas_comment import Comment
+# from .schemas_item import Item
+# from .schemas_post import Post
+# from .schemas_comment import Comment
 
 
 ### USER
@@ -74,9 +74,9 @@ class UserInDBBase(UserInfos, UserUX):
   id: Optional[int] = None
 
   ### linked data
-  items: List[Item] = []
-  posts: List[Post] = []
-  comments: List[Comment] = []
+  # items: List[Item] = []
+  # posts: List[Post] = []
+  # comments: List[Comment] = []
 
   my_workspaces: List[Workspace] = []
   my_datasets: List[Dataset] = []
