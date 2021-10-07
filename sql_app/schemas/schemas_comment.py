@@ -8,6 +8,7 @@ from enum import Enum, IntEnum
 
 from .schemas_choices import ItemTypeForComments
 
+from .schemas_patch import Patch, PatchCreate
 # from .schemas_user import User, UserInDBBaseLight
 
 
@@ -59,6 +60,7 @@ class CommentTabledata(CommentBasics):
 
 class CommentCreate(CommentBasics):
   comment_status = CommentStatus.new
+  patch_data: Optional[PatchCreate]
 
 
 class CommentUpdate(CommentBasics):
