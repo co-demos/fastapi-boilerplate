@@ -14,7 +14,6 @@ from . import (
   routers_invitations,
   routers_searches,
 
-  routers_posts,
   routers_comments,
 
 )
@@ -64,6 +63,12 @@ api_router.include_router(
   tags=["tables"]
 )
 
+api_router.include_router(
+  routers_comments.router,
+  prefix="/comments",
+  tags=["comments"]
+)
+
 
 ### tutorial routes
 
@@ -76,10 +81,5 @@ api_router.include_router(
 #   routers_posts.router,
 #   prefix="/posts",
 #   tags=["posts"]
-# )
-# api_router.include_router(
-#   routers_comments.router,
-#   prefix="/comments",
-#   tags=["comments"]
 # )
 

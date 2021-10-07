@@ -1,36 +1,37 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, JSON
 from sqlalchemy_utils import EmailType, URLType
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 
 import datetime
 
 from ..db.base_class import BaseCommons
 
-class Comment(BaseCommons):
-  # __tablename__ = "comments"
+class Patch(BaseCommons):
+  # __tablename__ = "Patch"
+
+  # __bind_key__ = 'DB_commons'
 
   ### meta
   id = Column(Integer, primary_key=True, index=True)
   created_date = Column(DateTime, default=datetime.datetime.utcnow)
   is_active = Column(Boolean, default=True)
-
+  
   ### basic infos
   # title = Column(String, index=True)
   message = Column(String, index=True)
 
-  ### owner (as optional to include not registred users)
-  owner_email = Column(EmailType)
+  ### owner
   # owner_email = Column(String, ForeignKey("users.email"))
   # owner_id = Column(Integer, ForeignKey("users.id"))
   # owner = relationship("User")
 
-  ### comment data 
-  comment_to_item_type = Column(String, index=True)
-  comment_to_item_id = Column(Integer, index=True)
-  comment_status = Column(String, index=True) # new | read | treated | inappropriate
+  ### patch data
+  patch_type = Column(String)
+  patch_to_item_type = Column(String)
+  patch_to_item_id = Column(Integer)
+  patch_status = Column(String, index=True) # pending | accepted | modified | refused
+  patch_data = Column(JSONB)
 
-  ### related patch
-  has_patch = Column(Boolean)
-  patch_id = Column(Integer, ForeignKey("patches.id"))
-  patch = relationship("Patch")
-
+  def can_manage(self, user_id: int):
+    return self.owner_id == user_id

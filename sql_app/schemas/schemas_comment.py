@@ -2,15 +2,14 @@ print(">>>>>> import schemas_comment.py >  Comment ...")
 from typing import List, Optional
 import datetime
 
-from pydantic import BaseModel
-
+from pydantic import BaseModel, EmailStr
 from enum import Enum, IntEnum
 
 
-class CommentType(str, Enum):
-  simple_comment = "simple comment"
-  important = "important"
-  proposal = "proposal"
+from .schemas_choices import ItemTypeForComments
+
+# from .schemas_user import User, UserInDBBaseLight
+
 
 
 class CommentStatus(str, Enum):
@@ -20,35 +19,62 @@ class CommentStatus(str, Enum):
   inappropriate = "inappropriate"
 
 
-class ToolEnum(IntEnum):
-  prio_1 = 1
-  prio_2 = 2
+class CommentBasics(BaseModel):
+  
+  ### basic infos
+  message: str
+
+  ### related data
+  alert_item_owner: bool = False
+  comment_to_item_id: int
+  comment_to_item_type: ItemTypeForComments = ItemTypeForComments.comment
+  comment_status: CommentStatus = CommentStatus.new
+
+  ### patch data  (optional)
+  has_patch: bool = False
+  patch_id: Optional[int]
+
+  ### owner (as optional to include not registred users)
+  owner_email: Optional[EmailStr]
 
 
-class CommentBase(BaseModel):
-  body: str
+class CommentComment(CommentBasics):
+  comment_to_item_type: ItemTypeForComments = ItemTypeForComments.comment
+
+class CommentGroup(CommentBasics):
+  comment_to_item_type: ItemTypeForComments = ItemTypeForComments.group
+
+class CommentWorkspace(CommentBasics):
+  comment_to_item_type: ItemTypeForComments = ItemTypeForComments.workspace
+
+class CommentDataset(CommentBasics):
+  comment_to_item_type: ItemTypeForComments = ItemTypeForComments.dataset
+
+class CommentTablemeta(CommentBasics):
+  comment_to_item_type: ItemTypeForComments = ItemTypeForComments.table
+
+class CommentTabledata(CommentBasics):
+  comment_to_item_type: ItemTypeForComments = ItemTypeForComments.tabledata
 
 
-class CommentCreate(CommentBase):
+class CommentCreate(CommentBasics):
+  comment_status = CommentStatus.new
+
+
+class CommentUpdate(CommentBasics):
   pass
 
 
-class CommentUpdate(CommentBase):
-  pass
-
-
-class Comment(CommentBase):
+class Comment(CommentBasics):
+  ### meta
   item_type: str = "comment"
   id: int
-  email: str
   created_date: Optional[datetime.datetime]
-  post_id: int
-  owner_id: int
-  comment_type: CommentType = CommentType.simple_comment
+  is_active: bool = True
 
   class Config:
     orm_mode = True
 
 
-class CommentList(Comment):
-  pass
+class CommentsList(BaseModel):
+  __root__: List[Comment]

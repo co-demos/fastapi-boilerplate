@@ -20,6 +20,15 @@ class ItemType(str, Enum):
   dataset = "dataset"
   table = "table"
 
+class ItemTypeForComments(str, Enum):
+  user = "user"
+  group = "group"
+  workspace = "workspace"
+  dataset = "dataset"
+  table = "table"
+  tabledata = "tabledata"
+  invitation = "invitation"
+  comment = "comment"
 
 class ItemTypeExtended(str, Enum):
   user = "user"
@@ -30,8 +39,9 @@ class ItemTypeExtended(str, Enum):
   invitation = "invitation"
   message = "message"
   comment = "comment"
-  moderation = "moderation"
-  item = "item"
+  patch = "patch"
+  # moderation = "moderation"
+  # item = "item"
 
 
 class ItemTypes(str, Enum):
@@ -48,6 +58,13 @@ class InvitationStatus(str, Enum):
   refused = "refused"
 
 
+class PatchStatus(str, Enum):
+  pending = "pending"
+  accepted = "accepted"
+  modified = "modified"
+  refused = "refused"
+
+
 class OperatorType(str, Enum):
   or_ = "or"
   and_ = "and"
@@ -56,6 +73,12 @@ class OperatorType(str, Enum):
 
 class InvitationStatusAction(str, Enum):
   accept = "accept"
+  refuse = "refuse"
+
+
+class PatchStatusAction(str, Enum):
+  accept = "accept"
+  modify = "modify"
   refuse = "refuse"
 
 
