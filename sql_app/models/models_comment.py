@@ -29,6 +29,8 @@ class Comment(BaseCommons):
   comment_to_item_id = Column(Integer, index=True)
   comment_status = Column(String, index=True) # new | read | treated | inappropriate
 
+  response_to_comment_id = Column(Integer, index=True)
+
   ### related patch
   has_patch = Column(Boolean)
   patch_id = Column(Integer, ForeignKey("patches.id"))

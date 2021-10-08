@@ -30,6 +30,7 @@ class CommentBasics(BaseModel):
   comment_to_item_id: int
   comment_to_item_type: ItemTypeForComments = ItemTypeForComments.comment
   comment_status: CommentStatus = CommentStatus.new
+  response_to_comment_id: Optional[int]
 
   ### patch data  (optional)
   has_patch: bool = False
