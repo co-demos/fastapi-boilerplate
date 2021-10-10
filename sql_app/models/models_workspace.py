@@ -28,6 +28,7 @@ class Workspace(BaseCommons):
 
   ### access auths
   read = Column(String, default='owner-only')
+  comment = Column(String, default='owner-only')
   write = Column(String, default='owner-only')
   manage = Column(String, default='owner-only')
 

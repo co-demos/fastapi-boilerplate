@@ -23,6 +23,7 @@ class CommentStatus(str, Enum):
 class CommentBasics(BaseModel):
   
   ### basic infos
+  title: Optional[str]
   message: str
 
   ### related data
@@ -33,8 +34,6 @@ class CommentBasics(BaseModel):
   response_to_comment_id: Optional[int]
 
   ### patch data  (optional)
-  has_patch: bool = False
-  patch_id: Optional[int]
   patch_data: Optional[Patch]
 
   ### owner (as optional to include not registred users)
@@ -65,8 +64,9 @@ class CommentCreate(CommentBasics):
   patch_data: Optional[PatchCreate]
 
 
-class CommentUpdate(CommentBasics):
-  pass
+class CommentUpdate(BaseModel):
+  id: int
+  comment_status: CommentStatus = CommentStatus.new
 
 
 class Comment(CommentBasics):
@@ -75,6 +75,9 @@ class Comment(CommentBasics):
   id: int
   created_date: Optional[datetime.datetime]
   is_active: bool = True
+
+  # has_patch: bool = False
+  patch_id: Optional[int]
 
   class Config:
     orm_mode = True

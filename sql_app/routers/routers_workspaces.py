@@ -12,6 +12,7 @@ from ..crud.crud_workspaces import workspace
 
 from ..schemas.schemas_invitation import InvitationToWorkspace
 from ..schemas.schemas_comment import CommentWorkspace
+from ..schemas.schemas_patch import PatchWorkspace
 
 from ..models.models_user import User
 from ..crud.crud_users import user
@@ -20,6 +21,7 @@ from ..crud.crud_users import (
   get_current_user_optional,
   get_current_active_user,
 )
+# from ..crud.crud_comments import comment
 
 
 router = APIRouter()
@@ -109,10 +111,9 @@ async def comment_workspace(
   workspace_in_db = workspace.get_by_id(db=db, id=obj_id, user=current_user, req_type="comment")
   workspace_in_db = workspace.comment_or_patch(
     db=db,
-    background_tasks=background_tasks,
     db_obj=workspace_in_db,
+    background_tasks=background_tasks,
     obj_in=obj_in,
-    invitor=current_user
   )
   return workspace_in_db
 
@@ -124,7 +125,7 @@ async def comment_workspace(
   )
 async def patch_workspace(
   obj_id: int,
-  obj_in: CommentWorkspace,
+  obj_in: PatchWorkspace,
   background_tasks: BackgroundTasks,
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user)
@@ -132,10 +133,9 @@ async def patch_workspace(
   workspace_in_db = workspace.get_by_id(db=db, id=obj_id, user=current_user, req_type="patch")
   workspace_in_db = workspace.comment_or_patch(
     db=db,
-    background_tasks=background_tasks,
     db_obj=workspace_in_db,
+    background_tasks=background_tasks,
     obj_in=obj_in,
-    invitor=current_user
   )
   return workspace_in_db
 

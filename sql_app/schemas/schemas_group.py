@@ -35,6 +35,7 @@ class GroupBase(BaseModel):
 
   ### access auths
   read: PermissionType = PermissionType.perm_owner
+  comment: PermissionType = PermissionType.perm_owner
   write: PermissionType = PermissionType.perm_owner
   manage: PermissionType = PermissionType.perm_owner
 

@@ -49,7 +49,23 @@ def read_comment(
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user_optional)
   ):
-  comment_in_db = workspace.get_by_id(db, id=obj_id, user=current_user, req_type="read")
+  comment_in_db = comment.get_by_id(db, id=obj_id, user=current_user, req_type="read")
+  return comment_in_db
+
+
+@router.put("/{obj_id}",
+  summary="Update a comment status",
+  description="Update a comment status by its id",
+  response_model=Comment
+  )
+def update_comment_stattus(
+  obj_id: int,
+  obj_in: CommentUpdate,
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user)
+  ):
+  comment_in_db = comment.get_by_id(db=db, id=obj_id, user=current_user, req_type="write")
+  comment_in_db = comment.update(db=db, db_obj=comment_in_db, obj_in=obj_in)
   return comment_in_db
 
 

@@ -15,7 +15,7 @@ class Comment(BaseCommons):
   is_active = Column(Boolean, default=True)
 
   ### basic infos
-  # title = Column(String, index=True)
+  title = Column(String, index=True)
   message = Column(String, index=True)
 
   ### owner (as optional to include not registred users)
@@ -32,7 +32,7 @@ class Comment(BaseCommons):
   response_to_comment_id = Column(Integer, index=True)
 
   ### related patch
-  has_patch = Column(Boolean)
+  # has_patch = Column(Boolean)
   patch_id = Column(Integer, ForeignKey("patches.id"))
   patch = relationship("Patch")
 
