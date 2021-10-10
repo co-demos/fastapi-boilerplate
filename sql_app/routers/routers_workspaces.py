@@ -11,8 +11,6 @@ from ..schemas.schemas_workspace import Workspace, WorkspaceCreate, WorkspaceUpd
 from ..crud.crud_workspaces import workspace
 
 from ..schemas.schemas_invitation import InvitationToWorkspace
-from ..schemas.schemas_comment import CommentWorkspace
-from ..schemas.schemas_patch import PatchWorkspace
 
 from ..models.models_user import User
 from ..crud.crud_users import user
@@ -21,8 +19,12 @@ from ..crud.crud_users import (
   get_current_user_optional,
   get_current_active_user,
 )
-# from ..crud.crud_comments import comment
 
+from ..schemas.schemas_comment import Comment, CommentWorkspace
+from ..crud.crud_comments import comment
+
+from ..schemas.schemas_patch import Patch, PatchWorkspace
+from ..crud.crud_patches import patch
 
 router = APIRouter()
 
@@ -99,45 +101,41 @@ async def invite_to_workspace(
 @router.post("/{obj_id}/comment",
   summary="Comment a workspace",
   description="Add a comment to a workspace",
-  response_model=Workspace
+  response_model=Comment
   )
 async def comment_workspace(
   obj_id: int,
   obj_in: CommentWorkspace,
   background_tasks: BackgroundTasks,
   db: Session = Depends(get_db),
-  current_user: User = Depends(get_current_user)
+  current_user: User = Depends(get_current_user_optional)
   ):
   workspace_in_db = workspace.get_by_id(db=db, id=obj_id, user=current_user, req_type="comment")
-  workspace_in_db = workspace.comment_or_patch(
+  comment_in_db = comment.create(
     db=db,
-    db_obj=workspace_in_db,
-    background_tasks=background_tasks,
     obj_in=obj_in,
   )
-  return workspace_in_db
+  return comment_in_db
 
-### work in progress
+## work in progress
 @router.post("/{obj_id}/patch",
   summary="Patch a workspace",
-  description="Propose a patch a workspace",
-  response_model=Workspace
+  description="Propose to patch a workspace",
+  response_model=Patch
   )
 async def patch_workspace(
   obj_id: int,
   obj_in: PatchWorkspace,
   background_tasks: BackgroundTasks,
   db: Session = Depends(get_db),
-  current_user: User = Depends(get_current_user)
+  current_user: User = Depends(get_current_user_optional)
   ):
   workspace_in_db = workspace.get_by_id(db=db, id=obj_id, user=current_user, req_type="patch")
-  workspace_in_db = workspace.comment_or_patch(
+  patch_in_db = patch.create(
     db=db,
-    db_obj=workspace_in_db,
-    background_tasks=background_tasks,
     obj_in=obj_in,
   )
-  return workspace_in_db
+  return patch_in_db
 
 
 @router.get("/",

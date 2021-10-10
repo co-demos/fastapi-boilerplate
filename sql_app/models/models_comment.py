@@ -15,7 +15,7 @@ class Comment(BaseCommons):
   is_active = Column(Boolean, default=True)
 
   ### basic infos
-  title = Column(String, index=True)
+  # title = Column(String, index=True)
   message = Column(String, index=True)
 
   ### owner (as optional to include not registred users)

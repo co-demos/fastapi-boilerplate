@@ -19,6 +19,11 @@ from ..crud.crud_users import (
   get_current_active_user,
 )
 
+from ..schemas.schemas_comment import Comment, CommentGroup
+from ..crud.crud_comments import comment
+
+from ..schemas.schemas_patch import Patch, PatchGroup
+from ..crud.crud_patches import patch
 
 router = APIRouter()
 
@@ -105,6 +110,47 @@ async def invite_to_group(
     invitor=current_user
   )
   return group_in_db
+
+
+### work in progress
+@router.post("/{obj_id}/comment",
+  summary="Comment a group",
+  description="Add a comment to a group",
+  response_model=Comment
+  )
+async def comment_group(
+  obj_id: int,
+  obj_in: CommentGroup,
+  background_tasks: BackgroundTasks,
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user_optional)
+  ):
+  group_in_db = group.get_by_id(db=db, id=obj_id, user=current_user, req_type="comment")
+  comment_in_db = comment.create(
+    db=db,
+    obj_in=obj_in,
+  )
+  return comment_in_db
+
+## work in progress
+@router.post("/{obj_id}/patch",
+  summary="Patch a group",
+  description="Propose to patch a group",
+  response_model=Patch
+  )
+async def patch_group(
+  obj_id: int,
+  obj_in: PatchGroup,
+  background_tasks: BackgroundTasks,
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user_optional)
+  ):
+  group_in_db = group.get_by_id(db=db, id=obj_id, user=current_user, req_type="patch")
+  patch_in_db = patch.create(
+    db=db,
+    obj_in=obj_in,
+  )
+  return patch_in_db
 
 
 @router.get("/",

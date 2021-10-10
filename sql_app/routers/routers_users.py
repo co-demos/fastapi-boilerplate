@@ -16,9 +16,8 @@ from . import ( settings,
   crud_comments,
 )
 
-from ..schemas.schemas_item import Item, ItemCreate
-from ..schemas.schemas_post import Post
-from ..schemas.schemas_comment import Comment
+# from ..schemas.schemas_item import Item, ItemCreate
+# from ..schemas.schemas_post import Post
 
 from ..schemas.schemas_invitation import Invitation, InvitationBasics
 
@@ -51,6 +50,7 @@ from ..security.jwt import ( JWTError, jwt, CryptContext,
 )
 
 from .routers_invitations import read_invitation
+from ..schemas.schemas_comment import CommentUser
 
 
 from ..emails.emails import (
@@ -58,6 +58,9 @@ from ..emails.emails import (
   send_new_account_email,
   send_reset_password_email
 )
+
+from ..schemas.schemas_comment import Comment, CommentUser
+from ..crud.crud_comments import comment
 
 
 router = APIRouter()
@@ -133,6 +136,8 @@ def read_user(
   print("read_user > current_user : ", current_user)
   user_in_db = user.get_by_id(db, id=user_id, user=current_user, req_type="read")
   return user_in_db
+
+
 
 
 @router.delete("/{user_id}",

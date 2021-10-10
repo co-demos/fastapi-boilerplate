@@ -5,7 +5,7 @@ from . import ( List, Session, APIRouter, Depends,
   get_db, Query
 )
 
-from ..schemas.schemas_comment import Comment, CommentCreate, CommentUpdate, CommentsList
+from ..schemas.schemas_comment import Comment, CommentCreate, CommentUpdate, CommentComment, CommentsList
 from ..crud.crud_comments import comment
 
 from ..models.models_user import User
@@ -17,26 +17,25 @@ from ..crud.crud_users import (
 )
 
 from ..models.models_user import User
-# from ..schemas.schemas_comment import CommentList
 
 
 router = APIRouter()
 
 
-@router.post("/",
-  summary="Create a comment",
-  description="Create a comment, including the email of the user creating the comment - authentication is optional",
-  response_model=Comment,
-  status_code=status.HTTP_201_CREATED
-  )
-def create_comment(
-  obj_in: CommentCreate,
-  db: Session = Depends(get_db),
-  current_user: User = Depends(get_current_user_optional)
-  ):
-  ### TO DO 
-  ### must check if target item allows comments
-  return comment.create(db=db, obj_in=obj_in)
+# @router.post("/",
+#   summary="Create a comment",
+#   description="Create a comment, including the email of the user creating the comment - authentication is optional",
+#   response_model=Comment,
+#   status_code=status.HTTP_201_CREATED
+#   )
+# def create_comment(
+#   obj_in: CommentCreate,
+#   db: Session = Depends(get_db),
+#   current_user: User = Depends(get_current_user_optional)
+#   ):
+#   ### TO DO 
+#   ### must check if target item allows comments
+#   return comment.create(db=db, obj_in=obj_in)
 
 
 @router.get("/{comment_id}",
@@ -50,6 +49,27 @@ def read_comment(
   current_user: User = Depends(get_current_user_optional)
   ):
   comment_in_db = comment.get_by_id(db, id=obj_id, user=current_user, req_type="read")
+  return comment_in_db
+
+
+### work in progress
+@router.post("/{obj_id}/comment",
+  summary="Comment a comment",
+  description="Add a comment to a comment",
+  response_model=Comment
+  )
+async def comment_comment(
+  obj_id: int,
+  obj_in: CommentComment,
+  background_tasks: BackgroundTasks,
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user_optional)
+  ):
+  # comment_in_db = workspace.get_by_id(db=db, id=obj_id, user=current_user, req_type="comment")
+  comment_in_db = comment.create(
+    db=db,
+    obj_in=obj_in,
+  )
   return comment_in_db
 
 

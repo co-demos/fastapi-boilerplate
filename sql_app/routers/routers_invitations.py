@@ -12,6 +12,9 @@ from ..schemas.schemas_invitation import Invitation, InvitationCreate, Invitatio
 from ..schemas.schemas_choices import status_dict, invitee_id_dict
 from ..crud.crud_invitations import invitation
 
+from ..schemas.schemas_comment import Comment, CommentInvitation
+from ..crud.crud_comments import comment
+
 from ..models.models_user import User
 from ..crud.crud_users import user
 from ..crud.crud_users import (
@@ -100,6 +103,27 @@ def read_invitation(
 
   # return invitation_in_db
   return invitation_dict
+
+
+### work in progress
+@router.post("/{obj_id}/comment",
+  summary="Comment an invitation",
+  description="Add a comment to an invitation",
+  response_model=Comment
+  )
+async def comment_invitation(
+  obj_id: int,
+  obj_in: CommentInvitation,
+  background_tasks: BackgroundTasks,
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user)
+  ):
+  invitation_in_db = invitation.get_by_id(db=db, id=obj_id, user=current_user, req_type="comment")
+  comment_in_db = comment.create(
+    db=db,
+    obj_in=obj_in,
+  )
+  return comment_in_db
 
 
 @router.post("/{obj_id}",

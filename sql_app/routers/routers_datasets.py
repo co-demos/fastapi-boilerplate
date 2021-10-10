@@ -19,6 +19,12 @@ from ..crud.crud_users import (
   get_current_active_user,
 )
 
+from ..schemas.schemas_comment import Comment, CommentDataset
+from ..crud.crud_comments import comment
+
+from ..schemas.schemas_patch import Patch, PatchDataset
+from ..crud.crud_patches import patch
+
 from ..routers.routers_tablemetas import (
   create_tablemeta_for_user,
   read_tablemeta_data
@@ -137,6 +143,46 @@ async def invite_to_dataset(
   )
   return dataset_in_db
 
+
+### work in progress
+@router.post("/{obj_id}/comment",
+  summary="Comment a dataset",
+  description="Add a comment to a dataset",
+  response_model=Comment
+  )
+async def comment_dataset(
+  obj_id: int,
+  obj_in: CommentDataset,
+  background_tasks: BackgroundTasks,
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user_optional)
+  ):
+  dataset_in_db = dataset.get_by_id(db=db, id=obj_id, user=current_user, req_type="comment")
+  comment_in_db = comment.create(
+    db=db,
+    obj_in=obj_in,
+  )
+  return comment_in_db
+
+## work in progress
+@router.post("/{obj_id}/patch",
+  summary="Patch a dataset",
+  description="Propose to patch a dataset",
+  response_model=Patch
+  )
+async def patch_dataset(
+  obj_id: int,
+  obj_in: PatchDataset,
+  background_tasks: BackgroundTasks,
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user_optional)
+  ):
+  dataset_in_db = dataset.get_by_id(db=db, id=obj_id, user=current_user, req_type="patch")
+  patch_in_db = patch.create(
+    db=db,
+    obj_in=obj_in,
+  )
+  return patch_in_db
 
 @router.get("/",
   summary="Get a list of all datasets",

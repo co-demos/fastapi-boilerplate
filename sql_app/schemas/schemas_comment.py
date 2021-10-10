@@ -23,7 +23,7 @@ class CommentStatus(str, Enum):
 class CommentBasics(BaseModel):
   
   ### basic infos
-  title: Optional[str]
+  # title: Optional[str]
   message: str
 
   ### related data
@@ -43,8 +43,14 @@ class CommentBasics(BaseModel):
 class CommentComment(CommentBasics):
   comment_to_item_type: ItemTypeForComments = ItemTypeForComments.comment
 
+class CommentUser(CommentBasics):
+  comment_to_item_type: ItemTypeForComments = ItemTypeForComments.user
+
 class CommentGroup(CommentBasics):
   comment_to_item_type: ItemTypeForComments = ItemTypeForComments.group
+
+class CommentInvitation(CommentBasics):
+  comment_to_item_type: ItemTypeForComments = ItemTypeForComments.invitation
 
 class CommentWorkspace(CommentBasics):
   comment_to_item_type: ItemTypeForComments = ItemTypeForComments.workspace
