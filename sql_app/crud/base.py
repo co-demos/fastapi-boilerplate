@@ -678,14 +678,14 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
   ### COMMENT / PATCH REQUESTS
 
-  def comment_or_patch(
-    self, db: Session, *,
-    db_obj: ModelType,
-    background_tasks: BackgroundTasks,
-    obj_in: [CommentBasics, PatchBasics],
-    ) -> ModelType:
-    print("\ncomment > db_obj : ", db_obj)
-    print("comment > obj_in : ", obj_in)
+  # def comment_or_patch(
+  #   self, db: Session, *,
+  #   db_obj: ModelType,
+  #   background_tasks: BackgroundTasks,
+  #   obj_in: [CommentBasics, PatchBasics],
+  #   ) -> ModelType:
+  #   print("\ncomment > db_obj : ", db_obj)
+  #   print("comment > obj_in : ", obj_in)
 
 
   ### DELETE REQUESTS

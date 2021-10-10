@@ -27,17 +27,18 @@ class CommentBasics(BaseModel):
   message: str
 
   ### related data
-  alert_item_owner: bool = False
   comment_to_item_id: int
   comment_to_item_type: ItemTypeForComments = ItemTypeForComments.comment
   comment_status: CommentStatus = CommentStatus.new
   response_to_comment_id: Optional[int]
 
   ### patch data  (optional)
-  patch_data: Optional[Patch]
+  patch: Optional[Patch]
+  patch_data: Optional[PatchCreate]
 
   ### owner (as optional to include not registred users)
   owner_email: Optional[EmailStr]
+  alert_item_owner: Optional[bool] = False
 
 
 class CommentComment(CommentBasics):
