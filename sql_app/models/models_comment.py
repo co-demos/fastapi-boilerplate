@@ -23,6 +23,7 @@ class Comment(BaseCommons):
   # owner_email = Column(String, ForeignKey("users.email"))
   # owner_id = Column(Integer, ForeignKey("users.id"))
   # owner = relationship("User")
+  alert_item_owner = Column(Boolean, default=False)
 
   ### comment data 
   comment_to_item_type = Column(String, index=True)

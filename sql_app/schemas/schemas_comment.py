@@ -1,5 +1,5 @@
 print(">>>>>> import schemas_comment.py >  Comment ...")
-from typing import List, Optional
+from typing import List, Optional, Union
 import datetime
 
 from pydantic import BaseModel, EmailStr
@@ -33,8 +33,8 @@ class CommentBasics(BaseModel):
   response_to_comment_id: Optional[int]
 
   ### patch data  (optional)
-  patch: Optional[Patch]
-  patch_data: Optional[PatchCreate]
+  patch: Union[Patch, None]
+  # patch_data: Optional[PatchCreate]
 
   ### owner (as optional to include not registred users)
   owner_email: Optional[EmailStr]
@@ -68,7 +68,8 @@ class CommentTabledata(CommentBasics):
 
 class CommentCreate(CommentBasics):
   comment_status = CommentStatus.new
-  patch_data: Optional[PatchCreate]
+  # patch_data: Optional[PatchCreate]
+  patch: Union[PatchCreate, None]
 
 
 class CommentUpdate(BaseModel):
