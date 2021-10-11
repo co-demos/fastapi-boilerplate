@@ -80,7 +80,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
   def check_user_auth(
     self, db: Session,
     item,
-    current_user: User,
+    current_user: Optional[User], # User
     level_field: str,
     auth_exception = None,
     ):
@@ -98,7 +98,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     # print("check_user_auth > item_authorized_users : ", item_authorized_users)
     # print("check_user_auth > item_authorized_groups : ", item_authorized_groups)
     
-    print(f"check_user_auth > id : {item.id} / owner_id {item_owner_id} ")
+    print(f"check_user_auth > item.id : {item.id} / item_owner_id : {item_owner_id} ")
 
     user_auth_level = False
 
@@ -152,15 +152,18 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     self, db: Session,
     item,
     tablename: str,
-    current_user: User,
+    current_user: Optional[User], # User,
     req_type: Optional[RequestType] = "read",
     ):
 
     auth_check = None
+
+    if not current_user :
+      current_user = User()
     
     if item:
-      # print("\ncheck_user_auth_against_item > req_type : ", req_type)
-      # print("check_user_auth_against_item > current_user.__dict__ : ", current_user.__dict__)
+      print("\ncheck_user_auth_against_item > req_type : ", req_type)
+      print("check_user_auth_against_item > current_user.__dict__ : ", current_user.__dict__)
       user_superuser = current_user.is_superuser
       # print("check_user_auth_against_item > user_superuser : ", user_superuser)
       

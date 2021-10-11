@@ -8,6 +8,22 @@ from . import ( List, Session, APIRouter, Depends,
 from ..schemas.schemas_comment import Comment, CommentCreate, CommentUpdate, CommentComment, CommentsList
 from ..crud.crud_comments import comment
 
+from ..crud.crud_users import user
+from ..crud.crud_groups import group
+from ..crud.crud_workspaces import workspace
+from ..crud.crud_datasets import dataset
+from ..crud.crud_tablemetas import tablemeta
+from ..crud.crud_invitations import invitation
+
+crud_choices = {
+  "user" : user,
+  "group" : group,
+  "workspace" : workspace,
+  "dataset" : dataset,
+  "tablemeta" : tablemeta,
+  "invitation" : invitation,
+}
+
 from ..models.models_user import User
 
 from ..crud.crud_users import (
@@ -48,7 +64,21 @@ def read_comment(
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user_optional)
   ):
+  print("\nread_comment > current_user :", current_user)
+
   comment_in_db = comment.get_by_id(db, id=obj_id, user=current_user, req_type="read")
+
+  related_item_id = comment_in_db.comment_to_item_id
+  comment_to_item_type = comment_in_db.comment_to_item_type
+  print("read_comment > related_item_id :", related_item_id)
+  print("read_comment > comment_to_item_type :", comment_to_item_type)
+
+  item_crud = crud_choices[ comment_to_item_type ]
+  item_in_db = item_crud.get_by_id( db=db, id=related_item_id, user=current_user, req_type="read", get_auth_check=False )
+  item_in_db_read = item_in_db.read
+  print("read_comment > item_in_db.title :", item_in_db.title)
+  print("read_comment > item_in_db_read :", item_in_db_read)
+
   return comment_in_db
 
 
@@ -65,7 +95,9 @@ async def comment_comment(
   db: Session = Depends(get_db),
   current_user: User = Depends(get_current_user_optional)
   ):
-  # comment_in_db = workspace.get_by_id(db=db, id=obj_id, user=current_user, req_type="comment")
+  parent_comment_in_db = read_comment(obj_id=obj_id, db=db, current_user=current_user)
+  print("\nread_comment > parent_comment_in_db.id :", parent_comment_in_db.id)
+
   comment_in_db = comment.create(
     db=db,
     obj_in=obj_in,
