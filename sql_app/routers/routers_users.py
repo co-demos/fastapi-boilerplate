@@ -138,6 +138,49 @@ def read_user(
   return user_in_db
 
 
+### work in progress
+@router.post("/{user_id}/comment",
+  summary="Comment an user",
+  description="Add a comment to an user",
+  response_model=Comment
+  )
+async def comment_user(
+  user_id: int,
+  obj_in: CommentUser,
+  background_tasks: BackgroundTasks,
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user)
+  ):
+  user_in_db = user.get_by_id(db=db, id=user_id, user=current_user, req_type="comment")
+  comment_in_db = comment.create(
+    db=db,
+    obj_in=obj_in,
+  )
+  return comment_in_db
+
+
+### work in progress
+@router.get("/{user_id}/comments",
+  summary="Get an user's comments",
+  description="Get comments related to an user",
+  response_model=List[Comment]
+  )
+async def get_comments_user(
+  user_id: int,
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user),
+  skip: int = 0, limit: int = 100, 
+  ):
+  print("\nget_comments_user > user_id : ", user_id)
+  comments_in_db = user.get_comments(
+    db=db,
+    id=user_id,
+    user=current_user,
+    skip=skip,
+    limit=limit,
+  )
+  print("get_comments_user > comments_in_db : ", comments_in_db)
+  return comments_in_db
 
 
 @router.delete("/{user_id}",

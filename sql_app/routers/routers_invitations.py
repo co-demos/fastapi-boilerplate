@@ -125,6 +125,29 @@ async def comment_invitation(
   )
   return comment_in_db
 
+### work in progress
+@router.get("/{obj_id}/comments",
+  summary="Get a invitation's comments",
+  description="Get comments related to a invitation",
+  response_model=List[Comment]
+  )
+async def get_comments_invitation(
+  obj_id: int,
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user),
+  skip: int = 0, limit: int = 100, 
+  ):
+  print("\nget_comments_invitation > obj_id : ", obj_id)
+  comments_in_db = invitation.get_comments(
+    db=db,
+    id=obj_id,
+    user=current_user,
+    skip=skip,
+    limit=limit,
+  )
+  print("get_comments_invitation > comments_in_db : ", comments_in_db)
+  return comments_in_db
+
 
 @router.post("/{obj_id}",
   summary="Accept / refuse a invitation",

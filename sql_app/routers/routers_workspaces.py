@@ -117,6 +117,32 @@ async def comment_workspace(
   )
   return comment_in_db
 
+
+### work in progress
+@router.get("/{obj_id}/comments",
+  summary="Get a workspace's comments",
+  description="Get comments related to a workspace",
+  response_model=List[Comment]
+  )
+async def get_comments_workspace(
+  obj_id: int,
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user_optional),
+  skip: int = 0, limit: int = 100, 
+  ):
+  print("\nget_comments_workspace > obj_id : ", obj_id)
+  # workspace_in_db = workspace.get_by_id(db=db, id=obj_id, user=current_user, req_type="read")
+  comments_in_db = workspace.get_comments(
+    db=db,
+    id=obj_id,
+    user=current_user,
+    skip=skip,
+    limit=limit,
+  )
+  print("get_comments_workspace > comments_in_db : ", comments_in_db)
+  return comments_in_db
+
+
 ## work in progress
 @router.post("/{obj_id}/patch",
   summary="Patch a workspace",

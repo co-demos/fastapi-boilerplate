@@ -164,6 +164,31 @@ async def comment_dataset(
   )
   return comment_in_db
 
+
+### work in progress
+@router.get("/{obj_id}/comments",
+  summary="Get a dataset's comments",
+  description="Get comments related to a dataset",
+  response_model=List[Comment]
+  )
+async def get_comments_dataset(
+  obj_id: int,
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user_optional),
+  skip: int = 0, limit: int = 100, 
+  ):
+  print("\nget_comments_dataset > obj_id : ", obj_id)
+  comments_in_db = dataset.get_comments(
+    db=db,
+    id=obj_id,
+    user=current_user,
+    skip=skip,
+    limit=limit,
+  )
+  print("get_comments_dataset > comments_in_db : ", comments_in_db)
+  return comments_in_db
+
+
 ## work in progress
 @router.post("/{obj_id}/patch",
   summary="Patch a dataset",

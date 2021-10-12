@@ -132,6 +132,31 @@ async def comment_group(
   )
   return comment_in_db
 
+
+### work in progress
+@router.get("/{obj_id}/comments",
+  summary="Get a group's comments",
+  description="Get comments related to a group",
+  response_model=List[Comment]
+  )
+async def get_comments_group(
+  obj_id: int,
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user_optional),
+  skip: int = 0, limit: int = 100, 
+  ):
+  print("\nget_comments_group > obj_id : ", obj_id)
+  comments_in_db = group.get_comments(
+    db=db,
+    id=obj_id,
+    user=current_user,
+    skip=skip,
+    limit=limit,
+  )
+  print("get_comments_group > comments_in_db : ", comments_in_db)
+  return comments_in_db
+
+
 ## work in progress
 @router.post("/{obj_id}/patch",
   summary="Patch a group",

@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from ..db.base_class import BaseCommons
 from ..models.models_user import User
 from ..models.models_group import Group
+from ..models.models_comment import Comment
 from ..models.models_invitation import Invitation
 
 from ..schemas.schemas_choices import OperatorType, RequestType
@@ -330,6 +331,34 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     results = items_in_db.all()
     return results
+
+  def get_comments(
+    self, db: Session, 
+    id: Any,
+    user: Optional[User] = None,
+    # get_auth_check: bool = True,
+    # req_type: Optional[RequestType] = "read",
+    skip: int = 0,
+    limit: int = 100,
+    ) -> List[Comment]:
+    print("\nget_comments > id : ", id)
+    print("get_comments > self.tablename_singlar : ", self.tablename_singlar)
+    results = db.query(Comment).filter( 
+      and_(
+        Comment.comment_to_item_id == id,
+        Comment.comment_to_item_type == self.tablename_singlar,
+      )
+    )
+    
+    results = (
+      results
+      .offset(skip)
+      .limit(limit)
+      .all()
+    )
+    print("get_comments > results : ", results)
+    return results
+
 
 
   ### SEARCH REQUESTS
