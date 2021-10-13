@@ -7,7 +7,7 @@ from . import ( List, Session, APIRouter, Depends,
 
 from typing import Optional
 
-from ..schemas.schemas_workspace import Workspace, WorkspaceCreate, WorkspaceUpdate, WorkspaceList
+from ..schemas.schemas_workspace import Workspace, WorkspaceCreate, WorkspaceUpdate
 from ..crud.crud_workspaces import workspace
 
 from ..schemas.schemas_invitation import InvitationToWorkspace

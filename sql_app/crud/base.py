@@ -36,7 +36,7 @@ AUTHS_EXCEPTIONS = {
   "invitations" : { 
     "user_field": "email", 
     "item_field": "invitee",
-    "level_fields": [ "read", "response" ]
+    "level_fields": [ "read", "comment", "response" ]
   },
   "users" : { 
     "user_field": "id", 
@@ -331,6 +331,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     results = items_in_db.all()
     return results
+
 
   def get_comments(
     self, db: Session, 
