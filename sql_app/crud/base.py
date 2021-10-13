@@ -343,21 +343,21 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     ) -> List[Comment]:
     print("\nget_comments > id : ", id)
     print("get_comments > self.tablename_singlar : ", self.tablename_singlar)
-    results = db.query(Comment).filter( 
+    comments_in_db = db.query(Comment).filter( 
       and_(
         Comment.comment_to_item_id == id,
         Comment.comment_to_item_type == self.tablename_singlar,
       )
     )
-    
-    results = (
-      results
-      .offset(skip)
-      .limit(limit)
-      .all()
-    )
-    print("get_comments > results : ", results)
-    return results
+
+    if skip > 0 :
+      comments_in_db = comments_in_db.offset(skip)
+    if limit and limit > 0 :
+      comments_in_db = comments_in_db.limit(limit)
+
+    comments_in_db = comments_in_db.all()
+    print("get_comments > comments_in_db : ", comments_in_db)
+    return comments_in_db
 
 
 

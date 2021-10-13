@@ -96,6 +96,10 @@ class Invitation(InvitationBase):
     orm_mode = True
 
 
-class InvitationList(Invitation):
-  pass
-  # owner: User
+# class InvitationList(Invitation):
+  # pass
+
+
+class InvitationsList(BaseModel):
+  # pass
+  __root__: List[Invitation] = []

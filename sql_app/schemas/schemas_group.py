@@ -88,4 +88,4 @@ class GroupLight(GroupUpdate) :
     orm_mode = True
 
 class GroupsList(BaseModel):
-  __root__: List[GroupLight]
+  __root__: List[GroupLight] = []

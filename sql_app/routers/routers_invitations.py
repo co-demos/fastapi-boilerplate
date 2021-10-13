@@ -8,7 +8,7 @@ from . import ( List, Session, APIRouter, Depends,
 import datetime
 from fastapi.encoders import jsonable_encoder
 
-from ..schemas.schemas_invitation import Invitation, InvitationCreate, InvitationUpdate, InvitationList, InvitationResponse
+from ..schemas.schemas_invitation import Invitation, InvitationCreate, InvitationUpdate, InvitationsList, InvitationResponse
 from ..schemas.schemas_choices import status_dict, invitee_id_dict
 from ..crud.crud_invitations import invitation
 

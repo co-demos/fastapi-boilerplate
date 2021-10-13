@@ -33,3 +33,7 @@ class Licence(LicenceBase):
 
 class LicenceList(Licence):
   pass
+
+
+class LicencesList(BaseModel):
+  __root__: List[Licence] = []

@@ -75,4 +75,4 @@ class DatasetList(Dataset):
 
 
 class DatasetsList(BaseModel):
-  __root__: List[Dataset]
+  __root__: List[Dataset] = []

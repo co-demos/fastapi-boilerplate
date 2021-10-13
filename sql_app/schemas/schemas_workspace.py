@@ -1,8 +1,8 @@
 print(">>>>>> import schemas_workspace.py >  Workspace ...")
-from typing import List, Optional, Any
+from typing import List, Optional, Any, Union
 import datetime
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, root_validator
 # from uuid import UUID
 
 from .schemas_dataset import Dataset
@@ -66,8 +66,9 @@ class Workspace(WorkspaceBase):
     orm_mode = True
 
 
-class WorkspaceList(Workspace):
+class WorkspaceList(BaseModel):
   pass
+  # __root__: List[Workspace]
   # owner: User
 
 
@@ -85,4 +86,9 @@ class WorkspaceList(Workspace):
 #     orm_mode = True
 
 class WorkspacesList(BaseModel):
-  __root__: List[Workspace]
+  __root__: List[Workspace] = [] # ⯇-- __root__
+  # __root__: List[WorkspaceBase] = [] # ⯇-- __root__
+
+  # @root_validator(pre=True)
+  # def check_list_length(cls, values) :
+  #   print("\nWorkspacesList > check_list_length > values : ", values)

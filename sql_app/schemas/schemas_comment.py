@@ -92,4 +92,4 @@ class Comment(CommentBasics):
 
 
 class CommentsList(BaseModel):
-  __root__: List[Comment]
+  __root__: List[Comment] = []

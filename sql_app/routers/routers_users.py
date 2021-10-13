@@ -41,6 +41,11 @@ from ..crud.crud_workspaces import workspace
 from ..crud.crud_datasets import dataset
 from ..crud.crud_tablemetas import tablemeta
 
+from ..schemas.schemas_workspace import WorkspacesList
+from ..schemas.schemas_group import GroupsList
+from ..schemas.schemas_dataset import DatasetsList
+from ..schemas.schemas_tablemeta import TablemetasList
+
 from ..security.jwt import ( JWTError, jwt, CryptContext, 
   OAuth2PasswordBearer, OAuth2PasswordRequestForm,
   SECRET_KEY, ALGORITHM, 
@@ -290,31 +295,6 @@ async def update_user_ux(
 #   return user.update(db=db, user_id=user_id, field=field, value=url)
 
 
-# @router.get("/me/items/",
-#   summary="Get user's own items",
-#   description="Get connected/authenticated user's own items",
-# )
-# async def read_own_items(
-#   current_user: UserModel = Depends(get_current_active_user),
-#   db: Session = Depends(get_db)
-#   ):
-#   user_id = current_user.id
-#   user_items = crud_items.get_user_items(db=db, user_id=user_id)
-#   return [{"items": user_items, "owner": current_user.email, "owner_id": current_user.id}]
-
-
-# @router.get("/me/posts/",
-#   summary="Get user's own posts",
-#   description="Get connected/authenticated user's own posts",
-#  )
-# async def read_own_posts(
-#   current_user: UserModel = Depends(get_current_active_user),
-#   db: Session = Depends(get_db)
-#   ):
-#   user_id = current_user.id
-#   user_posts = crud_posts.get_user_posts(db=db, user_id=user_id)
-#   return [{"posts": user_posts, "owner": current_user.email, "owner_id": current_user.id}]
-
 @router.get("/me/groups/",
   summary="Get user's groups",
   description="Get connected/authenticated user's groups",
@@ -402,11 +382,19 @@ async def read_shared(
     group_ids=authorized_groups,
   )
 
+  print("\nread_shared > shared_workspaces : ", shared_workspaces)
+  print("read_shared > len(shared_workspaces) : ", len(shared_workspaces))
+  print("read_shared > jsonable_encoder(shared_workspaces) : ", jsonable_encoder(shared_workspaces))
+
   results = {
-    "shared_workspaces": shared_workspaces,
-    "shared_groups": shared_groups,
-    "shared_datasets": shared_datasets,
-    "shared_tablemeta": shared_tablemeta,
+    "shared_workspaces": WorkspacesList(__root__=jsonable_encoder(shared_workspaces)),
+    # "shared_workspaces": shared_workspaces,
+    "shared_groups": GroupsList(__root__=jsonable_encoder(shared_groups)),
+    # "shared_groups": shared_groups,
+    "shared_datasets": DatasetsList(__root__=jsonable_encoder(shared_datasets)),
+    # "shared_datasets": shared_datasets,
+    "shared_tablemeta": TablemetasList(__root__=jsonable_encoder(shared_tablemeta)),
+    # "shared_tablemeta": shared_tablemeta,
   }
 
   return results
