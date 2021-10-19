@@ -99,7 +99,7 @@ async def io_broadcast_action(
   from_user_email = data["from_user_email"]
   action_done = messages_dict[ data["action"] ]
   rooms = data["target_rooms"]
-  include_sid = data["include_sid"]
+  include_sid = data.get("include_sid", False)
   data = {
     "origin_user": from_user_email,
     "item_type": data["item_type"],
