@@ -79,7 +79,7 @@ class UserInDBBase(UserInfos, UserUX):
   # comments: List[Comment] = []
 
   my_workspaces: List[Workspace] = []
-  my_datasets: List[Dataset] = []
+  # my_datasets: List[Dataset] = []
   # my_tables: List[Tablemeta] = []
   # my_schemas: List[Schema] = []
   # my_fields: List[Field] = []

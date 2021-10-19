@@ -20,6 +20,8 @@ from ..crud.crud_users import (
   get_current_active_user,
 )
 
+from ..crud.crud_datasets import dataset
+
 from ..schemas.schemas_comment import Comment, CommentWorkspace
 from ..crud.crud_comments import comment
 
@@ -56,6 +58,25 @@ def read_workspace(
   ):
   workspace_in_db = workspace.get_by_id(db, id=obj_id, user=current_user, req_type="read")
   return workspace_in_db
+
+
+@router.get("/{obj_id}/datasets",
+  summary="Get a workspace's datasets",
+  description="Get a workspace's datasets by its id - authentication is optional",
+  )
+  # response_model=List[Dataset],
+def read_workspace_datasets(
+  obj_id: int, 
+  db: Session = Depends(get_db),
+  current_user: User = Depends(get_current_user_optional)
+  ):
+  workspace_in_db = workspace.get_by_id(db, id=obj_id, user=current_user, req_type="read")
+  dataset_ids = workspace_in_db.datasets["ids"]
+  results = []
+  for ds_id in dataset_ids:
+    dataset_in_db = dataset.get_by_id(db=db, id=ds_id, user=current_user, req_type="read")
+    results.append(dataset_in_db)
+  return results
 
 
 @router.put("/{obj_id}",

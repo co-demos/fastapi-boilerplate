@@ -87,30 +87,33 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     ):
     
     print("\ncheck_user_auth > level_field : ", level_field)
-    print(f"check_user_auth > current_user.id : {current_user.id} / current_user.email : {current_user.email} ")
+    # print(f"check_user_auth > current_user.id : {current_user.id} / current_user.email : {current_user.email} ")
     
     check = False
 
     item_owner_id = getattr( item, "owner_id", None )
     item_auth = getattr( item, level_field, None )
+    print("\ncheck_user_auth > item_owner_id : ", item_owner_id)
+    print("check_user_auth > item_auth : ", item_auth)
 
+  
     item_authorized_users = getattr( item, "authorized_users", [] )
     item_authorized_groups = getattr( item, "authorized_groups", [] )
-    # print("check_user_auth > item_authorized_users : ", item_authorized_users)
-    # print("check_user_auth > item_authorized_groups : ", item_authorized_groups)
+    print("\ncheck_user_auth > item_authorized_users : ", item_authorized_users)
+    print("check_user_auth > item_authorized_groups : ", item_authorized_groups)
     
-    print(f"check_user_auth > item.id : {item.id} / item_owner_id : {item_owner_id} ")
+    print(f"\ncheck_user_auth > item.id : {item.id} / item_owner_id : {item_owner_id} ")
 
     user_auth_level = False
 
     ### get item's authorized users list
     if item_authorized_users:
       user_in_authorized_users = list(filter(lambda user: user['user_email'] == current_user.email, item_authorized_users))
-      # print("check_user_auth > user_in_authorized_users : ", user_in_authorized_users)
+      print("check_user_auth > user_in_authorized_users : ", user_in_authorized_users)
       if user_in_authorized_users:
         user_auths = user_in_authorized_users[0]["auths"]
         user_auth_level = user_auths.get(level_field, False)
-    # print("check_user_auth > user_auth_level : ", user_auth_level)
+    print("check_user_auth > user_auth_level : ", user_auth_level)
 
     ### get item's authorized users list
     if item_authorized_groups:
@@ -172,7 +175,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         auth_check = True
       else :
         auth_exception = AUTHS_EXCEPTIONS.get(tablename,  None)
-        # print("check_user_auth_against_item > auth_exception : ", auth_exception)
+        print("check_user_auth_against_item > auth_exception : ", auth_exception)
         auth_check = self.check_user_auth( db, item, current_user, req_type, auth_exception )
 
     print("\ncheck_user_auth_against_item > auth_check : ", auth_check)

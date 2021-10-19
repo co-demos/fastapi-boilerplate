@@ -100,7 +100,7 @@ def read_dataset(
   dataset_in_db = dataset.get_by_id(db=db, id=obj_id, user=current_user, req_type="read")
 
   print("\n...read_dataset > dataset_in_db ... " )
-  pp.pprint( dataset_in_db )
+  # pp.pprint( dataset_in_db )
 
   return dataset_in_db
 

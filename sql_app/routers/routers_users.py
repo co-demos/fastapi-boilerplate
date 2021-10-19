@@ -217,7 +217,8 @@ def delete_user(
 async def read_users_me(
   current_user: UserModel = Depends(get_current_active_user)
   ):
-  print("\n read_users_me > current_user.__dict__ : ", current_user.__dict__)
+  print("\nread_users_me > current_user...", )
+  # print("read_users_me > current_user.__dict__ : ", current_user.__dict__)
   return current_user
 
 

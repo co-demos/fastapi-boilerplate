@@ -145,6 +145,7 @@ messages_dict = {
   "comment": "commented your",
   "edit": "edited your",
   "invite": "invited you to",
+  "create": "created a",
   "remove": "removed your",
   "delete": "deleted your",
 }

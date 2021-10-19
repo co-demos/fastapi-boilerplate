@@ -21,6 +21,11 @@ class CreateOwnRoom(SocketBase):
   user_id: Optional[int]
 
 
+class CreateItemRoom(SocketBase):
+  item_type: ItemTypeExtended
+  item_id: int
+
+
 class Callback(BaseModel):
   method: CallbackMethod
   url: Optional[str]
@@ -38,6 +43,7 @@ class BroadcastAction(BaseModel):
   # from_user_id: Optional[int]
 
   target_rooms: List[EmailStr]
+  include_sid: Optional[bool] = False
 
   item_type: ItemTypeExtended
   item_id: int

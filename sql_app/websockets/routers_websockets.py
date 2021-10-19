@@ -5,7 +5,7 @@ from . import ( List, Session, APIRouter, Depends,
   get_db,
 )
 
-from ..schemas.schemas_sockets import CreateOwnRoom, BroadcastAction
+from ..schemas.schemas_sockets import CreateOwnRoom, CreateItemRoom, BroadcastAction
 from ..schemas.schemas_choices import messages_dict
 
 # from ..crud.crud_users import (
@@ -57,7 +57,35 @@ async def io_join_own_room(
 
   ## create own room for user
   sio.enter_room( sid, user_email )
-  await sio.emit('own_room', f'room created for : {user_email}', to=sid)
+  data = {
+    "sid": sid,
+    "room_name": user_email,
+    "message": f'room created for : {user_email}',
+  }
+  await sio.emit('own_room', data, to=sid)
+
+
+@sio.on("join_item_room")
+async def io_join_item_room(
+  sid,
+  data: CreateItemRoom,
+  ):
+  print("\njoin_item_room > sid : ", sid)
+  print("join_item_room > data : ", data)
+  item_type = data["item_type"]
+  item_id = data["item_id"]
+  print("join_item_room > item_type : ", item_type)
+  print("join_item_room > item_id : ", item_id)
+  item_room_name = f"{item_type}_{item_id}"
+
+  ## create room for item
+  sio.enter_room( sid, item_room_name )
+  data = {
+    "sid": sid,
+    "room_name": item_room_name,
+    "message": f'room {item_room_name} created for : {item_type} - {item_id}',
+  }
+  await sio.emit('item_room', data, to=sid)
 
 
 @sio.on("broadcast_action")
@@ -71,6 +99,7 @@ async def io_broadcast_action(
   from_user_email = data["from_user_email"]
   action_done = messages_dict[ data["action"] ]
   rooms = data["target_rooms"]
+  include_sid = data["include_sid"]
   data = {
     "origin_user": from_user_email,
     "item_type": data["item_type"],
@@ -83,7 +112,10 @@ async def io_broadcast_action(
   ## broadcast msg room to target users
   for room in rooms:
     print("broadcast_action > room : ", room)
-    await sio.emit('action_message', data, to=room, skip_sid=sid)
+    if include_sid : 
+      await sio.emit('action_message', data, to=room)
+    else :
+      await sio.emit('action_message', data, to=room, skip_sid=sid)
 
 
 # @sio.on("join")

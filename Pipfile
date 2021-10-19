@@ -27,6 +27,7 @@ emails = "*"
 jinja2 = "*"
 tenacity = "*"
 websockets = "*"
+gunicorn = "*"
 
 [dev-packages]
 
