@@ -12,6 +12,9 @@ from .base_class import BaseCommons, BaseData
 
 import databases
 
+pool_size = 30
+max_overflow = 20
+
 SQLALCHEMY_DATABASE_TYPE = settings.SQL_TYPE
 # print("database.py > SQLALCHEMY_DATABASE_TYPE :", SQLALCHEMY_DATABASE_TYPE)
 
@@ -38,9 +41,9 @@ elif SQLALCHEMY_DATABASE_TYPE == "postgre_sql" :
   DATABASE_URL = settings.SQL_DB_URL_BIS
   print("database.py > postgre_sql > SQLALCHEMY_DATABASE_URL :", SQLALCHEMY_DATABASE_URL)
   engine_commons = create_engine(SQLALCHEMY_DATABASE_URL,
-    pool_size=3,
+    pool_size=pool_size,
     pool_pre_ping=True,
-    max_overflow=0 # only use with postgresql
+    max_overflow=max_overflow # only use with postgresql
   )
 
   ### DB - DYNAMIC DATA TABLES
@@ -48,9 +51,9 @@ elif SQLALCHEMY_DATABASE_TYPE == "postgre_sql" :
   DATABASE_URL_DATA = settings.SQL_DB_URL_DATA_BIS
   print("database.py > postgre_sql > SQLALCHEMY_DATABASE_URL_DATA :", SQLALCHEMY_DATABASE_URL_DATA)
   engine_data = create_engine(SQLALCHEMY_DATABASE_URL_DATA,
-    pool_size=3,
+    pool_size=pool_size,
     pool_pre_ping=True,
-    max_overflow=0 # only use with postgresql
+    max_overflow=max_overflow # only use with postgresql
   )
 
 ### Create database if it does not exist.
