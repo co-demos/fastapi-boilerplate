@@ -269,7 +269,8 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
       hashed_password=get_password_hash(user_in.password),
       is_active=superuser,
       is_superuser=superuser,
-      read=user_in.read
+      read=user_in.read,
+      comment=user_in.comment
     )
     print("create_user_in_db > db_user : ", db_user)
     self.create(db=db, obj_in=db_user)
